@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>OCAD Inter - Sistema de Gestión de Recupero de Equipos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+        import { getFirestore, collection, doc, getDocs, getDoc, setDoc, updateDoc, deleteDoc, query, where, orderBy, limit, Timestamp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+        
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDSCfVZtsmUUvD2wrEQlSjQ4t81AurynRs",
+            authDomain: "gestion-y-seguimiento-ocad.firebaseapp.com",
+            projectId: "gestion-y-seguimiento-ocad",
+            storageBucket: "gestion-y-seguimiento-ocad.firebasestorage.app",
+            messagingSenderId: "285110388389",
+            appId: "1:285110388389:web:78196eaced8edf43e96f4c"
+        };
+        
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        
+        // Exponer Firebase para uso global
+        window.firebaseDB = db;
+        window.firebaseCollections = {
+            recoveries: collection(db, "recoveries"),
+            subscribers: collection(db, "subscribers"),
+            technicians: collection(db, "technicians"),
+            activityLog: collection(db, "activityLog"),
+            importHistory: collection(db, "importHistory")
+        };
+        window.firebaseTimestamp = Timestamp;
+        
+        console.log("🔥 Firebase initialized successfully");
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        .transition-all { transition: all 0.3s ease; }
+        .status-badge { padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; display: inline-block; }
+        .bg-pending { background-color: #fef3c7; color: #92400e; }
+        .bg-scheduled { background-color: #dbeafe; color: #1e40af; }
+        .bg-attended { background-color: #d1fae5; color: #065f46; }
+        .bg-reconectado { background-color: #d1fae5; color: #065f46; }
+        .bg-retirado { background-color: #fee2e2; color: #991b1b; }
+        .bg-potential { background-color: #e0e7ff; color: #3730a3; }
+        .bg-contactado { background-color: #cffafe; color: #0e7490; }
+        .bg-no-contacto { background-color: #fef3c7; color: #92400e; }
+        .hidden { display: none; }
+        .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; display: flex; justify-content: center; align-items: center; }
+        .login-card { background: white; border-radius: 1rem; padding: 2rem; width: 450px; max-width: 90%; }
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; border-radius: 1rem; padding: 1.5rem; width: 900px; max-width: 95%; max-height: 85vh; overflow-y: auto; }
+        .metric-card { transition: all 0.3s ease; cursor: pointer; }
+        .metric-card:hover { transform: translateY(-4px); box-shadow: 0 12px 20px rgba(0,0,0,0.1); }
+        .tab-active { color: #4f46e5 !important; border-bottom-color: #4f46e5 !important; border-bottom-width: 2px !important; font-weight: 600 !important; }
+        .tab-inactive { color: #6b7280 !important; border-bottom-color: transparent !important; }
+        .assign-btn, .edit-btn, .delete-btn, .attend-btn, .reactivate-btn, .gestionar-btn, .history-btn { padding: 6px 12px; border-radius: 8px; font-size: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; border: none; }
+        .assign-btn { background: #8b5cf6; color: white; }
+        .assign-btn:hover { background: #7c3aed; }
+        .edit-btn { background: #3b82f6; color: white; }
+        .edit-btn:hover { background: #2563eb; }
+        .delete-btn { background: #ef4444; color: white; }
+        .delete-btn:hover { background: #dc2626; }
+        .attend-btn { background: #10b981; color: white; }
+        .attend-btn:hover { background: #059669; }
+        .reactivate-btn { background: #f59e0b; color: white; }
+        .reactivate-btn:hover { background: #d97706; }
+        .gestionar-btn { background: #06b6d4; color: white; }
+        .gestionar-btn:hover { background: #0891b2; }
+        .history-btn { background: #6b7280; color: white; }
+        .history-btn:hover { background: #4b5563; }
+        .clear-data-btn { background: #dc2626; color: white; padding: 8px 16px; border-radius: 8px; font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; border: none; margin-top: 10px; }
+        .clear-data-btn:hover { background: #b91c1c; }
+        .sync-btn { background: #3b82f6; color: white; padding: 8px 16px; border-radius: 8px; font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; border: none; margin-top: 10px; }
+        .sync-btn:hover { background: #2563eb; }
+        .sync-status { font-size: 0.7rem; padding: 2px 6px; border-radius: 12px; background: #e5e7eb; display: inline-flex; align-items: center; gap: 4px; }
+        .sync-status.synced { background: #d1fae5; color: #065f46; }
+        .sync-status.syncing { background: #fef3c7; color: #92400e; animation: pulse 1s infinite; }
+        .sync-status.error { background: #fee2e2; color: #991b1b; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .whatsapp-link { background: #25D366; color: white; padding: 4px 8px; border-radius: 8px; font-size: 12px; display: inline-flex; align-items: center; gap: 4px; text-decoration: none; }
+        .call-link { background: #3b82f6; color: white; padding: 4px 8px; border-radius: 8px; font-size: 12px; display: inline-flex; align-items: center; gap: 4px; text-decoration: none; }
+        .search-input { transition: all 0.2s; }
+        .search-input:focus { border-color: #4f46e5; outline: none; box-shadow: 0 0 0 2px rgba(79,70,229,0.2); }
+        .timeline-item { border-left: 2px solid #e5e7eb; padding-left: 1rem; margin-bottom: 1rem; position: relative; }
+        .timeline-item::before { content: "●"; position: absolute; left: -8px; top: 0; color: #4f46e5; }
+        .duplicate-warning { background: #fef3c7; border-left: 4px solid #f59e0b; }
+        .import-success { background: #f0fdf4; border-left: 4px solid #22c55e; }
+        .empty-state { text-align: center; padding: 3rem; background: #f9fafb; border-radius: 1rem; }
+        .empty-state i { font-size: 4rem; color: #9ca3af; margin-bottom: 1rem; }
+        .empty-state h3 { font-size: 1.25rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem; }
+        .empty-state p { color: #6b7280; }
+        @media (max-width: 768px) {
+            .container { padding-left: 1rem; padding-right: 1rem; }
+            .tab-btn { padding: 0.75rem 0.5rem; font-size: 0.75rem; }
+            .metric-card { padding: 1rem; }
+            .metric-card .text-3xl { font-size: 1.5rem; }
+        }
+        .progress-bar { height: 4px; background: #e5e7eb; border-radius: 2px; overflow: hidden; }
+        .progress-fill { height: 100%; background: #10b981; width: 0%; transition: width 0.3s; }
+        .motivo-baja-badge { font-size: 0.7rem; padding: 2px 6px; border-radius: 12px; background: #f3f4f6; display: inline-block; }
+        .import-card { transition: all 0.2s; }
+        .import-card:hover { transform: translateY(-2px); }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="login-overlay">
+        <div class="login-card">
+            <div class="text-center mb-6">
+                <i class="fas fa-tools text-5xl text-indigo-600"></i>
+                <h2 class="text-2xl font-bold mt-2">OCAD Inter</h2>
+                <p class="text-gray-500">Sistema de Gestión de Recupero de Equipos</p>
+            </div>
+            <form id="loginForm" onsubmit="return false;">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Seleccione su perfil</label>
+                <select id="loginUserSelect" class="w-full border rounded-lg px-4 py-2 mb-4" required>
+                    <option value="">-- Seleccionar perfil --</option>
+                </select>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Contraseña</label>
+                <div class="relative mb-4">
+                    <input type="password" id="loginPassword" placeholder="Ingrese su contraseña" class="w-full border rounded-lg px-4 py-2 pr-10" required>
+                    <i class="fas fa-eye absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-400" onclick="togglePassword()"></i>
+                </div>
+                <div id="loginError" class="hidden text-red-500 text-sm mb-2"></div>
+                <button type="button" onclick="doLogin()" class="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition-all">
+                    <i class="fas fa-sign-in-alt mr-2"></i>Ingresar
+                </button>
+            </form>
+            <div class="mt-4 text-center text-xs text-gray-400">
+                <p><strong>Perfiles disponibles:</strong></p>
+                <p>👑 Administrador</p>
+                <p>📊 Supervisor - Contraseña: <span class="font-mono">Inter1234</span></p>
+                <p>📞 Agente OCAD - Contraseña: <span class="font-mono">Inter1234</span></p>
+                <p class="text-xs text-gray-500 mt-2">🔒 La contraseña de Administrador es confidencial</p>
+                <p class="text-xs text-blue-500 mt-2"><i class="fas fa-cloud-upload-alt"></i> Datos sincronizados en la nube</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="mainContent" class="hidden">
+        <nav class="bg-indigo-800 text-white shadow-lg sticky top-0 z-50">
+            <div class="container mx-auto px-4 sm:px-6 py-3 flex justify-between items-center flex-wrap gap-2">
+                <div class="flex items-center space-x-2 sm:space-x-3">
+                    <i class="fas fa-tools text-xl sm:text-2xl"></i>
+                    <span class="font-bold text-sm sm:text-xl">OCAD Inter - Gestión de Recupero</span>
+                </div>
+                <div class="flex items-center space-x-2 sm:space-x-4">
+                    <div id="syncStatus" class="sync-status synced">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <span>Sincronizado</span>
+                    </div>
+                    <span id="userRoleDisplay" class="text-xs sm:text-sm bg-indigo-600 px-2 sm:px-3 py-1 rounded-full">
+                        <i class="fas fa-user mr-1"></i><span id="currentUserName"></span>
+                    </span>
+                    <button id="logoutBtn" class="bg-red-500 hover:bg-red-600 text-white px-2 sm:px-3 py-1 rounded text-xs sm:text-sm font-semibold transition-all">
+                        <i class="fas fa-sign-out-alt mr-1"></i> Salir
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container mx-auto px-4 sm:px-6 py-4 sm:py-8">
+            <!-- Tabs -->
+            <div class="border-b border-gray-200 mb-4 sm:mb-6 overflow-x-auto">
+                <ul class="flex flex-nowrap -mb-px text-xs sm:text-sm font-medium text-center min-w-max">
+                    <li class="mr-1 sm:mr-2"><button onclick="showTab('dashboard')" id="tab-dashboard-btn" class="tab-btn inline-block p-2 sm:p-4 border-b-2 rounded-t-lg"><i class="fas fa-chart-line mr-1"></i><span>Dashboard</span></button></li>
+                    <li class="mr-1 sm:mr-2"><button onclick="showTab('import')" id="tab-import-btn" class="tab-btn inline-block p-2 sm:p-4 border-b-2 rounded-t-lg"><i class="fas fa-file-import mr-1"></i><span>Importar</span></button></li>
+                    <li class="mr-1 sm:mr-2"><button onclick="showTab('equipos')" id="tab-equipos-btn" class="tab-btn inline-block p-2 sm:p-4 border-b-2 rounded-t-lg"><i class="fas fa-box-open mr-1"></i><span>📦 Equipos Pendientes</span></button></li>
+                    <li class="mr-1 sm:mr-2"><button onclick="showTab('abonados')" id="tab-abonados-btn" class="tab-btn inline-block p-2 sm:p-4 border-b-2 rounded-t-lg"><i class="fas fa-users mr-1"></i><span>👥 Abonados Pendientes</span></button></li>
+                    <li class="mr-1 sm:mr-2"><button onclick="showTab('technicians')" id="tab-technicians-btn" class="tab-btn inline-block p-2 sm:p-4 border-b-2 rounded-t-lg"><i class="fas fa-truck mr-1"></i><span>🔧 Técnicos</span></button></li>
+                    <li class="mr-1 sm:mr-2"><button onclick="showTab('history')" id="tab-history-btn" class="tab-btn inline-block p-2 sm:p-4 border-b-2 rounded-t-lg"><i class="fas fa-history mr-1"></i><span>📜 Historial</span></button></li>
+                    <li id="reportsTabBtn" class="mr-1 sm:mr-2 hidden"><button onclick="showTab('reports')" id="tab-reports-btn" class="tab-btn inline-block p-2 sm:p-4 border-b-2 rounded-t-lg"><i class="fas fa-chart-bar mr-1"></i><span>📊 Reportes</span></button></li>
+                </ul>
+            </div>
+
+            <!-- Dashboard Tab (mismo contenido que antes, se mantiene) -->
+            <div id="dashboardTab" class="tab-content">
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-6 mb-4 sm:mb-8">
+                    <div class="bg-white rounded-xl shadow-md p-3 sm:p-5 metric-card" onclick="showTab('equipos')">
+                        <div><p class="text-gray-500 text-xs sm:text-sm">Equipos Pendientes</p><p id="totalEquiposPendientes" class="text-xl sm:text-3xl font-bold text-orange-600">0</p></div>
+                        <i class="fas fa-box-open text-xl sm:text-3xl text-orange-400"></i>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-md p-3 sm:p-5 metric-card" onclick="showTab('abonados')">
+                        <div><p class="text-gray-500 text-xs sm:text-sm">Abonados Pendientes</p><p id="totalAbonadosPendientes" class="text-xl sm:text-3xl font-bold text-blue-600">0</p></div>
+                        <i class="fas fa-users text-xl sm:text-3xl text-blue-400"></i>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-md p-3 sm:p-5 metric-card" onclick="showTab('history')">
+                        <div><p class="text-gray-500 text-xs sm:text-sm">Equipos Recuperados</p><p id="totalEquiposRecuperados" class="text-xl sm:text-3xl font-bold text-green-600">0</p></div>
+                        <i class="fas fa-check-circle text-xl sm:text-3xl text-green-400"></i>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-md p-3 sm:p-5 metric-card" onclick="showTab('history')">
+                        <div><p class="text-gray-500 text-xs sm:text-sm">Abonados Reconectados</p><p id="totalAbonadosReconectados" class="text-xl sm:text-3xl font-bold text-emerald-600">0</p></div>
+                        <i class="fas fa-user-check text-xl sm:text-3xl text-emerald-400"></i>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-md p-3 sm:p-5 metric-card" onclick="showTab('abonados')">
+                        <div><p class="text-gray-500 text-xs sm:text-sm">Contactados Hoy</p><p id="totalContactadosHoy" class="text-xl sm:text-3xl font-bold text-purple-600">0</p></div>
+                        <i class="fas fa-phone-alt text-xl sm:text-3xl text-purple-400"></i>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-md p-3 sm:p-5 metric-card" onclick="showTab('abonados')">
+                        <div><p class="text-gray-500 text-xs sm:text-sm">No Contactables</p><p id="totalNoContactables" class="text-xl sm:text-3xl font-bold text-red-600">0</p></div>
+                        <i class="fas fa-phone-slash text-xl sm:text-3xl text-red-400"></i>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
+                    <div class="bg-white rounded-xl shadow-md p-4 sm:p-5">
+                        <h3 class="font-bold mb-3 text-sm sm:text-base">Estado General de Recuperos</h3>
+                        <canvas id="statusChart" height="200"></canvas>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-md p-4 sm:p-5">
+                        <h3 class="font-bold mb-3 text-sm sm:text-base">Recuperos por Día (Últimos 7 días)</h3>
+                        <canvas id="dailyChart" height="200"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-md p-4 sm:p-5">
+                    <h3 class="font-bold mb-3 text-sm sm:text-base"><i class="fas fa-history mr-2 text-gray-500"></i>Actividad Reciente</h3>
+                    <div id="recentActivity" class="space-y-2 max-h-64 overflow-y-auto"></div>
+                </div>
+            </div>
+
+            <!-- Importar Datos Tab con sincronización -->
+            <div id="importTab" class="tab-content hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                    <div class="bg-white rounded-xl shadow-md p-4 sm:p-6 import-card">
+                        <h3 class="font-bold mb-3 text-base sm:text-lg"><i class="fas fa-file-excel text-green-600 mr-2"></i>Importar Equipos (RETIRO DE EQUIPOS)</h3>
+                        <p class="text-xs sm:text-sm text-gray-500 mb-3">Archivo Excel con solicitudes de retiro de equipos</p>
+                        <input type="file" id="recoveryExcelUpload" accept=".xlsx, .xls, .csv" class="border rounded-lg px-3 py-2 w-full mb-3 text-sm">
+                        <div id="recoveryProgress" class="hidden mt-2">
+                            <div class="progress-bar"><div id="recoveryProgressFill" class="progress-fill"></div></div>
+                            <p id="recoveryProgressText" class="text-xs text-gray-500 mt-1"></p>
+                        </div>
+                        <button onclick="importRecoveryExcel()" class="bg-green-600 text-white px-4 py-2 rounded-lg w-full text-sm hover:bg-green-700 transition-all">
+                            <i class="fas fa-upload mr-1"></i>Importar Equipos
+                        </button>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-md p-4 sm:p-6 import-card">
+                        <h3 class="font-bold mb-3 text-base sm:text-lg"><i class="fas fa-file-excel text-green-600 mr-2"></i>Importar Abonados (data(11).xlsx)</h3>
+                        <p class="text-xs sm:text-sm text-gray-500 mb-3">Archivo Excel con abonados desconectados</p>
+                        <p class="text-xs text-amber-600 mb-2">📋 Campos: IDENTIFICADOR, NOMBRE CLIENTE, DOCUMENTO, TELEFONO, PLAN, CENTRO_OP</p>
+                        <input type="file" id="subscriberExcelUpload" accept=".xlsx, .xls, .csv" class="border rounded-lg px-3 py-2 w-full mb-3 text-sm">
+                        <div id="subscriberProgress" class="hidden mt-2">
+                            <div class="progress-bar"><div id="subscriberProgressFill" class="progress-fill"></div></div>
+                            <p id="subscriberProgressText" class="text-xs text-gray-500 mt-1"></p>
+                        </div>
+                        <button onclick="importSubscriberExcel()" class="bg-green-600 text-white px-4 py-2 rounded-lg w-full text-sm hover:bg-green-700 transition-all">
+                            <i class="fas fa-upload mr-1"></i>Importar Abonados
+                        </button>
+                    </div>
+                </div>
+                <div id="importResult" class="mt-4 sm:mt-6"></div>
+                <div class="mt-4 bg-white rounded-xl shadow-md p-4">
+                    <div class="flex justify-between items-center flex-wrap gap-3">
+                        <div>
+                            <h3 class="font-bold mb-2">Resumen de Datos Cargados</h3>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                <div class="text-center p-2 bg-gray-50 rounded"><div class="text-xl font-bold" id="totalEquiposCargados">0</div><div class="text-xs">Equipos Totales</div></div>
+                                <div class="text-center p-2 bg-gray-50 rounded"><div class="text-xl font-bold" id="totalAbonadosCargados">0</div><div class="text-xs">Abonados Totales</div></div>
+                                <div class="text-center p-2 bg-gray-50 rounded"><div class="text-xl font-bold" id="totalEquiposPendientesCargados">0</div><div class="text-xs">Equipos Pendientes</div></div>
+                                <div class="text-center p-2 bg-gray-50 rounded"><div class="text-xl font-bold" id="totalAbonadosPendientesCargados">0</div><div class="text-xs">Abonados Pendientes</div></div>
+                            </div>
+                        </div>
+                        <div id="adminClearDataBtn" class="hidden">
+                            <button onclick="clearAllData()" class="clear-data-btn"><i class="fas fa-trash-alt mr-1"></i>Limpiar Todos los Datos</button>
+                            <p class="text-xs text-gray-500 mt-1">⚠️ Elimina TODOS los datos del sistema</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4 bg-white rounded-xl shadow-md p-4">
+                    <h3 class="font-bold mb-3"><i class="fas fa-history mr-2 text-gray-500"></i>Historial de Importaciones</h3>
+                    <div id="importHistoryList" class="space-y-2 max-h-64 overflow-y-auto"></div>
+                </div>
+            </div>
+
+            <!-- Equipos Pendientes Tab -->
+            <div id="equiposTab" class="tab-content hidden">
+                <div class="bg-white rounded-xl shadow-md p-4 sm:p-6 mb-4 sm:mb-6">
+                    <div class="flex flex-col sm:flex-row flex-wrap justify-between items-start sm:items-center gap-3">
+                        <h3 class="font-bold text-base sm:text-lg"><i class="fas fa-box-open text-orange-500 mr-2"></i>Equipos Pendientes por Recuperar</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <button id="showPendingEquiposBtn" onclick="setEquiposFilter('pendiente')" class="px-2 sm:px-3 py-1 rounded text-xs sm:text-sm border filter-active">📋 Solo Pendientes</button>
+                            <button id="showAllEquiposBtn" onclick="setEquiposFilter('todos')" class="px-2 sm:px-3 py-1 rounded text-xs sm:text-sm border">📊 Todos</button>
+                            <select id="equiposCOFilter" onchange="renderEquiposList()" class="border rounded px-2 py-1 text-xs sm:text-sm">
+                                <option value="">Todos los CO</option>
+                                <option value="RUICES">CO Los Ruices</option>
+                                <option value="NAYA">CO La Naya</option>
+                                <option value="ROSAL">CO El Rosal</option>
+                                <option value="PARAISO">CO Paraiso</option>
+                            </select>
+                            <button onclick="exportEquiposToExcel()" class="bg-green-600 text-white px-2 sm:px-3 py-1 rounded text-xs sm:text-sm"><i class="fas fa-file-excel mr-1"></i>Exportar</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="equiposList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4"></div>
+            </div>
+
+            <!-- Abonados Pendientes Tab -->
+            <div id="abonadosTab" class="tab-content hidden">
+                <div class="bg-white rounded-xl shadow-md p-4 sm:p-6 mb-4 sm:mb-6">
+                    <div class="flex flex-col gap-4">
+                        <div class="flex flex-col sm:flex-row flex-wrap justify-between items-start sm:items-center gap-3">
+                            <h3 class="font-bold text-base sm:text-lg"><i class="fas fa-users text-blue-500 mr-2"></i>Abonados Pendientes por Recupero</h3>
+                            <div class="flex flex-wrap gap-2">
+                                <button id="showPendingAbonadosBtn" onclick="setAbonadosFilter('pendiente')" class="px-2 sm:px-3 py-1 rounded text-xs sm:text-sm border filter-active">📋 Solo Pendientes</button>
+                                <button id="showAllAbonadosBtn" onclick="setAbonadosFilter('todos')" class="px-2 sm:px-3 py-1 rounded text-xs sm:text-sm border">📊 Todos</button>
+                                <button onclick="exportAbonadosToExcel()" class="bg-green-600 text-white px-2 sm:px-3 py-1 rounded text-xs sm:text-sm"><i class="fas fa-file-excel mr-1"></i>Exportar</button>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                            <div class="relative"><i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"></i><input type="text" id="searchAbonado" placeholder="Buscar por nombre, cédula o teléfono..." class="search-input w-full border rounded-lg pl-9 pr-3 py-2 text-sm"></div>
+                            <select id="filterAbonadoStatus" class="border rounded-lg px-3 py-2 text-sm"><option value="">Todos los estados</option><option value="pendiente">Pendiente</option><option value="asignado">Asignado</option><option value="contactado">Contactado</option><option value="no_contacto">No Contactable</option><option value="reconectado">Reconectado</option><option value="retirado">Equipo Retirado</option></select>
+                            <select id="filterAbonadoCO" class="border rounded-lg px-3 py-2 text-sm"><option value="">Todos los CO</option><option value="RUICES">CO Los Ruices</option><option value="NAYA">CO La Naya</option><option value="ROSAL">CO El Rosal</option><option value="PARAISO">CO Paraiso</option></select>
+                            <select id="filterAbonadoInteres" class="border rounded-lg px-3 py-2 text-sm"><option value="">Interés (todos)</option><option value="true">Sí reconectar</option><option value="false">No reconectar</option><option value="null">No determinado</option></select>
+                        </div>
+                    </div>
+                </div>
+                <div id="abonadosList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4"></div>
+            </div>
+
+            <!-- Gestión de Técnicos Tab -->
+            <div id="techniciansTab" class="tab-content hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                    <div class="bg-white rounded-xl shadow-md p-4 sm:p-6">
+                        <h3 class="font-bold mb-3 text-sm sm:text-base"><i class="fas fa-user-plus text-blue-500 mr-2"></i>Registrar Técnico de Campo</h3>
+                        <p class="text-xs text-gray-500 mb-3">Los técnicos son asignados para recuperar equipos físicamente</p>
+                        <div class="space-y-3"><input type="text" id="techName" placeholder="Nombre completo" class="border rounded-lg px-3 py-2 w-full text-sm"><select id="techCO" class="border rounded-lg px-3 py-2 w-full text-sm"><option value="">Seleccionar Centro de Operaciones</option><option value="RUICES">CO Los Ruices</option><option value="NAYA">CO La Naya</option><option value="ROSAL">CO El Rosal</option><option value="PARAISO">CO Paraiso</option></select><input type="text" id="techPhone" placeholder="Teléfono de contacto" class="border rounded-lg px-3 py-2 w-full text-sm"><button onclick="addTechnician()" class="bg-blue-600 text-white py-2 rounded-lg w-full text-sm"><i class="fas fa-plus mr-1"></i>Agregar Técnico</button></div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-md p-4 sm:p-6">
+                        <h3 class="font-bold mb-3 text-sm sm:text-base"><i class="fas fa-users mr-2"></i>Técnicos Registrados</h3>
+                        <div id="techniciansList" class="space-y-2 max-h-96 overflow-y-auto"></div>
+                    </div>
+                </div>
+                <div class="mt-4 sm:mt-6 bg-white rounded-xl shadow-md p-4 sm:p-6">
+                    <h3 class="font-bold mb-3 text-sm sm:text-base"><i class="fas fa-clipboard-list mr-2"></i>Asignaciones de Visitas</h3>
+                    <div class="mb-4"><label class="block text-sm font-medium mb-1">Seleccionar Fecha</label><input type="date" id="assignmentDate" class="border rounded-lg px-3 py-2 text-sm" onchange="renderAssignmentsByDate()"></div>
+                    <div id="assignmentsList" class="space-y-4"></div>
+                </div>
+            </div>
+
+            <!-- Historial Tab -->
+            <div id="historyTab" class="tab-content hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                    <div class="bg-white rounded-xl shadow-md p-4 sm:p-6"><h3 class="font-bold mb-3 text-sm sm:text-base"><i class="fas fa-box-open text-green-500 mr-2"></i>Equipos Recuperados</h3><div id="historyEquiposList" class="space-y-2 max-h-96 overflow-y-auto"></div></div>
+                    <div class="bg-white rounded-xl shadow-md p-4 sm:p-6"><h3 class="font-bold mb-3 text-sm sm:text-base"><i class="fas fa-users text-green-500 mr-2"></i>Abonados Gestionados</h3><div id="historyAbonadosList" class="space-y-2 max-h-96 overflow-y-auto"></div></div>
+                </div>
+            </div>
+
+            <!-- Reportes Tab -->
+            <div id="reportsTab" class="tab-content hidden">
+                <div class="bg-white rounded-xl shadow-md p-4 sm:p-6">
+                    <h3 class="font-bold mb-3">Reportes de Gestión</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4"><input type="date" id="reportStartDate" class="border rounded px-3 py-2 text-sm"><input type="date" id="reportEndDate" class="border rounded px-3 py-2 text-sm"><select id="reportCOFilter" class="border rounded px-3 py-2 text-sm"><option value="">Todos los CO</option><option value="RUICES">CO Los Ruices</option><option value="NAYA">CO La Naya</option><option value="ROSAL">CO El Rosal</option><option value="PARAISO">CO Paraiso</option></select></div>
+                    <div class="flex flex-wrap gap-3 mb-4"><button onclick="generateReport()" class="bg-emerald-600 text-white px-3 py-2 rounded text-sm"><i class="fas fa-chart-bar mr-1"></i>Generar</button><button onclick="exportFullReportExcel()" class="bg-green-600 text-white px-3 py-2 rounded text-sm"><i class="fas fa-file-excel mr-1"></i>Exportar Excel</button><button onclick="exportFullReportPDF()" class="bg-red-600 text-white px-3 py-2 rounded text-sm"><i class="fas fa-file-pdf mr-1"></i>Exportar PDF</button></div>
+                    <div id="reportResult"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modales (simplificados para mantener el código) -->
+    <div id="editEquipoModal" class="modal hidden"><div class="modal-content"><div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold">Editar Equipo</h3><button onclick="closeEditEquipoModal()"><i class="fas fa-times text-xl"></i></button></div><form id="editEquipoForm"><input type="hidden" id="editEquipoId"><div class="grid grid-cols-1 gap-3 mb-3"><input type="text" id="editEquipoNombre" placeholder="Nombre" class="border rounded-lg px-3 py-2"><input type="text" id="editEquipoTelefono" placeholder="Teléfono" class="border rounded-lg px-3 py-2"><input type="text" id="editEquipoDireccion" placeholder="Dirección" class="border rounded-lg px-3 py-2"><select id="editEquipoCO" class="border rounded-lg px-3 py-2"><option value="RUICES">RUICES</option><option value="NAYA">NAYA</option><option value="ROSAL">ROSAL</option><option value="PARAISO">PARAISO</option></select><select id="editEquipoStatus" class="border rounded-lg px-3 py-2"><option value="pendiente">Pendiente</option><option value="asignado">Asignado</option><option value="recuperado">Recuperado</option></select></div><div class="flex gap-3"><button type="submit" class="flex-1 bg-blue-600 text-white py-2 rounded-lg">Guardar</button><button type="button" onclick="closeEditEquipoModal()" class="flex-1 bg-gray-500 text-white py-2 rounded-lg">Cancelar</button></div></form></div></div>
+
+    <div id="editAbonadoModal" class="modal hidden"><div class="modal-content"><div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold">Editar Abonado</h3><button onclick="closeEditAbonadoModal()"><i class="fas fa-times text-xl"></i></button></div><form id="editAbonadoForm"><input type="hidden" id="editAbonadoId"><div class="grid grid-cols-1 gap-3 mb-3"><input type="text" id="editAbonadoNombre" placeholder="Nombre" class="border rounded-lg px-3 py-2"><input type="text" id="editAbonadoCedula" placeholder="Cédula" class="border rounded-lg px-3 py-2"><input type="text" id="editAbonadoTelefono" placeholder="Teléfono" class="border rounded-lg px-3 py-2"><input type="text" id="editAbonadoPlan" placeholder="Plan" class="border rounded-lg px-3 py-2"><select id="editAbonadoCO" class="border rounded-lg px-3 py-2"><option value="RUICES">RUICES</option><option value="NAYA">NAYA</option><option value="ROSAL">ROSAL</option><option value="PARAISO">PARAISO</option></select><select id="editAbonadoStatus" class="border rounded-lg px-3 py-2"><option value="pendiente">Pendiente</option><option value="asignado">Asignado</option><option value="contactado">Contactado</option><option value="reconectado">Reconectado</option><option value="retirado">Equipo Retirado</option><option value="no_contacto">No Contactable</option></select><select id="editAbonadoMotivoBaja" class="border rounded-lg px-3 py-2"><option value="">-- Motivo de baja --</option><option value="mudanza">Mudanza</option><option value="problemas_servicio">Problemas con el servicio</option><option value="precio">Precio / Competencia</option><option value="morosidad">Morosidad / Deuda</option><option value="fallecimiento">Fallecimiento del titular</option><option value="cierre_negocio">Cierre del negocio</option><option value="otro">Otro</option></select><textarea id="editAbonadoObservacion" rows="2" placeholder="Observaciones adicionales" class="border rounded-lg px-3 py-2"></textarea></div><div class="flex gap-3"><button type="submit" class="flex-1 bg-blue-600 text-white py-2 rounded-lg">Guardar</button><button type="button" onclick="closeEditAbonadoModal()" class="flex-1 bg-gray-500 text-white py-2 rounded-lg">Cancelar</button></div></form></div></div>
+
+    <div id="historialGestionesModal" class="modal hidden"><div class="modal-content"><div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold">Historial de Gestiones</h3><button onclick="closeHistorialModal()"><i class="fas fa-times text-xl"></i></button></div><div id="historialInfo" class="bg-gray-50 p-3 rounded mb-4"></div><div id="historialList" class="space-y-3 max-h-96 overflow-y-auto"></div></div></div>
+
+    <div id="assignTechModal" class="modal hidden"><div class="modal-content"><div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold">Asignar Técnico</h3><button onclick="closeAssignTechModal()"><i class="fas fa-times text-xl"></i></button></div><div id="assignItemInfo" class="bg-gray-50 p-3 rounded mb-4"></div><select id="technicianSelect" class="w-full border rounded-lg px-3 py-2 mb-3"></select><input type="date" id="assignVisitDate" class="w-full border rounded-lg px-3 py-2 mb-3"><textarea id="assignInstructions" rows="2" placeholder="Instrucciones para el técnico" class="w-full border rounded-lg px-3 py-2 mb-3"></textarea><div class="flex gap-3"><button onclick="confirmAssignment()" class="flex-1 bg-blue-600 text-white py-2 rounded-lg">Confirmar</button><button onclick="closeAssignTechModal()" class="flex-1 bg-gray-500 text-white py-2 rounded-lg">Cancelar</button></div></div></div>
+
+    <div id="gestionarAbonadoModal" class="modal hidden"><div class="modal-content"><div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold">Gestionar Abonado</h3><button onclick="closeGestionarModal()"><i class="fas fa-times text-xl"></i></button></div><div id="gestionarInfo" class="bg-gray-50 p-3 rounded mb-4 text-sm"></div><form id="gestionarForm"><input type="hidden" id="gestionarId"><div class="mb-3"><label class="block text-sm font-medium mb-1">Resultado de la Gestión *</label><select id="gestionarResultado" class="w-full border rounded-lg px-3 py-2" required><option value="">Seleccionar</option><option value="contactado_interesado">✅ Contactado - INTERESADO en reconectar</option><option value="contactado_no_interesado">❌ Contactado - NO INTERESADO, coordinar retiro</option><option value="no_contesta">📞 No contesta</option><option value="numero_equivocado">❌ Número equivocado</option><option value="rechaza_llamada">🚫 Rechaza la llamada</option><option value="programar_visita">📅 Programar visita técnica</option></select></div><div id="interesFields" class="hidden mb-3"><label class="block text-sm font-medium mb-1">Motivo por el que desea reconectar</label><select id="interesMotivo" class="w-full border rounded-lg px-3 py-2 mb-2"><option value="mejoraron_servicio">Mejoró el servicio</option><option value="mejor_precio">Mejor precio / promoción</option><option value="problema_resuelto">Problema técnico resuelto</option><option value="recomendacion">Recomendación</option><option value="otro">Otro</option></select><label class="block text-sm font-medium mb-1">Observaciones</label><textarea id="interesObservaciones" rows="2" class="w-full border rounded-lg px-3 py-2" placeholder="Detalles de la gestión..."></textarea></div><div id="noInteresFields" class="hidden mb-3"><label class="block text-sm font-medium mb-1">Motivo por el que NO desea continuar</label><select id="noInteresMotivo" class="w-full border rounded-lg px-3 py-2 mb-2"><option value="mudanza">Mudanza / Cambio de domicilio</option><option value="competencia">Contrató otro proveedor</option><option value="problemas_servicio">Problemas recurrentes con el servicio</option><option value="precio_alto">Precio elevado</option><option value="no_utiliza">Ya no utiliza el servicio</option><option value="fallecimiento">Fallecimiento del titular</option><option value="cierre_negocio">Cierre del negocio</option><option value="otro">Otro</option></select><label class="block text-sm font-medium mb-1">Observaciones</label><textarea id="noInteresObservaciones" rows="2" class="w-full border rounded-lg px-3 py-2" placeholder="Detalles de la gestión..."></textarea></div><div id="visitaFields" class="hidden mb-3"><label class="block text-sm font-medium mb-1">Fecha de Visita Programada</label><input type="date" id="visitaFecha" class="w-full border rounded-lg px-3 py-2 mb-2"><label class="block text-sm font-medium mb-1">Horario</label><select id="visitaHorario" class="w-full border rounded-lg px-3 py-2"><option value="8:00-10:00">8:00 AM - 10:00 AM</option><option value="10:00-12:00">10:00 AM - 12:00 PM</option><option value="12:00-2:00">12:00 PM - 2:00 PM</option><option value="2:00-4:00">2:00 PM - 4:00 PM</option><option value="4:00-6:00">4:00 PM - 6:00 PM</option></select><label class="block text-sm font-medium mb-1 mt-2">Técnico Asignado</label><select id="visitaTecnico" class="w-full border rounded-lg px-3 py-2"></select></div><div class="mb-3"><label class="block text-sm font-medium mb-1">Observaciones Generales</label><textarea id="gestionarObservaciones" rows="2" class="w-full border rounded-lg px-3 py-2"></textarea></div><div class="flex gap-3"><button type="submit" class="flex-1 bg-green-600 text-white py-2 rounded-lg">Guardar Gestión</button><button type="button" onclick="closeGestionarModal()" class="flex-1 bg-gray-500 text-white py-2 rounded-lg">Cancelar</button></div></form></div></div>
+
+    <div id="markRecoveredModal" class="modal hidden"><div class="modal-content"><div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold">Registrar Recupero de Equipo</h3><button onclick="closeMarkRecoveredModal()"><i class="fas fa-times text-xl"></i></button></div><div id="recoveredInfo" class="bg-gray-50 p-3 rounded mb-4 text-sm"></div><form id="markRecoveredForm"><input type="hidden" id="recoveredId"><div class="mb-3"><label class="block text-sm font-medium mb-1">Equipos Recuperados</label><div class="space-y-2"><div class="flex gap-2 items-center"><input type="checkbox" class="equipment-check" value="ONT"> <span>ONT (Fibra)</span><input type="text" placeholder="N° Serie" class="border rounded px-2 py-1 text-sm flex-1"></div><div class="flex gap-2 items-center"><input type="checkbox" class="equipment-check" value="Router"> <span>Router</span><input type="text" placeholder="N° Serie" class="border rounded px-2 py-1 text-sm flex-1"></div><div class="flex gap-2 items-center"><input type="checkbox" class="equipment-check" value="Fuente de Poder"> <span>Fuente de Poder</span><input type="text" placeholder="N° Serie" class="border rounded px-2 py-1 text-sm flex-1"></div><div class="flex gap-2 items-center"><input type="checkbox" class="equipment-check" value="Cablemódem"> <span>Cablemódem</span><input type="text" placeholder="N° Serie" class="border rounded px-2 py-1 text-sm flex-1"></div></div><button type="button" onclick="addEquipmentField()" class="mt-2 text-sm text-blue-600"><i class="fas fa-plus-circle mr-1"></i>Agregar otro equipo</button></div><div class="mb-3"><label class="block text-sm font-medium mb-1">Observaciones</label><textarea id="recoveredObservations" rows="2" class="w-full border rounded-lg px-3 py-2"></textarea></div><div class="flex gap-3"><button type="submit" class="flex-1 bg-green-600 text-white py-2 rounded-lg">Registrar Recupero</button><button type="button" onclick="closeMarkRecoveredModal()" class="flex-1 bg-gray-500 text-white py-2 rounded-lg">Cancelar</button></div></form></div></div>
+
+    <div id="contactModal" class="modal hidden"><div class="modal-content"><div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold">Gestionar Contacto</h3><button onclick="closeContactModal()"><i class="fas fa-times text-xl"></i></button></div><div id="contactInfo" class="bg-gray-50 p-3 rounded mb-4"></div><select id="contactResult" class="w-full border rounded-lg px-3 py-2 mb-3"><option value="">Seleccionar resultado</option><option value="contactado_exitoso">✅ Contacto Exitoso - Acordó retiro</option><option value="no_contesta">📞 No contesta</option><option value="numero_equivocado">❌ Número equivocado</option><option value="rechaza_llamada">🚫 Rechaza la llamada</option></select><textarea id="contactObservations" rows="2" placeholder="Observaciones" class="w-full border rounded-lg px-3 py-2 mb-3"></textarea><div class="flex gap-3"><button type="button" id="submitContactBtn" class="flex-1 bg-green-600 text-white py-2 rounded-lg">Guardar</button><button onclick="closeContactModal()" class="flex-1 bg-gray-500 text-white py-2 rounded-lg">Cancelar</button></div></div></div>
+
+    <script>
+        // ==================== DATA STRUCTURE ====================
+        let appUsers = [
+            { id: 1, fullName: 'Administrador', role: 'admin', password: 'Admin1234' },
+            { id: 2, fullName: 'Supervisor', role: 'supervisor', password: 'Inter1234' },
+            { id: 3, fullName: 'Agente OCAD', role: 'agente', password: 'Inter1234' }
+        ];
+        
+        let appRecoveries = [];
+        let appSubscribers = [];
+        let appTechnicians = [];
+        let appActivityLog = [];
+        let appImportHistory = [];
+        let appCurrentUser = null;
+        let currentEquiposFilter = 'pendiente';
+        let currentAbonadosFilter = 'pendiente';
+        let pendingAssignment = null;
+        let pendingMarkRecovered = null;
+        let pendingGestionar = null;
+        let currentContactItem = null;
+        let searchTerm = '', filterStatus = '', filterCO = '', filterInteres = '';
+        let isSyncing = false;
+
+        // Firebase references
+        let db = null;
+        let collections = null;
+
+        function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
+        function generateSubscriberKey(nombre, cedula, telefono) { return `${nombre}|${cedula}|${telefono}`.toLowerCase().trim(); }
+        function generateEquipmentKey(nombre, telefono, direccion) { return `${nombre}|${telefono}|${direccion}`.toLowerCase().trim(); }
+        function getEquipoById(id) { return appRecoveries.find(r => r.id === id); }
+        function getAbonadoById(id) { return appSubscribers.find(s => s.id === id); }
+        function isAdmin() { return appCurrentUser && appCurrentUser.role === 'admin'; }
+        function isSupervisor() { return appCurrentUser && appCurrentUser.role === 'supervisor'; }
+
+        // ==================== FIREBASE SYNC FUNCTIONS ====================
+        function updateSyncStatus(status, message) {
+            const syncDiv = document.getElementById('syncStatus');
+            if (syncDiv) {
+                syncDiv.className = `sync-status ${status}`;
+                syncDiv.innerHTML = `<i class="fas fa-${status === 'synced' ? 'cloud-upload-alt' : status === 'syncing' ? 'sync-alt fa-spin' : 'exclamation-triangle'}"></i><span>${message}</span>`;
+            }
+        }
+
+        async function loadAllDataFromFirebase() {
+            if (!window.firebaseDB) {
+                console.warn("Firebase not initialized yet");
+                return false;
+            }
+            
+            updateSyncStatus('syncing', 'Sincronizando...');
+            isSyncing = true;
+            
+            try {
+                const db = window.firebaseDB;
+                
+                // Load recoveries
+                const recoveriesSnapshot = await getDocs(collection(db, "recoveries"));
+                appRecoveries = recoveriesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                
+                // Load subscribers
+                const subscribersSnapshot = await getDocs(collection(db, "subscribers"));
+                appSubscribers = subscribersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                
+                // Load technicians
+                const techniciansSnapshot = await getDocs(collection(db, "technicians"));
+                appTechnicians = techniciansSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                
+                // Load activity log
+                const activitySnapshot = await getDocs(collection(db, "activityLog"));
+                appActivityLog = activitySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                
+                // Load import history
+                const importSnapshot = await getDocs(collection(db, "importHistory"));
+                appImportHistory = importSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+                
+                updateSyncStatus('synced', 'Sincronizado');
+                console.log(`✅ Datos sincronizados: ${appRecoveries.length} equipos, ${appSubscribers.length} abonados`);
+                return true;
+            } catch (error) {
+                console.error("Error loading from Firebase:", error);
+                updateSyncStatus('error', 'Error de sincronización');
+                return false;
+            } finally {
+                isSyncing = false;
+            }
+        }
+
+        async function saveToFirebase(collectionName, data, id = null) {
+            if (!window.firebaseDB) return false;
+            try {
+                const db = window.firebaseDB;
+                const colRef = collection(db, collectionName);
+                if (id) {
+                    await setDoc(doc(colRef, id), { ...data, updatedAt: new Date().toISOString() });
+                } else {
+                    const newId = Date.now().toString();
+                    await setDoc(doc(colRef, newId), { ...data, createdAt: new Date().toISOString() });
+                    return newId;
+                }
+                return true;
+            } catch (error) {
+                console.error(`Error saving to Firebase (${collectionName}):`, error);
+                return false;
+            }
+        }
+
+        async function deleteFromFirebase(collectionName, id) {
+            if (!window.firebaseDB) return false;
+            try {
+                const db = window.firebaseDB;
+                await deleteDoc(doc(db, collectionName, id));
+                return true;
+            } catch (error) {
+                console.error(`Error deleting from Firebase (${collectionName}):`, error);
+                return false;
+            }
+        }
+
+        async function syncAllData() {
+            updateSyncStatus('syncing', 'Guardando cambios...');
+            
+            // Guardar equipos
+            for (const equipo of appRecoveries) {
+                await saveToFirebase("recoveries", equipo, equipo.id);
+            }
+            
+            // Guardar abonados
+            for (const abonado of appSubscribers) {
+                await saveToFirebase("subscribers", abonado, abonado.id);
+            }
+            
+            // Guardar técnicos
+            for (const tecnico of appTechnicians) {
+                await saveToFirebase("technicians", tecnico, tecnico.id);
+            }
+            
+            // Guardar actividad reciente (solo las últimas 50)
+            const recentLogs = appActivityLog.slice(0, 100);
+            for (const log of recentLogs) {
+                await saveToFirebase("activityLog", log, log.id);
+            }
+            
+            // Guardar historial de importaciones
+            for (const imp of appImportHistory) {
+                await saveToFirebase("importHistory", imp, imp.id);
+            }
+            
+            updateSyncStatus('synced', 'Sincronizado');
+            console.log("✅ Todos los datos sincronizados con Firebase");
+        }
+
+        // Modificar addLog para sincronizar
+        function addLog(action, details) {
+            if (!appCurrentUser) return;
+            const newLog = { id: Date.now().toString(), user: appCurrentUser.fullName, action, details, timestamp: new Date().toLocaleString() };
+            appActivityLog.unshift(newLog);
+            saveToFirebase("activityLog", newLog, newLog.id);
+            saveAll();
+            updateRecentActivity();
+        }
+
+        function updateRecentActivity() {
+            const container = document.getElementById('recentActivity');
+            if (!container) return;
+            if (appActivityLog.length === 0) { container.innerHTML = '<div class="empty-state"><i class="fas fa-info-circle"></i><h3>Sin actividad reciente</h3><p>Las acciones que realices aparecerán aquí</p></div>'; return; }
+            const recent = appActivityLog.slice(0, 15);
+            container.innerHTML = recent.map(log => `<div class="flex items-start gap-3 p-2 border-b hover:bg-gray-50"><i class="fas fa-user-circle text-gray-400 mt-1"></i><div class="flex-1"><div class="text-sm"><span class="font-semibold">${escapeHtml(log.user)}</span> - ${escapeHtml(log.action)}</div><div class="text-xs text-gray-500">${escapeHtml(log.details)}</div><div class="text-xs text-gray-400">${log.timestamp}</div></div></div>`).join('');
+        }
+
+        function updateDashboard() {
+            document.getElementById('totalEquiposPendientes').innerText = appRecoveries.filter(r => r.status !== 'recuperado').length;
+            document.getElementById('totalAbonadosPendientes').innerText = appSubscribers.filter(s => s.status === 'pendiente' || s.status === 'asignado' || s.status === 'contactado').length;
+            document.getElementById('totalEquiposRecuperados').innerText = appRecoveries.filter(r => r.status === 'recuperado').length;
+            document.getElementById('totalAbonadosReconectados').innerText = appSubscribers.filter(s => s.status === 'reconectado').length;
+            const hoyStr = new Date().toISOString().split('T')[0];
+            document.getElementById('totalContactadosHoy').innerText = appSubscribers.filter(s => s.ultimoContacto && s.ultimoContacto.startsWith(hoyStr)).length;
+            document.getElementById('totalNoContactables').innerText = appSubscribers.filter(s => s.status === 'no_contacto').length;
+            document.getElementById('totalEquiposCargados').innerText = appRecoveries.length;
+            document.getElementById('totalAbonadosCargados').innerText = appSubscribers.length;
+            document.getElementById('totalEquiposPendientesCargados').innerText = appRecoveries.filter(r => r.status !== 'recuperado').length;
+            document.getElementById('totalAbonadosPendientesCargados').innerText = appSubscribers.filter(s => s.status === 'pendiente' || s.status === 'asignado' || s.status === 'contactado').length;
+            const adminClearBtn = document.getElementById('adminClearDataBtn');
+            if (adminClearBtn) { isAdmin() ? adminClearBtn.classList.remove('hidden') : adminClearBtn.classList.add('hidden'); }
+        }
+
+        function renderImportHistory() {
+            const container = document.getElementById('importHistoryList');
+            if (!container) return;
+            if (appImportHistory.length === 0) { container.innerHTML = '<div class="empty-state py-4"><i class="fas fa-database"></i><h3 class="text-base">Sin importaciones</h3><p class="text-sm">Importa tus primeros datos para comenzar</p></div>'; return; }
+            container.innerHTML = appImportHistory.slice(0, 20).map(imp => `<div class="p-3 border rounded ${imp.nuevos > 0 ? 'import-success' : 'duplicate-warning'}"><div class="flex justify-between items-center flex-wrap gap-2"><div><span class="font-medium">${imp.tipo}</span><span class="text-xs text-gray-500 ml-2">${imp.fecha}</span></div><span class="text-xs ${imp.nuevos > 0 ? 'text-green-600' : 'text-yellow-600'}">✅ ${imp.nuevos} nuevos | ⚠️ ${imp.duplicados} duplicados</span></div><div class="text-xs text-gray-500 mt-1">📄 Archivo: ${imp.archivo}</div><div class="text-xs text-gray-400 mt-1">Total en sistema: ${imp.totalAcumulado} registros</div></div>`).join('');
+        }
+
+        function showEmptyState(container, message, icon = 'fa-inbox') {
+            container.innerHTML = `<div class="empty-state col-span-full"><i class="fas ${icon}"></i><h3>Sin datos</h3><p>${message}</p></div>`;
+        }
+
+        async function refreshAllViews() {
+            updateDashboard();
+            renderEquiposList();
+            renderAbonadosList();
+            renderTechniciansList();
+            renderAssignmentsByDate();
+            renderHistoryEquipos();
+            renderHistoryAbonados();
+            renderImportHistory();
+            updateRecentActivity();
+            renderCharts();
+        }
+
+        async function saveAll() {
+            // Guardar en localStorage como backup
+            localStorage.setItem('ocad_recoveries_v17', JSON.stringify(appRecoveries));
+            localStorage.setItem('ocad_subscribers_v17', JSON.stringify(appSubscribers));
+            localStorage.setItem('ocad_technicians_v17', JSON.stringify(appTechnicians));
+            localStorage.setItem('ocad_recovery_logs_v17', JSON.stringify(appActivityLog));
+            localStorage.setItem('ocad_import_history_v17', JSON.stringify(appImportHistory));
+            
+            // Sincronizar con Firebase
+            await syncAllData();
+        }
+
+        async function initializeDefaultData() {
+            // Intentar cargar desde Firebase primero
+            const firebaseLoaded = await loadAllDataFromFirebase();
+            
+            if (!firebaseLoaded || (appRecoveries.length === 0 && appSubscribers.length === 0)) {
+                // Si no hay datos en Firebase, cargar desde localStorage
+                const storedRecoveries = localStorage.getItem('ocad_recoveries_v17');
+                if (storedRecoveries) appRecoveries = JSON.parse(storedRecoveries);
+                else appRecoveries = [];
+                
+                const storedSubscribers = localStorage.getItem('ocad_subscribers_v17');
+                if (storedSubscribers) appSubscribers = JSON.parse(storedSubscribers);
+                else appSubscribers = [];
+                
+                const storedTechnicians = localStorage.getItem('ocad_technicians_v17');
+                if (storedTechnicians) appTechnicians = JSON.parse(storedTechnicians);
+                else appTechnicians = [];
+                
+                const storedLogs = localStorage.getItem('ocad_recovery_logs_v17');
+                if (storedLogs) appActivityLog = JSON.parse(storedLogs);
+                else appActivityLog = [];
+                
+                const storedImports = localStorage.getItem('ocad_import_history_v17');
+                if (storedImports) appImportHistory = JSON.parse(storedImports);
+                else appImportHistory = [];
+                
+                // Si hay datos en localStorage, sincronizarlos con Firebase
+                if (appRecoveries.length > 0 || appSubscribers.length > 0) {
+                    await syncAllData();
+                }
+            }
+            
+            saveAll();
+        }
+
+        window.clearAllData = async function() {
+            if (!isAdmin()) { alert('Solo el Administrador puede eliminar todos los datos'); return; }
+            if (confirm('⚠️ ¿ESTÁ SEGURO? Esta acción eliminará TODOS los datos del sistema (equipos, abonados, técnicos, historial).')) {
+                const confirmText = prompt('Escriba "ELIMINAR" para confirmar:');
+                if (confirmText === 'ELIMINAR') {
+                    appRecoveries = [];
+                    appSubscribers = [];
+                    appTechnicians = [];
+                    appActivityLog = [];
+                    appImportHistory = [];
+                    await saveAll();
+                    addLog('Limpiar Datos', 'Se eliminaron TODOS los datos del sistema');
+                    await refreshAllViews();
+                    alert('✅ Todos los datos han sido eliminados. El sistema está limpio y listo para importar nuevos datos.');
+                } else { alert('Operación cancelada.'); }
+            }
+        };
+
+        // Importar equipos
+        window.importRecoveryExcel = async function() {
+            const file = document.getElementById('recoveryExcelUpload').files[0];
+            if (!file) return alert('Seleccione un archivo Excel');
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+                    let nuevos = 0, duplicados = 0;
+                    const fechaImportacion = new Date().toLocaleString();
+                    const existingKeys = new Set();
+                    appRecoveries.forEach(e => existingKeys.add(generateEquipmentKey(e.nombre, e.telefono, e.direccion)));
+                    
+                    for (let i = 2; i < rows.length; i++) {
+                        const row = rows[i];
+                        if (!row || !row[0]) continue;
+                        let centroOp = (row[9] || '').toString();
+                        if (centroOp.includes('RUICES')) centroOp = 'RUICES';
+                        else if (centroOp.includes('NAYA')) centroOp = 'NAYA';
+                        else if (centroOp.includes('ROSAL')) centroOp = 'ROSAL';
+                        else if (centroOp.includes('PARAISO')) centroOp = 'PARAISO';
+                        const nombre = (row[3] || '').toString().trim();
+                        const telefono = (row[4] || '').toString().trim();
+                        const direccion = (row[6] || '').toString().trim();
+                        if (!nombre) continue;
+                        const key = generateEquipmentKey(nombre, telefono, direccion);
+                        if (existingKeys.has(key)) { duplicados++; continue; }
+                        const newId = Date.now().toString() + nuevos;
+                        appRecoveries.push({ id: newId, fechaSolicitud: row[0] ? new Date(row[0]).toISOString().split('T')[0] : new Date().toISOString().split('T')[0], fechaImportacion: fechaImportacion, nombre: nombre, telefono: telefono || 'Sin teléfono', direccion: direccion || 'Sin dirección', centroOp: centroOp || 'SIN ASIGNAR', status: 'pendiente', equiposRecuperados: [], fechaRecupero: null });
+                        existingKeys.add(key); nuevos++;
+                    }
+                    appImportHistory.unshift({ id: Date.now().toString(), fecha: fechaImportacion, tipo: 'Equipos', archivo: file.name, nuevos: nuevos, duplicados: duplicados, totalAcumulado: appRecoveries.length });
+                    await saveAll();
+                    addLog('Importar Equipos', `${nuevos} nuevos, ${duplicados} duplicados`);
+                    await refreshAllViews();
+                    document.getElementById('importResult').innerHTML = `<div class="p-4 rounded-lg ${nuevos > 0 ? 'import-success' : 'duplicate-warning'}"><div class="flex items-center gap-2 mb-2"><i class="fas fa-${nuevos > 0 ? 'check-circle text-green-600' : 'exclamation-triangle text-yellow-600'}"></i><span class="font-bold">Importación de Equipos</span></div><p>📄 Archivo: ${file.name}</p><p>🆕 Nuevos equipos: <span class="font-bold text-green-600">${nuevos}</span></p><p>⚠️ Duplicados omitidos: <span class="font-bold text-yellow-600">${duplicados}</span></p><p>📊 Total en sistema: <span class="font-bold">${appRecoveries.length}</span></p></div>`;
+                    setTimeout(() => document.getElementById('importResult').innerHTML = '', 5000);
+                    alert(`✅ Importación completada: ${nuevos} equipos nuevos, ${duplicados} duplicados omitidos`);
+                } catch (error) { alert('Error al importar el archivo. Verifique el formato.'); }
+                document.getElementById('recoveryExcelUpload').value = '';
+            };
+            reader.readAsArrayBuffer(file);
+        };
+
+        // Importar abonados
+        window.importSubscriberExcel = async function() {
+            const file = document.getElementById('subscriberExcelUpload').files[0];
+            if (!file) return alert('Seleccione un archivo Excel');
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const rows = XLSX.utils.sheet_to_json(sheet);
+                    let nuevos = 0, duplicados = 0;
+                    const fechaImportacion = new Date().toLocaleString();
+                    const existingKeys = new Set();
+                    appSubscribers.forEach(s => existingKeys.add(generateSubscriberKey(s.nombre, s.cedula, s.telefono)));
+                    
+                    rows.forEach(row => {
+                        let telefono = row['TELEFONO_1'] || row['TELEFONO_2'] || row['TELEFONO_3'] || 'Sin teléfono';
+                        let centroOp = row['CENTRO_OP'] || '';
+                        if (centroOp.includes('RUICES')) centroOp = 'RUICES';
+                        else if (centroOp.includes('NAYA')) centroOp = 'NAYA';
+                        else if (centroOp.includes('ROSAL')) centroOp = 'ROSAL';
+                        else if (centroOp.includes('PARAISO')) centroOp = 'PARAISO';
+                        const nombre = (row['NOMBRE CLIENTE'] || '').toString().trim();
+                        const cedula = (row['DOCUMENTO'] || 'N/A').toString();
+                        if (!nombre) return;
+                        const key = generateSubscriberKey(nombre, cedula, telefono);
+                        if (existingKeys.has(key)) { duplicados++; return; }
+                        const newId = row['IDENTIFICADOR'] || 'SUB' + Date.now() + nuevos;
+                        appSubscribers.push({ id: newId, fechaImportacion: fechaImportacion, nombre: nombre, cedula: cedula, telefono: telefono, plan: row['PLAN'] || 'No especificado', centroOp: centroOp || 'SIN ASIGNAR', status: 'pendiente', motivoBaja: '', interesReconectar: null, gestiones: [], ultimoContacto: null });
+                        existingKeys.add(key); nuevos++;
+                    });
+                    appImportHistory.unshift({ id: Date.now().toString(), fecha: fechaImportacion, tipo: 'Abonados', archivo: file.name, nuevos: nuevos, duplicados: duplicados, totalAcumulado: appSubscribers.length });
+                    await saveAll();
+                    addLog('Importar Abonados', `${nuevos} nuevos, ${duplicados} duplicados`);
+                    await refreshAllViews();
+                    document.getElementById('importResult').innerHTML = `<div class="p-4 rounded-lg ${nuevos > 0 ? 'import-success' : 'duplicate-warning'}"><div class="flex items-center gap-2 mb-2"><i class="fas fa-${nuevos > 0 ? 'check-circle text-green-600' : 'exclamation-triangle text-yellow-600'}"></i><span class="font-bold">Importación de Abonados</span></div><p>📄 Archivo: ${file.name}</p><p>🆕 Nuevos abonados: <span class="font-bold text-green-600">${nuevos}</span></p><p>⚠️ Duplicados omitidos: <span class="font-bold text-yellow-600">${duplicados}</span></p><p>📊 Total en sistema: <span class="font-bold">${appSubscribers.length}</span></p></div>`;
+                    setTimeout(() => document.getElementById('importResult').innerHTML = '', 5000);
+                    alert(`✅ Importación completada: ${nuevos} abonados nuevos, ${duplicados} duplicados omitidos`);
+                } catch (error) { alert('Error al importar el archivo. Verifique el formato.'); }
+                document.getElementById('subscriberExcelUpload').value = '';
+            };
+            reader.readAsArrayBuffer(file);
+        };
+
+        // Render functions (simplificadas pero funcionales)
+        function renderEquiposList() {
+            const container = document.getElementById('equiposList');
+            if (!container) return;
+            if (appRecoveries.length === 0) { showEmptyState(container, 'No hay equipos cargados. Ve a la pestaña "Importar" para cargar tus datos.', 'fa-box-open'); return; }
+            const coFilter = document.getElementById('equiposCOFilter')?.value || '';
+            let items = [...appRecoveries];
+            if (currentEquiposFilter === 'pendiente') items = items.filter(i => i.status !== 'recuperado');
+            if (coFilter) items = items.filter(i => i.centroOp === coFilter);
+            if (items.length === 0) { showEmptyState(container, 'No hay equipos que coincidan con los filtros seleccionados.', 'fa-filter'); return; }
+            const statusConfig = { 'pendiente': { text: '⏳ Pendiente', class: 'bg-pending' }, 'asignado': { text: '👨‍🔧 Asignado', class: 'bg-scheduled' }, 'recuperado': { text: '✅ Recuperado', class: 'bg-attended' } };
+            container.innerHTML = items.slice(0, 50).map(item => `<div class="bg-white rounded-xl shadow-md p-4 border-l-4 ${item.status === 'asignado' ? 'border-blue-500' : item.status === 'recuperado' ? 'border-green-500' : 'border-orange-500'}"><div class="flex justify-between items-start mb-2"><div><h3 class="font-bold">${escapeHtml(item.nombre.substring(0, 40))}</h3></div><span class="status-badge ${statusConfig[item.status]?.class || 'bg-pending'}">${statusConfig[item.status]?.text || 'Pendiente'}</span></div><div class="text-xs space-y-1"><p><i class="fas fa-phone"></i> ${escapeHtml(item.telefono)}</p><p><i class="fas fa-map-marker-alt"></i> ${escapeHtml(item.direccion?.substring(0, 50))}</p><p><i class="fas fa-building"></i> ${escapeHtml(item.centroOp)}</p>${item.tecnicoAsignado ? `<p><i class="fas fa-user-cog"></i> Técnico: ${escapeHtml(item.tecnicoAsignado)}</p>` : ''}</div><div class="mt-3 flex flex-wrap gap-2">${item.status !== 'recuperado' ? `<button onclick="openMarkRecoveredModal('${item.id}', 'equipo')" class="attend-btn"><i class="fas fa-check-circle"></i>Registrar Recupero</button><button onclick="openAssignTechModal('${item.id}', 'equipo')" class="assign-btn"><i class="fas fa-user-plus"></i>Asignar</button>` : ''}${isAdmin() ? `<button onclick="openEditEquipo('${item.id}')" class="edit-btn"><i class="fas fa-edit"></i>Editar</button><button onclick="deleteEquipo('${item.id}')" class="delete-btn"><i class="fas fa-trash"></i>Eliminar</button>` : ''}<a href="tel:${item.telefono}" class="call-link"><i class="fas fa-phone"></i></a><a href="https://wa.me/${item.telefono?.replace(/[^0-9]/g, '')}" target="_blank" class="whatsapp-link"><i class="fab fa-whatsapp"></i></a></div></div>`).join('');
+        }
+
+        function renderAbonadosList() {
+            const container = document.getElementById('abonadosList');
+            if (!container) return;
+            if (appSubscribers.length === 0) { showEmptyState(container, 'No hay abonados cargados. Ve a la pestaña "Importar" para cargar tus datos.', 'fa-users'); return; }
+            searchTerm = document.getElementById('searchAbonado')?.value.toLowerCase() || '';
+            filterStatus = document.getElementById('filterAbonadoStatus')?.value || '';
+            filterCO = document.getElementById('filterAbonadoCO')?.value || '';
+            filterInteres = document.getElementById('filterAbonadoInteres')?.value || '';
+            let items = [...appSubscribers];
+            if (currentAbonadosFilter === 'pendiente') items = items.filter(i => i.status !== 'reconectado' && i.status !== 'retirado');
+            if (searchTerm) items = items.filter(i => i.nombre.toLowerCase().includes(searchTerm) || i.cedula.toLowerCase().includes(searchTerm) || i.telefono.toLowerCase().includes(searchTerm));
+            if (filterStatus) items = items.filter(i => i.status === filterStatus);
+            if (filterCO) items = items.filter(i => i.centroOp === filterCO);
+            if (filterInteres) { if (filterInteres === 'true') items = items.filter(i => i.interesReconectar === true); else if (filterInteres === 'false') items = items.filter(i => i.interesReconectar === false); else if (filterInteres === 'null') items = items.filter(i => i.interesReconectar === null); }
+            if (items.length === 0) { showEmptyState(container, 'No hay abonados que coincidan con los filtros seleccionados.', 'fa-filter'); return; }
+            const statusConfig = { 'pendiente': { text: '⏳ Pendiente', class: 'bg-pending' }, 'asignado': { text: '👨‍🔧 Asignado', class: 'bg-scheduled' }, 'contactado': { text: '📞 Contactado', class: 'bg-contactado' }, 'reconectado': { text: '✅ Reconectado', class: 'bg-attended' }, 'retirado': { text: '📦 Equipo Retirado', class: 'bg-retirado' }, 'no_contacto': { text: '❌ No Contactable', class: 'bg-no-contacto' } };
+            container.innerHTML = items.slice(0, 50).map(item => `<div class="bg-white rounded-xl shadow-md p-4 border-l-4 ${item.status === 'asignado' ? 'border-blue-500' : item.status === 'reconectado' ? 'border-green-500' : item.status === 'retirado' ? 'border-red-500' : 'border-orange-500'}"><div class="flex justify-between items-start mb-2"><div><h3 class="font-bold">${escapeHtml(item.nombre.substring(0, 40))}</h3></div><span class="status-badge ${statusConfig[item.status]?.class || 'bg-pending'}">${statusConfig[item.status]?.text || 'Pendiente'}</span></div><div class="text-xs space-y-1"><p><i class="fas fa-id-card"></i> ${escapeHtml(item.cedula)}</p><p><i class="fas fa-phone"></i> ${escapeHtml(item.telefono)}</p><p><i class="fas fa-building"></i> ${escapeHtml(item.centroOp)}</p>${item.motivoBaja ? `<p><i class="fas fa-info-circle"></i> Motivo baja: <span class="motivo-baja-badge">${escapeHtml(item.motivoBaja)}</span></p>` : ''}${item.interesReconectar !== null ? `<p><i class="fas fa-star"></i> Interés: ${item.interesReconectar ? '✅ Sí reconectar' : '❌ No reconectar'}</p>` : ''}${item.gestiones?.length > 0 ? `<p><i class="fas fa-clock"></i> Última gestión: ${item.gestiones[0].fecha}</p>` : ''}</div><div class="mt-3 flex flex-wrap gap-2"><button onclick="openHistorialModal('${item.id}', 'abonado')" class="history-btn"><i class="fas fa-history"></i>Ver Historial</button>${item.status !== 'reconectado' && item.status !== 'retirado' ? `<button onclick="openGestionarModal('${item.id}', 'abonado')" class="gestionar-btn"><i class="fas fa-phone-alt"></i>Gestionar</button><button onclick="openAssignTechModal('${item.id}', 'abonado')" class="assign-btn"><i class="fas fa-user-plus"></i>Asignar</button>` : ''}${isAdmin() ? `<button onclick="openEditAbonado('${item.id}')" class="edit-btn"><i class="fas fa-edit"></i>Editar</button><button onclick="deleteAbonado('${item.id}')" class="delete-btn"><i class="fas fa-trash"></i>Eliminar</button>` : ''}<a href="tel:${item.telefono}" class="call-link"><i class="fas fa-phone"></i></a><a href="https://wa.me/${item.telefono?.replace(/[^0-9]/g, '')}" target="_blank" class="whatsapp-link"><i class="fab fa-whatsapp"></i></a></div></div>`).join('');
+        }
+
+        function renderHistoryEquipos() { const container = document.getElementById('historyEquiposList'); if (!container) return; const items = appRecoveries.filter(i => i.status === 'recuperado'); if (items.length === 0) { showEmptyState(container, 'No hay equipos recuperados aún.', 'fa-box-open'); return; } container.innerHTML = items.map(item => `<div class="p-3 border rounded bg-gray-50"><div class="font-medium">${escapeHtml(item.nombre)}</div><div class="text-xs text-gray-500">${escapeHtml(item.centroOp)} | Recuperado: ${item.fechaRecupero || 'N/A'}</div><div class="text-xs">📦 Equipos: ${item.equiposRecuperados?.map(e => e.nombre).join(', ') || '-'}</div>${isAdmin() ? `<div class="flex gap-2 mt-2"><button onclick="openEditEquipo('${item.id}')" class="edit-btn">Editar</button><button onclick="reactivateEquipo('${item.id}')" class="reactivate-btn">Reactivar</button><button onclick="deleteEquipo('${item.id}')" class="delete-btn">Eliminar</button></div>` : ''}</div>`).join(''); }
+        function renderHistoryAbonados() { const container = document.getElementById('historyAbonadosList'); if (!container) return; const items = appSubscribers.filter(i => i.status === 'reconectado' || i.status === 'retirado'); if (items.length === 0) { showEmptyState(container, 'No hay abonados gestionados aún.', 'fa-users'); return; } container.innerHTML = items.map(item => `<div class="p-3 border rounded bg-gray-50"><div class="font-medium">${escapeHtml(item.nombre)}</div><div class="text-xs text-gray-500">${escapeHtml(item.centroOp)}</div><div class="text-xs">📌 Resultado final: ${item.status === 'reconectado' ? '✅ Reconectado' : '📦 Equipo retirado'}</div><div class="text-xs">📋 Motivo de baja: ${item.motivoBaja || 'No registrado'}</div><div class="text-xs">💬 Interés: ${item.interesReconectar ? 'Sí reconectar' : (item.interesReconectar === false ? 'No reconectar' : 'No determinado')}</div>${item.gestiones?.length > 0 ? `<div class="text-xs text-gray-500 mt-1">📞 Última gestión: ${item.gestiones[0].fecha}</div>` : ''}${isAdmin() ? `<div class="flex gap-2 mt-2"><button onclick="openEditAbonado('${item.id}')" class="edit-btn">Editar</button><button onclick="reactivateAbonado('${item.id}')" class="reactivate-btn">Reactivar</button><button onclick="deleteAbonado('${item.id}')" class="delete-btn">Eliminar</button></div>` : ''}</div>`).join(''); }
+
+        function openHistorialModal(id, type) { const item = getAbonadoById(id); if (!item) return; document.getElementById('historialInfo').innerHTML = `<div class="font-bold text-lg">${escapeHtml(item.nombre)}</div><div>📞 ${escapeHtml(item.telefono)} | 🆔 ${escapeHtml(item.cedula)} | 🏢 ${escapeHtml(item.centroOp)}</div><div>📡 Plan: ${escapeHtml(item.plan)}</div>${item.motivoBaja ? `<div>📋 Motivo de baja: ${escapeHtml(item.motivoBaja)}</div>` : ''}`; const gestiones = item.gestiones || []; if (gestiones.length === 0) { document.getElementById('historialList').innerHTML = '<div class="text-center py-8 text-gray-500">No hay gestiones registradas para este abonado</div>'; } else { document.getElementById('historialList').innerHTML = gestiones.map(g => `<div class="timeline-item p-3 bg-gray-50 rounded"><div class="flex justify-between"><div class="font-semibold">${g.resultado === 'contactado_interesado' ? '✅ INTERESADO en reconectar' : g.resultado === 'contactado_no_interesado' ? '❌ NO INTERESADO' : g.resultado === 'programar_visita' ? '📅 Visita programada' : g.resultado}</div><div class="text-xs text-gray-400">${g.fecha}</div></div><div class="text-xs text-gray-500 mt-1">👤 ${escapeHtml(g.agente)}</div>${g.observaciones ? `<div class="text-xs text-gray-600 mt-1">📝 ${escapeHtml(g.observaciones)}</div>` : ''}</div>`).join(''); } document.getElementById('historialModal').classList.remove('hidden'); }
+        function closeHistorialModal() { document.getElementById('historialModal').classList.add('hidden'); }
+
+        // Funciones de edición, eliminación, gestión (adaptadas para usar IDs)
+        window.openEditEquipo = async function(id) { if (!isAdmin()) return; const item = getEquipoById(id); if (!item) return; document.getElementById('editEquipoId').value = id; document.getElementById('editEquipoNombre').value = item.nombre; document.getElementById('editEquipoTelefono').value = item.telefono; document.getElementById('editEquipoDireccion').value = item.direccion; document.getElementById('editEquipoCO').value = item.centroOp; document.getElementById('editEquipoStatus').value = item.status; document.getElementById('editEquipoModal').classList.remove('hidden'); };
+        window.closeEditEquipoModal = function() { document.getElementById('editEquipoModal').classList.add('hidden'); };
+        window.deleteEquipo = async function(id) { if (!isAdmin()) return; if (confirm('¿Eliminar este equipo permanentemente?')) { appRecoveries = appRecoveries.filter(r => r.id !== id); await deleteFromFirebase("recoveries", id); addLog('Eliminar Equipo', `ID: ${id}`); await saveAll(); await refreshAllViews(); alert('Equipo eliminado'); } };
+        window.openEditAbonado = async function(id) { if (!isAdmin()) return; const item = getAbonadoById(id); if (!item) return; document.getElementById('editAbonadoId').value = id; document.getElementById('editAbonadoNombre').value = item.nombre; document.getElementById('editAbonadoCedula').value = item.cedula; document.getElementById('editAbonadoTelefono').value = item.telefono; document.getElementById('editAbonadoPlan').value = item.plan; document.getElementById('editAbonadoCO').value = item.centroOp; document.getElementById('editAbonadoStatus').value = item.status; document.getElementById('editAbonadoMotivoBaja').value = item.motivoBaja || ''; document.getElementById('editAbonadoObservacion').value = item.observaciones || ''; document.getElementById('editAbonadoModal').classList.remove('hidden'); };
+        window.closeEditAbonadoModal = function() { document.getElementById('editAbonadoModal').classList.add('hidden'); };
+        window.deleteAbonado = async function(id) { if (!isAdmin()) return; if (confirm('¿Eliminar este abonado permanentemente?')) { appSubscribers = appSubscribers.filter(s => s.id !== id); await deleteFromFirebase("subscribers", id); addLog('Eliminar Abonado', `ID: ${id}`); await saveAll(); await refreshAllViews(); alert('Abonado eliminado'); } };
+        
+        document.getElementById('editAbonadoForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('editAbonadoId').value;
+            const abonado = getAbonadoById(id);
+            if (abonado) {
+                abonado.nombre = document.getElementById('editAbonadoNombre').value;
+                abonado.cedula = document.getElementById('editAbonadoCedula').value;
+                abonado.telefono = document.getElementById('editAbonadoTelefono').value;
+                abonado.plan = document.getElementById('editAbonadoPlan').value;
+                abonado.centroOp = document.getElementById('editAbonadoCO').value;
+                abonado.status = document.getElementById('editAbonadoStatus').value;
+                abonado.motivoBaja = document.getElementById('editAbonadoMotivoBaja').value;
+                abonado.observaciones = document.getElementById('editAbonadoObservacion').value;
+                addLog('Editar Abonado', `${abonado.nombre} - Datos actualizados`);
+                await saveAll();
+                await refreshAllViews();
+                closeEditAbonadoModal();
+                alert('Abonado actualizado');
+            }
+        });
+
+        function openGestionarModal(id, type) { const item = getAbonadoById(id); if (!item) return; pendingGestionar = { item, type }; document.getElementById('gestionarId').value = id; document.getElementById('gestionarInfo').innerHTML = `<div class="font-bold">${escapeHtml(item.nombre)}</div><div>📞 ${escapeHtml(item.telefono)}</div><div>🏢 ${escapeHtml(item.centroOp)}</div><div>📡 Plan: ${escapeHtml(item.plan)}</div>`; document.getElementById('gestionarResultado').value = ''; document.getElementById('interesFields').classList.add('hidden'); document.getElementById('noInteresFields').classList.add('hidden'); document.getElementById('visitaFields').classList.add('hidden'); document.getElementById('gestionarObservaciones').value = ''; const techSelect = document.getElementById('visitaTecnico'); techSelect.innerHTML = '<option value="">Seleccionar técnico</option>' + appTechnicians.map(t => `<option value="${t.id}">${escapeHtml(t.nombre)} (${escapeHtml(t.co)})</option>`).join(''); document.getElementById('gestionarModal').classList.remove('hidden'); }
+        document.getElementById('gestionarResultado')?.addEventListener('change', function() { const val = this.value; document.getElementById('interesFields').classList.toggle('hidden', val !== 'contactado_interesado'); document.getElementById('noInteresFields').classList.toggle('hidden', val !== 'contactado_no_interesado'); document.getElementById('visitaFields').classList.toggle('hidden', val !== 'programar_visita'); });
+        document.getElementById('gestionarForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault(); if (!pendingGestionar) return; const id = document.getElementById('gestionarId').value; const resultado = document.getElementById('gestionarResultado').value; const observaciones = document.getElementById('gestionarObservaciones').value; const item = getAbonadoById(id); if (!item) return; const gestion = { fecha: new Date().toLocaleString(), agente: appCurrentUser.fullName, resultado: resultado, observaciones: observaciones }; item.ultimoContacto = new Date().toISOString().split('T')[0]; if (!item.gestiones) item.gestiones = []; item.gestiones.unshift(gestion); if (resultado === 'contactado_interesado') { item.interesReconectar = true; item.status = 'contactado'; item.motivoInteres = document.getElementById('interesMotivo').value; item.observacionesInteres = document.getElementById('interesObservaciones').value; addLog('Abonado Interesado', `${item.nombre} - Desea reconectar`); alert(`✅ ${item.nombre} ha manifestado interés en reconectar.`); } else if (resultado === 'contactado_no_interesado') { item.interesReconectar = false; item.status = 'retirado'; item.motivoNoInteres = document.getElementById('noInteresMotivo').value; item.observacionesNoInteres = document.getElementById('noInteresObservaciones').value; item.motivoBaja = item.motivoNoInteres; addLog('Abonado No Interesado', `${item.nombre} - No desea reconectar`); alert(`❌ ${item.nombre} no desea reconectar. Se canaliza para retiro de equipos.`); } else if (resultado === 'programar_visita') { item.status = 'asignado'; item.visitaFecha = document.getElementById('visitaFecha').value; item.visitaHorario = document.getElementById('visitaHorario').value; const techId = parseInt(document.getElementById('visitaTecnico').value); const tech = appTechnicians.find(t => t.id === techId); if (tech) item.tecnicoAsignado = tech.nombre; addLog('Visita Programada', `${item.nombre} - Visita: ${item.visitaFecha}`); alert(`📅 Visita programada para ${item.nombre} el ${item.visitaFecha}`); } else if (resultado === 'no_contesta' || resultado === 'numero_equivocado' || resultado === 'rechaza_llamada') { item.status = 'no_contacto'; addLog('No Contactable', `${item.nombre} - ${resultado}`); alert(`⚠️ No se pudo contactar a ${item.nombre}.`); } await saveAll(); await refreshAllViews(); closeGestionarModal(); });
+        function closeGestionarModal() { document.getElementById('gestionarModal').classList.add('hidden'); pendingGestionar = null; }
+        
+        function openMarkRecoveredModal(id, type) { const item = getEquipoById(id); if (!item) return; pendingMarkRecovered = { item, type }; document.getElementById('recoveredId').value = id; document.getElementById('recoveredInfo').innerHTML = `<div class="font-bold">${escapeHtml(item.nombre)}</div><div>📞 ${escapeHtml(item.telefono)}</div><div>📍 ${escapeHtml(item.direccion)}</div>`; document.getElementById('markRecoveredModal').classList.remove('hidden'); }
+        function addEquipmentField() { const container = document.querySelector('#markRecoveredForm .space-y-2'); const newDiv = document.createElement('div'); newDiv.className = 'flex gap-2 items-center'; newDiv.innerHTML = `<input type="checkbox" class="equipment-check" value="Otro"><input type="text" placeholder="Nombre del equipo" class="border rounded px-2 py-1 text-sm w-32"><input type="text" placeholder="N° Serie" class="border rounded px-2 py-1 text-sm flex-1"><button type="button" onclick="this.parentElement.remove()" class="text-red-500">✕</button>`; container.appendChild(newDiv); }
+        window.addEquipmentField = addEquipmentField;
+        document.getElementById('markRecoveredForm')?.addEventListener('submit', async (e) => { e.preventDefault(); if (!pendingMarkRecovered) return; const id = document.getElementById('recoveredId').value; const item = getEquipoById(id); if (!item) return; const equipos = []; document.querySelectorAll('#markRecoveredForm .flex').forEach(div => { const checkbox = div.querySelector('.equipment-check'); if (checkbox && checkbox.checked) { const nameInputs = div.querySelectorAll('input[type="text"]'); let equipmentName = checkbox.value; if (equipmentName === 'Otro' && nameInputs[0]) equipmentName = nameInputs[0].value || 'Equipo no especificado'; let serialNumber = ''; if (nameInputs.length >= 2) serialNumber = nameInputs[1] ? nameInputs[1].value : (nameInputs[0] ? nameInputs[0].value : ''); else if (nameInputs[0] && checkbox.value !== 'Otro') serialNumber = nameInputs[0].value; equipos.push({ nombre: equipmentName, serie: serialNumber }); } }); item.equiposRecuperados = equipos; item.status = 'recuperado'; item.fechaRecupero = new Date().toLocaleString(); addLog('Equipo Recuperado', `${item.nombre} - Equipos: ${equipos.map(e => e.nombre).join(', ')}`); await saveAll(); await refreshAllViews(); closeMarkRecoveredModal(); alert(`✅ Equipos de ${item.nombre} registrados como recuperados.`); });
+        function closeMarkRecoveredModal() { document.getElementById('markRecoveredModal').classList.add('hidden'); pendingMarkRecovered = null; }
+        window.reactivateEquipo = async function(id) { if (!isAdmin()) return; const item = getEquipoById(id); if (item && confirm(`¿Reactivar ${item.nombre}?`)) { item.status = 'pendiente'; item.fechaRecupero = null; addLog('Reactivar Equipo', `${item.nombre}`); await saveAll(); await refreshAllViews(); alert('Equipo reactivado'); } };
+        window.reactivateAbonado = async function(id) { if (!isAdmin()) return; const item = getAbonadoById(id); if (item && confirm(`¿Reactivar ${item.nombre}?`)) { item.status = 'pendiente'; addLog('Reactivar Abonado', `${item.nombre}`); await saveAll(); await refreshAllViews(); alert('Abonado reactivado'); } };
+        
+        window.addTechnician = async function() { const nombre = document.getElementById('techName').value.trim(); const co = document.getElementById('techCO').value; const telefono = document.getElementById('techPhone').value.trim(); if (!nombre || !co) return alert('Complete todos los campos'); const newId = Date.now().toString(); appTechnicians.push({ id: newId, nombre: nombre, co: co, telefono: telefono || 'Sin teléfono', activo: true, visitasAsignadas: [] }); await saveAll(); renderTechniciansList(); document.getElementById('techName').value = ''; document.getElementById('techPhone').value = ''; addLog('Agregar Técnico', `${nombre} (${co})`); alert(`Técnico ${nombre} agregado`); };
+        function renderTechniciansList() { const container = document.getElementById('techniciansList'); if (!container) return; if (appTechnicians.length === 0) { showEmptyState(container, 'No hay técnicos registrados. Crea uno usando el formulario.', 'fa-tools'); return; } container.innerHTML = appTechnicians.map(t => `<div class="flex justify-between items-center p-3 border rounded"><div><div class="font-medium">${escapeHtml(t.nombre)}</div><div class="text-xs text-gray-500">${escapeHtml(t.co)} | ${escapeHtml(t.telefono)}</div></div><div><span class="text-xs text-blue-600">${t.visitasAsignadas?.length || 0} visitas</span>${isAdmin() ? `<button onclick="deleteTechnician('${t.id}')" class="ml-3 text-red-500 text-xs"><i class="fas fa-trash"></i> Eliminar</button>` : ''}</div></div>`).join(''); }
+        async function deleteTechnician(id) { if (!isAdmin()) return; if (confirm('¿Eliminar técnico?')) { appTechnicians = appTechnicians.filter(t => t.id !== id); await deleteFromFirebase("technicians", id); await saveAll(); renderTechniciansList(); alert('Técnico eliminado'); } }
+        function renderAssignmentsByDate() { const container = document.getElementById('assignmentsList'); if (!container) return; const date = document.getElementById('assignmentDate')?.value; if (!date) { container.innerHTML = '<div class="empty-state py-4"><i class="fas fa-calendar-alt"></i><h3 class="text-base">Seleccione una fecha</h3><p class="text-sm">Elija una fecha para ver las visitas asignadas</p></div>'; return; } const assignments = [...appRecoveries.filter(r => r.fechaAsignacion === date && r.status !== 'recuperado'), ...appSubscribers.filter(s => s.fechaAsignacion === date && s.status !== 'reconectado' && s.status !== 'retirado')]; if (assignments.length === 0) { container.innerHTML = '<div class="empty-state py-4"><i class="fas fa-check-circle"></i><h3 class="text-base">Sin visitas</h3><p class="text-sm">No hay visitas asignadas para esta fecha</p></div>'; return; } container.innerHTML = assignments.map(a => `<div class="border rounded p-3 bg-gray-50"><div class="font-medium">${escapeHtml(a.nombre)}</div><div class="text-xs">${escapeHtml(a.centroOp)} | ${escapeHtml(a.direccion || '')}</div><div class="flex gap-2 mt-2"><button onclick="${a.direccion ? `openMarkRecoveredModal('${a.id}', 'equipo')` : `openGestionarModal('${a.id}', 'abonado')`}" class="attend-btn">Completar</button><a href="tel:${a.telefono}" class="call-link">Llamar</a></div></div>`).join(''); }
+        function openAssignTechModal(id, type) { if (!isAdmin() && !isSupervisor()) { alert('Solo Administradores y Supervisores pueden asignar técnicos'); return; } if (appTechnicians.length === 0) { alert('No hay técnicos registrados. Cree uno primero.'); return; } const item = type === 'equipo' ? getEquipoById(id) : getAbonadoById(id); if (!item) return; pendingAssignment = { item, type }; document.getElementById('assignItemInfo').innerHTML = `<div class="font-bold">${escapeHtml(item.nombre)}</div><div>📞 ${escapeHtml(item.telefono)}</div><div>📍 ${escapeHtml(item.direccion || item.centroOp)}</div>`; const techSelect = document.getElementById('technicianSelect'); techSelect.innerHTML = '<option value="">Seleccionar técnico</option>' + appTechnicians.map(t => `<option value="${t.id}">${escapeHtml(t.nombre)} (${escapeHtml(t.co)})</option>`).join(''); document.getElementById('assignVisitDate').value = new Date().toISOString().split('T')[0]; document.getElementById('assignTechModal').classList.remove('hidden'); }
+        function closeAssignTechModal() { document.getElementById('assignTechModal').classList.add('hidden'); pendingAssignment = null; }
+        async function confirmAssignment() { if (!pendingAssignment) return; const techId = document.getElementById('technicianSelect').value; if (!techId) { alert('Seleccione un técnico'); return; } const technician = appTechnicians.find(t => t.id === techId); if (technician) { pendingAssignment.item.tecnicoAsignado = technician.nombre; pendingAssignment.item.fechaAsignacion = document.getElementById('assignVisitDate').value; pendingAssignment.item.status = 'asignado'; addLog('Asignar Técnico', `${technician.nombre} → ${pendingAssignment.item.nombre}`); await saveAll(); await refreshAllViews(); closeAssignTechModal(); alert(`Técnico ${technician.nombre} asignado`); } }
+        
+        let statusChart, dailyChart;
+        function renderCharts() { const ctxStatus = document.getElementById('statusChart')?.getContext('2d'); if (ctxStatus) { const pendientes = appRecoveries.filter(r => r.status !== 'recuperado').length; const recuperados = appRecoveries.filter(r => r.status === 'recuperado').length; if (statusChart) statusChart.destroy(); statusChart = new Chart(ctxStatus, { type: 'doughnut', data: { labels: ['Equipos Pendientes', 'Equipos Recuperados'], datasets: [{ data: [pendientes, recuperados], backgroundColor: ['#f59e0b', '#10b981'] }] }, options: { responsive: true } }); } const ctxDaily = document.getElementById('dailyChart')?.getContext('2d'); if (ctxDaily) { const last7Days = []; const dailyRecovered = []; for (let i = 6; i >= 0; i--) { const date = new Date(); date.setDate(date.getDate() - i); const dateStr = date.toISOString().split('T')[0]; last7Days.push(dateStr.slice(5)); const recovered = appRecoveries.filter(r => r.fechaRecupero && r.fechaRecupero.startsWith(dateStr)).length; dailyRecovered.push(recovered); } if (dailyChart) dailyChart.destroy(); dailyChart = new Chart(ctxDaily, { type: 'bar', data: { labels: last7Days, datasets: [{ label: 'Equipos Recuperados', data: dailyRecovered, backgroundColor: '#10b981' }] }, options: { responsive: true } }); } }
+        
+        window.generateReport = function() { const start = document.getElementById('reportStartDate').value; const end = document.getElementById('reportEndDate').value; const coFilter = document.getElementById('reportCOFilter').value; let equipos = [...appRecoveries], abonados = [...appSubscribers]; if (start) { equipos = equipos.filter(r => r.fechaRecupero && r.fechaRecupero >= start); abonados = abonados.filter(s => s.ultimoContacto && s.ultimoContacto >= start); } if (end) { equipos = equipos.filter(r => r.fechaRecupero && r.fechaRecupero <= end); abonados = abonados.filter(s => s.ultimoContacto && s.ultimoContacto <= end); } if (coFilter) { equipos = equipos.filter(r => r.centroOp === coFilter); abonados = abonados.filter(s => s.centroOp === coFilter); } const reconectados = abonados.filter(s => s.status === 'reconectado').length; const retirados = abonados.filter(s => s.status === 'retirado').length; document.getElementById('reportResult').innerHTML = `<h3 class="font-bold mb-3">Reporte de Gestión</h3><div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4"><div class="bg-orange-100 p-3 rounded text-center"><div class="text-2xl font-bold">${equipos.filter(r => r.status !== 'recuperado').length}</div><div>Equipos Pendientes</div></div><div class="bg-green-100 p-3 rounded text-center"><div class="text-2xl font-bold">${equipos.filter(r => r.status === 'recuperado').length}</div><div>Equipos Recuperados</div></div><div class="bg-blue-100 p-3 rounded text-center"><div class="text-2xl font-bold">${reconectados}</div><div>Abonados Reconectados</div></div><div class="bg-red-100 p-3 rounded text-center"><div class="text-2xl font-bold">${retirados}</div><div>Equipos por Retirar</div></div></div>`; };
+        window.exportEquiposToExcel = function() { const items = currentEquiposFilter === 'pendiente' ? appRecoveries.filter(r => r.status !== 'recuperado') : appRecoveries; const data = [['Equipos Pendientes', new Date().toLocaleString()], [], ['Nombre', 'Teléfono', 'CO', 'Dirección', 'Estado']]; items.forEach(r => data.push([r.nombre, r.telefono, r.centroOp, r.direccion, r.status])); const ws = XLSX.utils.aoa_to_sheet(data); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Equipos'); XLSX.writeFile(wb, `equipos_${new Date().toISOString().slice(0,10)}.xlsx`); };
+        window.exportAbonadosToExcel = function() { const items = currentAbonadosFilter === 'pendiente' ? appSubscribers.filter(s => s.status !== 'reconectado' && s.status !== 'retirado') : appSubscribers; const data = [['Abonados Pendientes', new Date().toLocaleString()], [], ['Nombre', 'Cédula', 'Teléfono', 'CO', 'Plan', 'Motivo Baja', 'Estado']]; items.forEach(s => data.push([s.nombre, s.cedula, s.telefono, s.centroOp, s.plan, s.motivoBaja || '-', s.status])); const ws = XLSX.utils.aoa_to_sheet(data); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Abonados'); XLSX.writeFile(wb, `abonados_${new Date().toISOString().slice(0,10)}.xlsx`); };
+        window.exportFullReportExcel = function() { const data = [['Reporte Completo', new Date().toLocaleString()], [], ['Tipo', 'Nombre', 'Teléfono', 'CO', 'Estado', 'Fecha Gestión']]; appRecoveries.forEach(r => data.push(['Equipo', r.nombre, r.telefono, r.centroOp, r.status, r.fechaRecupero || '-'])); appSubscribers.forEach(s => data.push(['Abonado', s.nombre, s.telefono, s.centroOp, s.status, s.ultimoContacto || '-'])); const ws = XLSX.utils.aoa_to_sheet(data); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Reporte'); XLSX.writeFile(wb, `reporte_${new Date().toISOString().slice(0,10)}.xlsx`); };
+        window.exportFullReportPDF = function() { const { jsPDF } = window.jspdf; const doc = new jsPDF({ orientation: 'landscape' }); doc.text('Reporte OCAD Inter', 14, 15); doc.text(new Date().toLocaleString(), 14, 25); const body = [...appRecoveries.map(r => [r.nombre.substring(0, 25), r.telefono, r.centroOp, r.status]), ...appSubscribers.map(s => [s.nombre.substring(0, 25), s.telefono, s.centroOp, s.status])]; doc.autoTable({ head: [['Nombre', 'Teléfono', 'CO', 'Estado']], body: body, startY: 35 }); doc.save(`reporte_${new Date().toISOString().slice(0,10)}.pdf`); };
+        
+        function updateLoginSelect() { const select = document.getElementById('loginUserSelect'); if (select) select.innerHTML = '<option value="">-- Seleccionar perfil --</option>' + appUsers.map(u => `<option value="${u.id}">${u.fullName} (${u.role === 'admin' ? 'Administrador' : u.role === 'supervisor' ? 'Supervisor' : 'Agente OCAD'})</option>`).join(''); }
+        window.togglePassword = function() { const input = document.getElementById('loginPassword'); const icon = document.querySelector('.toggle-password'); if (input.type === 'password') { input.type = 'text'; icon.classList.replace('fa-eye', 'fa-eye-slash'); } else { input.type = 'password'; icon.classList.replace('fa-eye-slash', 'fa-eye'); } }
+        function doLogin() { const userId = parseInt(document.getElementById('loginUserSelect').value); const password = document.getElementById('loginPassword').value; const user = appUsers.find(u => u.id === userId); const errorDiv = document.getElementById('loginError'); if (!userId || isNaN(userId)) { errorDiv.textContent = 'Seleccione un perfil'; errorDiv.classList.remove('hidden'); return; } if (!user) { errorDiv.textContent = 'Perfil no válido'; errorDiv.classList.remove('hidden'); return; } if (user.password === password) { appCurrentUser = user; document.getElementById('loginModal').classList.add('hidden'); document.getElementById('mainContent').classList.remove('hidden'); document.getElementById('currentUserName').innerText = appCurrentUser.fullName; const isAdminUser = appCurrentUser.role === 'admin'; document.getElementById('reportsTabBtn').classList.toggle('hidden', !isAdminUser); addLog('Inicio de sesión', 'Ingresó al sistema'); refreshAllViews(); errorDiv.classList.add('hidden'); showTab('dashboard'); } else { errorDiv.textContent = 'Contraseña incorrecta'; errorDiv.classList.remove('hidden'); } }
+        document.getElementById('logoutBtn').addEventListener('click', () => { if (appCurrentUser) addLog('Cierre de sesión', 'Cerró sesión'); appCurrentUser = null; document.getElementById('mainContent').classList.add('hidden'); document.getElementById('loginModal').classList.remove('hidden'); document.getElementById('loginPassword').value = ''; document.getElementById('loginUserSelect').value = ''; updateLoginSelect(); });
+        function highlightActiveTab(tabName) { const tabs = ['dashboard', 'import', 'equipos', 'abonados', 'technicians', 'history', 'reports']; tabs.forEach(tab => { const btn = document.getElementById(`tab-${tab}-btn`); if (btn) { if (tab === tabName) { btn.classList.add('tab-active'); btn.classList.remove('tab-inactive'); } else { btn.classList.remove('tab-active'); btn.classList.add('tab-inactive'); } } }); }
+        window.showTab = function(tabName) { document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden')); document.getElementById(`${tabName}Tab`).classList.remove('hidden'); highlightActiveTab(tabName); if (tabName === 'dashboard') updateDashboard(); if (tabName === 'equipos') renderEquiposList(); if (tabName === 'abonados') renderAbonadosList(); if (tabName === 'technicians') { renderTechniciansList(); renderAssignmentsByDate(); } if (tabName === 'history') { renderHistoryEquipos(); renderHistoryAbonados(); } };
+        window.setEquiposFilter = function(filter) { currentEquiposFilter = filter; const pendingBtn = document.getElementById('showPendingEquiposBtn'); const allBtn = document.getElementById('showAllEquiposBtn'); if (pendingBtn) pendingBtn.className = filter === 'pendiente' ? 'px-2 sm:px-3 py-1 rounded text-xs sm:text-sm border filter-active' : 'px-2 sm:px-3 py-1 rounded text-xs sm:text-sm border'; if (allBtn) allBtn.className = filter === 'todos' ? 'px-2 sm:px-3 py-1 rounded text-xs sm:text-sm border filter-active' : 'px-2 sm:px-3 py-1 rounded text-xs sm:text-sm border'; renderEquiposList(); };
+        window.setAbonadosFilter = function(filter) { currentAbonadosFilter = filter; const pendingBtn = document.getElementById('showPendingAbonadosBtn'); const allBtn = document.getElementById('showAllAbonadosBtn'); if (pendingBtn) pendingBtn.className = filter === 'pendiente' ? 'px-2 sm:px-3 py-1 rounded text-xs sm:text-sm border filter-active' : 'px-2 sm:px-3 py-1 rounded text-xs sm:text-sm border'; if (allBtn) allBtn.className = filter === 'todos' ? 'px-2 sm:px-3 py-1 rounded text-xs sm:text-sm border filter-active' : 'px-2 sm:px-3 py-1 rounded text-xs sm:text-sm border'; renderAbonadosList(); };
+        function setupSearchAndFilters() { const searchInput = document.getElementById('searchAbonado'); const statusFilter = document.getElementById('filterAbonadoStatus'); const coFilter = document.getElementById('filterAbonadoCO'); const interesFilter = document.getElementById('filterAbonadoInteres'); if (searchInput) searchInput.addEventListener('input', () => renderAbonadosList()); if (statusFilter) statusFilter.addEventListener('change', () => renderAbonadosList()); if (coFilter) coFilter.addEventListener('change', () => renderAbonadosList()); if (interesFilter) interesFilter.addEventListener('change', () => renderAbonadosList()); }
+        
+        // Inicialización con Firebase
+        async function init() {
+            // Esperar a que Firebase esté listo
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            await initializeDefaultData();
+            updateLoginSelect();
+            setupSearchAndFilters();
+            await refreshAllViews();
+            showTab('dashboard');
+        }
+        
+        init();
+    </script>
+</body>
+</html>

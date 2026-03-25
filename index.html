@@ -185,7 +185,7 @@
                 </ul>
             </div>
 
-            <!-- Dashboard Tab (mismo contenido que antes, se mantiene) -->
+            <!-- Dashboard Tab -->
             <div id="dashboardTab" class="tab-content">
                 <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-6 mb-4 sm:mb-8">
                     <div class="bg-white rounded-xl shadow-md p-3 sm:p-5 metric-card" onclick="showTab('equipos')">
@@ -231,7 +231,7 @@
                 </div>
             </div>
 
-            <!-- Importar Datos Tab con sincronización -->
+            <!-- Importar Datos Tab -->
             <div id="importTab" class="tab-content hidden">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                     <div class="bg-white rounded-xl shadow-md p-4 sm:p-6 import-card">
@@ -247,9 +247,9 @@
                         </button>
                     </div>
                     <div class="bg-white rounded-xl shadow-md p-4 sm:p-6 import-card">
-                        <h3 class="font-bold mb-3 text-base sm:text-lg"><i class="fas fa-file-excel text-green-600 mr-2"></i>Importar Abonados (data(11).xlsx)</h3>
+                        <h3 class="font-bold mb-3 text-base sm:text-lg"><i class="fas fa-file-excel text-green-600 mr-2"></i>Importar Abonados (REZAGADOS 2.xlsx)</h3>
                         <p class="text-xs sm:text-sm text-gray-500 mb-3">Archivo Excel con abonados desconectados</p>
-                        <p class="text-xs text-amber-600 mb-2">📋 Campos: IDENTIFICADOR, NOMBRE CLIENTE, DOCUMENTO, TELEFONO, PLAN, CENTRO_OP</p>
+                        <p class="text-xs text-amber-600 mb-2">📋 Campos: CLIENTE, NOMBRE, RIF, TELEFONO_1, TELEFONO_2, TELEFONO_3, PLAN_DESCONECTADO, EMPRESA</p>
                         <input type="file" id="subscriberExcelUpload" accept=".xlsx, .xls, .csv" class="border rounded-lg px-3 py-2 w-full mb-3 text-sm">
                         <div id="subscriberProgress" class="hidden mt-2">
                             <div class="progress-bar"><div id="subscriberProgressFill" class="progress-fill"></div></div>
@@ -369,7 +369,7 @@
         </div>
     </div>
 
-    <!-- Modales (simplificados para mantener el código) -->
+    <!-- Modales -->
     <div id="editEquipoModal" class="modal hidden"><div class="modal-content"><div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold">Editar Equipo</h3><button onclick="closeEditEquipoModal()"><i class="fas fa-times text-xl"></i></button></div><form id="editEquipoForm"><input type="hidden" id="editEquipoId"><div class="grid grid-cols-1 gap-3 mb-3"><input type="text" id="editEquipoNombre" placeholder="Nombre" class="border rounded-lg px-3 py-2"><input type="text" id="editEquipoTelefono" placeholder="Teléfono" class="border rounded-lg px-3 py-2"><input type="text" id="editEquipoDireccion" placeholder="Dirección" class="border rounded-lg px-3 py-2"><select id="editEquipoCO" class="border rounded-lg px-3 py-2"><option value="RUICES">RUICES</option><option value="NAYA">NAYA</option><option value="ROSAL">ROSAL</option><option value="PARAISO">PARAISO</option></select><select id="editEquipoStatus" class="border rounded-lg px-3 py-2"><option value="pendiente">Pendiente</option><option value="asignado">Asignado</option><option value="recuperado">Recuperado</option></select></div><div class="flex gap-3"><button type="submit" class="flex-1 bg-blue-600 text-white py-2 rounded-lg">Guardar</button><button type="button" onclick="closeEditEquipoModal()" class="flex-1 bg-gray-500 text-white py-2 rounded-lg">Cancelar</button></div></form></div></div>
 
     <div id="editAbonadoModal" class="modal hidden"><div class="modal-content"><div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold">Editar Abonado</h3><button onclick="closeEditAbonadoModal()"><i class="fas fa-times text-xl"></i></button></div><form id="editAbonadoForm"><input type="hidden" id="editAbonadoId"><div class="grid grid-cols-1 gap-3 mb-3"><input type="text" id="editAbonadoNombre" placeholder="Nombre" class="border rounded-lg px-3 py-2"><input type="text" id="editAbonadoCedula" placeholder="Cédula" class="border rounded-lg px-3 py-2"><input type="text" id="editAbonadoTelefono" placeholder="Teléfono" class="border rounded-lg px-3 py-2"><input type="text" id="editAbonadoPlan" placeholder="Plan" class="border rounded-lg px-3 py-2"><select id="editAbonadoCO" class="border rounded-lg px-3 py-2"><option value="RUICES">RUICES</option><option value="NAYA">NAYA</option><option value="ROSAL">ROSAL</option><option value="PARAISO">PARAISO</option></select><select id="editAbonadoStatus" class="border rounded-lg px-3 py-2"><option value="pendiente">Pendiente</option><option value="asignado">Asignado</option><option value="contactado">Contactado</option><option value="reconectado">Reconectado</option><option value="retirado">Equipo Retirado</option><option value="no_contacto">No Contactable</option></select><select id="editAbonadoMotivoBaja" class="border rounded-lg px-3 py-2"><option value="">-- Motivo de baja --</option><option value="mudanza">Mudanza</option><option value="problemas_servicio">Problemas con el servicio</option><option value="precio">Precio / Competencia</option><option value="morosidad">Morosidad / Deuda</option><option value="fallecimiento">Fallecimiento del titular</option><option value="cierre_negocio">Cierre del negocio</option><option value="otro">Otro</option></select><textarea id="editAbonadoObservacion" rows="2" placeholder="Observaciones adicionales" class="border rounded-lg px-3 py-2"></textarea></div><div class="flex gap-3"><button type="submit" class="flex-1 bg-blue-600 text-white py-2 rounded-lg">Guardar</button><button type="button" onclick="closeEditAbonadoModal()" class="flex-1 bg-gray-500 text-white py-2 rounded-lg">Cancelar</button></div></form></div></div>
@@ -506,28 +506,23 @@
         async function syncAllData() {
             updateSyncStatus('syncing', 'Guardando cambios...');
             
-            // Guardar equipos
             for (const equipo of appRecoveries) {
                 await saveToFirebase("recoveries", equipo, equipo.id);
             }
             
-            // Guardar abonados
             for (const abonado of appSubscribers) {
                 await saveToFirebase("subscribers", abonado, abonado.id);
             }
             
-            // Guardar técnicos
             for (const tecnico of appTechnicians) {
                 await saveToFirebase("technicians", tecnico, tecnico.id);
             }
             
-            // Guardar actividad reciente (solo las últimas 50)
             const recentLogs = appActivityLog.slice(0, 100);
             for (const log of recentLogs) {
                 await saveToFirebase("activityLog", log, log.id);
             }
             
-            // Guardar historial de importaciones
             for (const imp of appImportHistory) {
                 await saveToFirebase("importHistory", imp, imp.id);
             }
@@ -536,7 +531,6 @@
             console.log("✅ Todos los datos sincronizados con Firebase");
         }
 
-        // Modificar addLog para sincronizar
         function addLog(action, details) {
             if (!appCurrentUser) return;
             const newLog = { id: Date.now().toString(), user: appCurrentUser.fullName, action, details, timestamp: new Date().toLocaleString() };
@@ -595,23 +589,18 @@
         }
 
         async function saveAll() {
-            // Guardar en localStorage como backup
             localStorage.setItem('ocad_recoveries_v17', JSON.stringify(appRecoveries));
             localStorage.setItem('ocad_subscribers_v17', JSON.stringify(appSubscribers));
             localStorage.setItem('ocad_technicians_v17', JSON.stringify(appTechnicians));
             localStorage.setItem('ocad_recovery_logs_v17', JSON.stringify(appActivityLog));
             localStorage.setItem('ocad_import_history_v17', JSON.stringify(appImportHistory));
-            
-            // Sincronizar con Firebase
             await syncAllData();
         }
 
         async function initializeDefaultData() {
-            // Intentar cargar desde Firebase primero
             const firebaseLoaded = await loadAllDataFromFirebase();
             
             if (!firebaseLoaded || (appRecoveries.length === 0 && appSubscribers.length === 0)) {
-                // Si no hay datos en Firebase, cargar desde localStorage
                 const storedRecoveries = localStorage.getItem('ocad_recoveries_v17');
                 if (storedRecoveries) appRecoveries = JSON.parse(storedRecoveries);
                 else appRecoveries = [];
@@ -632,7 +621,6 @@
                 if (storedImports) appImportHistory = JSON.parse(storedImports);
                 else appImportHistory = [];
                 
-                // Si hay datos en localStorage, sincronizarlos con Firebase
                 if (appRecoveries.length > 0 || appSubscribers.length > 0) {
                     await syncAllData();
                 }
@@ -659,10 +647,11 @@
             }
         };
 
-        // Importar equipos
+        // ==================== IMPORTAR EQUIPOS (CORREGIDO) ====================
         window.importRecoveryExcel = async function() {
             const file = document.getElementById('recoveryExcelUpload').files[0];
             if (!file) return alert('Seleccione un archivo Excel');
+            
             const reader = new FileReader();
             reader.onload = async function(e) {
                 try {
@@ -670,88 +659,267 @@
                     const workbook = XLSX.read(data, { type: 'array' });
                     const sheet = workbook.Sheets[workbook.SheetNames[0]];
                     const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+                    
                     let nuevos = 0, duplicados = 0;
                     const fechaImportacion = new Date().toLocaleString();
                     const existingKeys = new Set();
                     appRecoveries.forEach(e => existingKeys.add(generateEquipmentKey(e.nombre, e.telefono, e.direccion)));
                     
-                    for (let i = 2; i < rows.length; i++) {
+                    // Buscar encabezados en la primera fila
+                    const headers = rows[0] || [];
+                    const colIndex = {
+                        CLIENTE: headers.findIndex(h => h && h.toString().toUpperCase().includes('CLIENTE')),
+                        NOMBRE: headers.findIndex(h => h && (h.toString().toUpperCase().includes('NOMBRE') || h.toString().toUpperCase().includes('RAZON_SOCIAL'))),
+                        TELEFONO: headers.findIndex(h => h && h.toString().toUpperCase().includes('TELEFONO')),
+                        DIRECCION: headers.findIndex(h => h && (h.toString().toUpperCase().includes('DIRECCION') || h.toString().toUpperCase().includes('URBANIZACION'))),
+                        CENTRO_OP: headers.findIndex(h => h && h.toString().toUpperCase().includes('EMPRESA'))
+                    };
+                    
+                    console.log("📊 Columnas equipos encontradas:", colIndex);
+                    
+                    for (let i = 1; i < rows.length; i++) {
                         const row = rows[i];
-                        if (!row || !row[0]) continue;
-                        let centroOp = (row[9] || '').toString();
-                        if (centroOp.includes('RUICES')) centroOp = 'RUICES';
-                        else if (centroOp.includes('NAYA')) centroOp = 'NAYA';
-                        else if (centroOp.includes('ROSAL')) centroOp = 'ROSAL';
-                        else if (centroOp.includes('PARAISO')) centroOp = 'PARAISO';
-                        const nombre = (row[3] || '').toString().trim();
-                        const telefono = (row[4] || '').toString().trim();
-                        const direccion = (row[6] || '').toString().trim();
+                        if (!row || row.length === 0) continue;
+                        
+                        let nombre = '';
+                        if (colIndex.NOMBRE >= 0 && row[colIndex.NOMBRE]) {
+                            nombre = row[colIndex.NOMBRE].toString().trim();
+                        }
+                        if (!nombre && colIndex.CLIENTE >= 0 && row[colIndex.CLIENTE]) {
+                            nombre = row[colIndex.CLIENTE].toString().trim();
+                        }
                         if (!nombre) continue;
+                        
+                        let telefono = '';
+                        if (colIndex.TELEFONO >= 0 && row[colIndex.TELEFONO]) {
+                            telefono = row[colIndex.TELEFONO].toString().trim();
+                        }
+                        if (!telefono) telefono = 'Sin teléfono';
+                        
+                        let direccion = '';
+                        if (colIndex.DIRECCION >= 0 && row[colIndex.DIRECCION]) {
+                            direccion = row[colIndex.DIRECCION].toString().trim().substring(0, 100);
+                        }
+                        if (!direccion) direccion = 'Sin dirección';
+                        
+                        let centroOp = 'SIN ASIGNAR';
+                        if (colIndex.CENTRO_OP >= 0 && row[colIndex.CENTRO_OP]) {
+                            const empresa = row[colIndex.CENTRO_OP].toString().toUpperCase();
+                            if (empresa.includes('RUICES')) centroOp = 'RUICES';
+                            else if (empresa.includes('NAYA')) centroOp = 'NAYA';
+                            else if (empresa.includes('ROSAL')) centroOp = 'ROSAL';
+                            else if (empresa.includes('PARAISO')) centroOp = 'PARAISO';
+                        }
+                        
                         const key = generateEquipmentKey(nombre, telefono, direccion);
                         if (existingKeys.has(key)) { duplicados++; continue; }
+                        
                         const newId = Date.now().toString() + nuevos;
-                        appRecoveries.push({ id: newId, fechaSolicitud: row[0] ? new Date(row[0]).toISOString().split('T')[0] : new Date().toISOString().split('T')[0], fechaImportacion: fechaImportacion, nombre: nombre, telefono: telefono || 'Sin teléfono', direccion: direccion || 'Sin dirección', centroOp: centroOp || 'SIN ASIGNAR', status: 'pendiente', equiposRecuperados: [], fechaRecupero: null });
-                        existingKeys.add(key); nuevos++;
+                        appRecoveries.push({ 
+                            id: newId, 
+                            fechaSolicitud: new Date().toISOString().split('T')[0], 
+                            fechaImportacion: fechaImportacion, 
+                            nombre: nombre, 
+                            telefono: telefono, 
+                            direccion: direccion, 
+                            centroOp: centroOp, 
+                            status: 'pendiente', 
+                            equiposRecuperados: [], 
+                            fechaRecupero: null 
+                        });
+                        existingKeys.add(key); 
+                        nuevos++;
                     }
+                    
                     appImportHistory.unshift({ id: Date.now().toString(), fecha: fechaImportacion, tipo: 'Equipos', archivo: file.name, nuevos: nuevos, duplicados: duplicados, totalAcumulado: appRecoveries.length });
                     await saveAll();
                     addLog('Importar Equipos', `${nuevos} nuevos, ${duplicados} duplicados`);
                     await refreshAllViews();
-                    document.getElementById('importResult').innerHTML = `<div class="p-4 rounded-lg ${nuevos > 0 ? 'import-success' : 'duplicate-warning'}"><div class="flex items-center gap-2 mb-2"><i class="fas fa-${nuevos > 0 ? 'check-circle text-green-600' : 'exclamation-triangle text-yellow-600'}"></i><span class="font-bold">Importación de Equipos</span></div><p>📄 Archivo: ${file.name}</p><p>🆕 Nuevos equipos: <span class="font-bold text-green-600">${nuevos}</span></p><p>⚠️ Duplicados omitidos: <span class="font-bold text-yellow-600">${duplicados}</span></p><p>📊 Total en sistema: <span class="font-bold">${appRecoveries.length}</span></p></div>`;
-                    setTimeout(() => document.getElementById('importResult').innerHTML = '', 5000);
+                    
+                    const resultDiv = document.getElementById('importResult');
+                    resultDiv.innerHTML = `<div class="p-4 rounded-lg ${nuevos > 0 ? 'import-success' : 'duplicate-warning'}"><div class="flex items-center gap-2 mb-2"><i class="fas fa-${nuevos > 0 ? 'check-circle text-green-600' : 'exclamation-triangle text-yellow-600'}"></i><span class="font-bold">Importación de Equipos</span></div><p>📄 Archivo: ${file.name}</p><p>🆕 Nuevos equipos: <span class="font-bold text-green-600">${nuevos}</span></p><p>⚠️ Duplicados omitidos: <span class="font-bold text-yellow-600">${duplicados}</span></p><p>📊 Total en sistema: <span class="font-bold">${appRecoveries.length}</span></p></div>`;
+                    setTimeout(() => resultDiv.innerHTML = '', 5000);
                     alert(`✅ Importación completada: ${nuevos} equipos nuevos, ${duplicados} duplicados omitidos`);
-                } catch (error) { alert('Error al importar el archivo. Verifique el formato.'); }
+                } catch (error) {
+                    console.error(error);
+                    alert('Error al importar el archivo. Verifique el formato.');
+                }
                 document.getElementById('recoveryExcelUpload').value = '';
             };
             reader.readAsArrayBuffer(file);
         };
 
-        // Importar abonados
+        // ==================== IMPORTAR ABONADOS (CORREGIDO PARA REZAGADOS 2.xlsx) ====================
         window.importSubscriberExcel = async function() {
             const file = document.getElementById('subscriberExcelUpload').files[0];
             if (!file) return alert('Seleccione un archivo Excel');
+            
             const reader = new FileReader();
             reader.onload = async function(e) {
                 try {
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, { type: 'array' });
                     const sheet = workbook.Sheets[workbook.SheetNames[0]];
-                    const rows = XLSX.utils.sheet_to_json(sheet);
+                    const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+                    
+                    console.log("📊 Filas del archivo:", rows.length);
+                    console.log("📋 Encabezados encontrados:", rows[0]);
+                    
+                    // Buscar los índices de las columnas según el archivo REZAGADOS 2.xlsx
+                    const headers = rows[0] || [];
+                    const colIndices = {
+                        IDENTIFICADOR: headers.findIndex(h => h === 'CLIENTE'),
+                        NOMBRE: headers.findIndex(h => h === 'NOMBRE'),
+                        DOCUMENTO: headers.findIndex(h => h === 'RIF'),
+                        TELEFONO_1: headers.findIndex(h => h === 'TELEFONO_1'),
+                        TELEFONO_2: headers.findIndex(h => h === 'TELEFONO_2'),
+                        TELEFONO_3: headers.findIndex(h => h === 'TELEFONO_3'),
+                        PLAN: headers.findIndex(h => h === 'PLAN_DESCONECTADO'),
+                        CENTRO_OP: headers.findIndex(h => h === 'EMPRESA'),
+                        FECHA_CORTE: headers.findIndex(h => h === 'FECHA_ING_CORTE')
+                    };
+                    
+                    console.log("📍 Columnas encontradas:", colIndices);
+                    
                     let nuevos = 0, duplicados = 0;
                     const fechaImportacion = new Date().toLocaleString();
                     const existingKeys = new Set();
                     appSubscribers.forEach(s => existingKeys.add(generateSubscriberKey(s.nombre, s.cedula, s.telefono)));
                     
-                    rows.forEach(row => {
-                        let telefono = row['TELEFONO_1'] || row['TELEFONO_2'] || row['TELEFONO_3'] || 'Sin teléfono';
-                        let centroOp = row['CENTRO_OP'] || '';
-                        if (centroOp.includes('RUICES')) centroOp = 'RUICES';
-                        else if (centroOp.includes('NAYA')) centroOp = 'NAYA';
-                        else if (centroOp.includes('ROSAL')) centroOp = 'ROSAL';
-                        else if (centroOp.includes('PARAISO')) centroOp = 'PARAISO';
-                        const nombre = (row['NOMBRE CLIENTE'] || '').toString().trim();
-                        const cedula = (row['DOCUMENTO'] || 'N/A').toString();
-                        if (!nombre) return;
+                    // Comenzar desde la fila 1 (índice 1) para saltar encabezados
+                    for (let i = 1; i < rows.length; i++) {
+                        const row = rows[i];
+                        if (!row || row.length === 0) continue;
+                        
+                        // Extraer teléfono - buscar el primero disponible
+                        let telefono = '';
+                        if (colIndices.TELEFONO_1 >= 0 && row[colIndices.TELEFONO_1] && row[colIndices.TELEFONO_1].toString().trim()) {
+                            telefono = row[colIndices.TELEFONO_1].toString().trim();
+                        } else if (colIndices.TELEFONO_2 >= 0 && row[colIndices.TELEFONO_2] && row[colIndices.TELEFONO_2].toString().trim()) {
+                            telefono = row[colIndices.TELEFONO_2].toString().trim();
+                        } else if (colIndices.TELEFONO_3 >= 0 && row[colIndices.TELEFONO_3] && row[colIndices.TELEFONO_3].toString().trim()) {
+                            telefono = row[colIndices.TELEFONO_3].toString().trim();
+                        }
+                        if (!telefono) telefono = 'Sin teléfono';
+                        
+                        // Obtener nombre
+                        let nombre = '';
+                        if (colIndices.NOMBRE >= 0 && row[colIndices.NOMBRE]) {
+                            nombre = row[colIndices.NOMBRE].toString().trim();
+                        }
+                        if (!nombre && colIndices.IDENTIFICADOR >= 0 && row[colIndices.IDENTIFICADOR]) {
+                            nombre = row[colIndices.IDENTIFICADOR].toString().trim();
+                        }
+                        if (!nombre) continue;
+                        
+                        // Obtener cédula/RIF
+                        let cedula = 'N/A';
+                        if (colIndices.DOCUMENTO >= 0 && row[colIndices.DOCUMENTO]) {
+                            cedula = row[colIndices.DOCUMENTO].toString().trim();
+                        }
+                        
+                        // Obtener plan
+                        let plan = 'No especificado';
+                        if (colIndices.PLAN >= 0 && row[colIndices.PLAN]) {
+                            plan = row[colIndices.PLAN].toString().trim();
+                        }
+                        
+                        // Determinar centro de operaciones basado en EMPRESA
+                        let centroOp = 'SIN ASIGNAR';
+                        if (colIndices.CENTRO_OP >= 0 && row[colIndices.CENTRO_OP]) {
+                            const empresa = row[colIndices.CENTRO_OP].toString().toUpperCase();
+                            if (empresa.includes('RUICES')) centroOp = 'RUICES';
+                            else if (empresa.includes('NAYA')) centroOp = 'NAYA';
+                            else if (empresa.includes('ROSAL')) centroOp = 'ROSAL';
+                            else if (empresa.includes('PARAISO')) centroOp = 'PARAISO';
+                        }
+                        
+                        // Obtener fecha de corte
+                        let fechaCorte = '';
+                        if (colIndices.FECHA_CORTE >= 0 && row[colIndices.FECHA_CORTE]) {
+                            fechaCorte = row[colIndices.FECHA_CORTE];
+                            if (fechaCorte && typeof fechaCorte === 'object' && fechaCorte.toLocaleDateString) {
+                                fechaCorte = fechaCorte.toISOString().split('T')[0];
+                            } else if (fechaCorte && typeof fechaCorte === 'string' && fechaCorte.includes('-')) {
+                                fechaCorte = fechaCorte.split(' ')[0];
+                            }
+                        }
+                        
                         const key = generateSubscriberKey(nombre, cedula, telefono);
-                        if (existingKeys.has(key)) { duplicados++; return; }
-                        const newId = row['IDENTIFICADOR'] || 'SUB' + Date.now() + nuevos;
-                        appSubscribers.push({ id: newId, fechaImportacion: fechaImportacion, nombre: nombre, cedula: cedula, telefono: telefono, plan: row['PLAN'] || 'No especificado', centroOp: centroOp || 'SIN ASIGNAR', status: 'pendiente', motivoBaja: '', interesReconectar: null, gestiones: [], ultimoContacto: null });
-                        existingKeys.add(key); nuevos++;
+                        if (existingKeys.has(key)) { 
+                            duplicados++; 
+                            continue; 
+                        }
+                        
+                        const newId = (colIndices.IDENTIFICADOR >= 0 && row[colIndices.IDENTIFICADOR]) 
+                            ? row[colIndices.IDENTIFICADOR].toString() 
+                            : 'SUB' + Date.now() + nuevos;
+                        
+                        appSubscribers.push({ 
+                            id: newId, 
+                            fechaImportacion: fechaImportacion,
+                            fechaCorte: fechaCorte,
+                            nombre: nombre, 
+                            cedula: cedula, 
+                            telefono: telefono, 
+                            plan: plan, 
+                            centroOp: centroOp, 
+                            status: 'pendiente', 
+                            motivoBaja: '', 
+                            interesReconectar: null, 
+                            gestiones: [], 
+                            ultimoContacto: null 
+                        });
+                        
+                        existingKeys.add(key); 
+                        nuevos++;
+                        
+                        // Log cada 100 registros para mostrar progreso
+                        if (nuevos % 100 === 0) {
+                            console.log(`📥 Procesados ${nuevos} registros...`);
+                        }
+                    }
+                    
+                    appImportHistory.unshift({ 
+                        id: Date.now().toString(), 
+                        fecha: fechaImportacion, 
+                        tipo: 'Abonados', 
+                        archivo: file.name, 
+                        nuevos: nuevos, 
+                        duplicados: duplicados, 
+                        totalAcumulado: appSubscribers.length 
                     });
-                    appImportHistory.unshift({ id: Date.now().toString(), fecha: fechaImportacion, tipo: 'Abonados', archivo: file.name, nuevos: nuevos, duplicados: duplicados, totalAcumulado: appSubscribers.length });
+                    
                     await saveAll();
                     addLog('Importar Abonados', `${nuevos} nuevos, ${duplicados} duplicados`);
                     await refreshAllViews();
-                    document.getElementById('importResult').innerHTML = `<div class="p-4 rounded-lg ${nuevos > 0 ? 'import-success' : 'duplicate-warning'}"><div class="flex items-center gap-2 mb-2"><i class="fas fa-${nuevos > 0 ? 'check-circle text-green-600' : 'exclamation-triangle text-yellow-600'}"></i><span class="font-bold">Importación de Abonados</span></div><p>📄 Archivo: ${file.name}</p><p>🆕 Nuevos abonados: <span class="font-bold text-green-600">${nuevos}</span></p><p>⚠️ Duplicados omitidos: <span class="font-bold text-yellow-600">${duplicados}</span></p><p>📊 Total en sistema: <span class="font-bold">${appSubscribers.length}</span></p></div>`;
-                    setTimeout(() => document.getElementById('importResult').innerHTML = '', 5000);
+                    
+                    const resultDiv = document.getElementById('importResult');
+                    resultDiv.innerHTML = `<div class="p-4 rounded-lg ${nuevos > 0 ? 'import-success' : 'duplicate-warning'}">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i class="fas fa-${nuevos > 0 ? 'check-circle text-green-600' : 'exclamation-triangle text-yellow-600'}"></i>
+                            <span class="font-bold">Importación de Abonados</span>
+                        </div>
+                        <p>📄 Archivo: ${file.name}</p>
+                        <p>🆕 Nuevos abonados: <span class="font-bold text-green-600">${nuevos}</span></p>
+                        <p>⚠️ Duplicados omitidos: <span class="font-bold text-yellow-600">${duplicados}</span></p>
+                        <p>📊 Total en sistema: <span class="font-bold">${appSubscribers.length}</span></p>
+                        ${nuevos > 0 ? `<p class="text-sm text-blue-600 mt-2">✅ Se importaron ${nuevos} abonados correctamente</p>` : '<p class="text-sm text-yellow-600 mt-2">⚠️ No se encontraron nuevos registros para importar</p>'}
+                    </div>`;
+                    
+                    setTimeout(() => resultDiv.innerHTML = '', 8000);
                     alert(`✅ Importación completada: ${nuevos} abonados nuevos, ${duplicados} duplicados omitidos`);
-                } catch (error) { alert('Error al importar el archivo. Verifique el formato.'); }
+                    
+                } catch (error) {
+                    console.error("Error al importar:", error);
+                    alert('Error al importar el archivo. Verifique el formato.\n' + error.message);
+                }
                 document.getElementById('subscriberExcelUpload').value = '';
             };
             reader.readAsArrayBuffer(file);
         };
 
-        // Render functions (simplificadas pero funcionales)
+        // ==================== FUNCIONES DE RENDER (MANTENIDAS IGUAL) ====================
         function renderEquiposList() {
             const container = document.getElementById('equiposList');
             if (!container) return;
@@ -790,7 +958,6 @@
         function openHistorialModal(id, type) { const item = getAbonadoById(id); if (!item) return; document.getElementById('historialInfo').innerHTML = `<div class="font-bold text-lg">${escapeHtml(item.nombre)}</div><div>📞 ${escapeHtml(item.telefono)} | 🆔 ${escapeHtml(item.cedula)} | 🏢 ${escapeHtml(item.centroOp)}</div><div>📡 Plan: ${escapeHtml(item.plan)}</div>${item.motivoBaja ? `<div>📋 Motivo de baja: ${escapeHtml(item.motivoBaja)}</div>` : ''}`; const gestiones = item.gestiones || []; if (gestiones.length === 0) { document.getElementById('historialList').innerHTML = '<div class="text-center py-8 text-gray-500">No hay gestiones registradas para este abonado</div>'; } else { document.getElementById('historialList').innerHTML = gestiones.map(g => `<div class="timeline-item p-3 bg-gray-50 rounded"><div class="flex justify-between"><div class="font-semibold">${g.resultado === 'contactado_interesado' ? '✅ INTERESADO en reconectar' : g.resultado === 'contactado_no_interesado' ? '❌ NO INTERESADO' : g.resultado === 'programar_visita' ? '📅 Visita programada' : g.resultado}</div><div class="text-xs text-gray-400">${g.fecha}</div></div><div class="text-xs text-gray-500 mt-1">👤 ${escapeHtml(g.agente)}</div>${g.observaciones ? `<div class="text-xs text-gray-600 mt-1">📝 ${escapeHtml(g.observaciones)}</div>` : ''}</div>`).join(''); } document.getElementById('historialModal').classList.remove('hidden'); }
         function closeHistorialModal() { document.getElementById('historialModal').classList.add('hidden'); }
 
-        // Funciones de edición, eliminación, gestión (adaptadas para usar IDs)
         window.openEditEquipo = async function(id) { if (!isAdmin()) return; const item = getEquipoById(id); if (!item) return; document.getElementById('editEquipoId').value = id; document.getElementById('editEquipoNombre').value = item.nombre; document.getElementById('editEquipoTelefono').value = item.telefono; document.getElementById('editEquipoDireccion').value = item.direccion; document.getElementById('editEquipoCO').value = item.centroOp; document.getElementById('editEquipoStatus').value = item.status; document.getElementById('editEquipoModal').classList.remove('hidden'); };
         window.closeEditEquipoModal = function() { document.getElementById('editEquipoModal').classList.add('hidden'); };
         window.deleteEquipo = async function(id) { if (!isAdmin()) return; if (confirm('¿Eliminar este equipo permanentemente?')) { appRecoveries = appRecoveries.filter(r => r.id !== id); await deleteFromFirebase("recoveries", id); addLog('Eliminar Equipo', `ID: ${id}`); await saveAll(); await refreshAllViews(); alert('Equipo eliminado'); } };
@@ -860,9 +1027,7 @@
         window.setAbonadosFilter = function(filter) { currentAbonadosFilter = filter; const pendingBtn = document.getElementById('showPendingAbonadosBtn'); const allBtn = document.getElementById('showAllAbonadosBtn'); if (pendingBtn) pendingBtn.className = filter === 'pendiente' ? 'px-2 sm:px-3 py-1 rounded text-xs sm:text-sm border filter-active' : 'px-2 sm:px-3 py-1 rounded text-xs sm:text-sm border'; if (allBtn) allBtn.className = filter === 'todos' ? 'px-2 sm:px-3 py-1 rounded text-xs sm:text-sm border filter-active' : 'px-2 sm:px-3 py-1 rounded text-xs sm:text-sm border'; renderAbonadosList(); };
         function setupSearchAndFilters() { const searchInput = document.getElementById('searchAbonado'); const statusFilter = document.getElementById('filterAbonadoStatus'); const coFilter = document.getElementById('filterAbonadoCO'); const interesFilter = document.getElementById('filterAbonadoInteres'); if (searchInput) searchInput.addEventListener('input', () => renderAbonadosList()); if (statusFilter) statusFilter.addEventListener('change', () => renderAbonadosList()); if (coFilter) coFilter.addEventListener('change', () => renderAbonadosList()); if (interesFilter) interesFilter.addEventListener('change', () => renderAbonadosList()); }
         
-        // Inicialización con Firebase
         async function init() {
-            // Esperar a que Firebase esté listo
             await new Promise(resolve => setTimeout(resolve, 1000));
             await initializeDefaultData();
             updateLoginSelect();

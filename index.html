@@ -9,38 +9,6 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
-    <!-- Firebase SDKs -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
-        import { getFirestore, collection, doc, getDocs, getDoc, setDoc, updateDoc, deleteDoc, query, orderBy, Timestamp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
-        
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyDSCfVZtsmUUvD2wrEQlSjQ4t81AurynRs",
-            authDomain: "gestion-y-seguimiento-ocad.firebaseapp.com",
-            projectId: "gestion-y-seguimiento-ocad",
-            storageBucket: "gestion-y-seguimiento-ocad.firebasestorage.app",
-            messagingSenderId: "285110388389",
-            appId: "1:285110388389:web:78196eaced8edf43e96f4c"
-        };
-        
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        
-        // Exponer Firebase para uso global
-        window.firebaseDB = db;
-        window.firebaseCollections = {
-            recoveries: collection(db, "recoveries"),
-            subscribers: collection(db, "subscribers"),
-            technicians: collection(db, "technicians"),
-            activityLog: collection(db, "activityLog"),
-            importHistory: collection(db, "importHistory")
-        };
-        window.firebaseTimestamp = Timestamp;
-        
-        console.log("🔥 Firebase initialized successfully");
-    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -413,6 +381,10 @@
         let currentContactItem = null;
         let searchTerm = '', filterStatus = '', filterCO = '', filterInteres = '';
         let isSyncing = false;
+        
+        // Firebase references - se inicializarán después
+        let db = null;
+        let firestoreHelpers = null;
 
         function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
         function generateSubscriberKey(nombre, cedula, telefono) { return `${nombre}|${cedula}|${telefono}`.toLowerCase().trim(); }
@@ -432,8 +404,8 @@
         }
 
         async function loadAllDataFromFirebase() {
-            if (!window.firebaseDB) {
-                console.warn("⚠️ Firebase no inicializado");
+            if (!window.firebaseDB || !window.firebaseHelpers) {
+                console.warn("⚠️ Firebase no inicializado o helpers no disponibles");
                 return false;
             }
             
@@ -441,7 +413,7 @@
             isSyncing = true;
             
             try {
-                const db = window.firebaseDB;
+                const { db, collection, getDocs } = window.firebaseHelpers;
                 
                 // Load recoveries
                 const recoveriesSnapshot = await getDocs(collection(db, "recoveries"));
@@ -470,13 +442,6 @@
             } catch (error) {
                 console.error("❌ Error cargando desde Firebase:", error);
                 updateSyncStatus('error', 'Error de conexión');
-                
-                if (error.code === 'permission-denied') {
-                    console.error("🔒 Error de permisos - verifica las reglas de Firestore");
-                } else if (error.code === 'unavailable') {
-                    console.error("🌐 Servicio no disponible - verifica tu conexión a internet");
-                }
-                
                 return false;
             } finally {
                 isSyncing = false;
@@ -484,9 +449,9 @@
         }
 
         async function saveToFirebase(collectionName, data, id = null) {
-            if (!window.firebaseDB) return false;
+            if (!window.firebaseDB || !window.firebaseHelpers) return false;
             try {
-                const db = window.firebaseDB;
+                const { db, collection, doc, setDoc } = window.firebaseHelpers;
                 const colRef = collection(db, collectionName);
                 if (id) {
                     await setDoc(doc(colRef, id), { ...data, updatedAt: new Date().toISOString() });
@@ -503,9 +468,9 @@
         }
 
         async function deleteFromFirebase(collectionName, id) {
-            if (!window.firebaseDB) return false;
+            if (!window.firebaseDB || !window.firebaseHelpers) return false;
             try {
-                const db = window.firebaseDB;
+                const { db, doc, deleteDoc } = window.firebaseHelpers;
                 await deleteDoc(doc(db, collectionName, id));
                 return true;
             } catch (error) {
@@ -542,29 +507,13 @@
             console.log("✅ Todos los datos sincronizados con Firebase");
         }
 
-        // Forzar sincronización manual
         window.forceSyncFromFirebase = async function() {
-            const btn = event?.target;
-            if (btn) {
-                const originalText = btn.innerHTML;
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sincronizando...';
-                btn.disabled = true;
-                
-                const success = await loadAllDataFromFirebase();
-                await refreshAllViews();
-                
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-                
-                if (success) {
-                    alert(`✅ Sincronización completada:\n📦 ${appRecoveries.length} equipos\n👥 ${appSubscribers.length} abonados`);
-                } else {
-                    alert('❌ Error al sincronizar. Verifica tu conexión a internet.');
-                }
+            const success = await loadAllDataFromFirebase();
+            await refreshAllViews();
+            if (success) {
+                alert(`✅ Sincronización completada:\n📦 ${appRecoveries.length} equipos\n👥 ${appSubscribers.length} abonados`);
             } else {
-                await loadAllDataFromFirebase();
-                await refreshAllViews();
-                alert(`✅ Sincronizado: ${appRecoveries.length} equipos, ${appSubscribers.length} abonados`);
+                alert('❌ Error al sincronizar. Verifica tu conexión a internet.');
             }
         };
 
@@ -634,7 +583,25 @@
             await syncAllData();
         }
 
-        // ==================== IMPORTAR EQUIPOS ====================
+        window.clearAllData = async function() {
+            if (!isAdmin()) { alert('Solo el Administrador puede eliminar todos los datos'); return; }
+            if (confirm('⚠️ ¿ESTÁ SEGURO? Esta acción eliminará TODOS los datos del sistema (equipos, abonados, técnicos, historial).')) {
+                const confirmText = prompt('Escriba "ELIMINAR" para confirmar:');
+                if (confirmText === 'ELIMINAR') {
+                    appRecoveries = [];
+                    appSubscribers = [];
+                    appTechnicians = [];
+                    appActivityLog = [];
+                    appImportHistory = [];
+                    await saveAll();
+                    addLog('Limpiar Datos', 'Se eliminaron TODOS los datos del sistema');
+                    await refreshAllViews();
+                    alert('✅ Todos los datos han sido eliminados. El sistema está limpio y listo para importar nuevos datos.');
+                } else { alert('Operación cancelada.'); }
+            }
+        };
+
+        // ==================== IMPORTAR FUNCTIONS ====================
         window.importRecoveryExcel = async function() {
             const file = document.getElementById('recoveryExcelUpload').files[0];
             if (!file) return alert('Seleccione un archivo Excel');
@@ -660,8 +627,6 @@
                         DIRECCION: headers.findIndex(h => h && (h.toString().toUpperCase().includes('DIRECCION') || h.toString().toUpperCase().includes('URBANIZACION'))),
                         CENTRO_OP: headers.findIndex(h => h && h.toString().toUpperCase().includes('EMPRESA'))
                     };
-                    
-                    console.log("📊 Columnas equipos encontradas:", colIndex);
                     
                     for (let i = 1; i < rows.length; i++) {
                         const row = rows[i];
@@ -735,7 +700,6 @@
             reader.readAsArrayBuffer(file);
         };
 
-        // ==================== IMPORTAR ABONADOS ====================
         window.importSubscriberExcel = async function() {
             const file = document.getElementById('subscriberExcelUpload').files[0];
             if (!file) return alert('Seleccione un archivo Excel');
@@ -747,9 +711,6 @@
                     const workbook = XLSX.read(data, { type: 'array' });
                     const sheet = workbook.Sheets[workbook.SheetNames[0]];
                     const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-                    
-                    console.log("📊 Filas del archivo:", rows.length);
-                    console.log("📋 Encabezados encontrados:", rows[0]);
                     
                     const headers = rows[0] || [];
                     const colIndices = {
@@ -763,8 +724,6 @@
                         CENTRO_OP: headers.findIndex(h => h === 'EMPRESA'),
                         FECHA_CORTE: headers.findIndex(h => h === 'FECHA_ING_CORTE')
                     };
-                    
-                    console.log("📍 Columnas encontradas:", colIndices);
                     
                     let nuevos = 0, duplicados = 0;
                     const fechaImportacion = new Date().toLocaleString();
@@ -851,10 +810,6 @@
                         
                         existingKeys.add(key); 
                         nuevos++;
-                        
-                        if (nuevos % 100 === 0) {
-                            console.log(`📥 Procesados ${nuevos} registros...`);
-                        }
                     }
                     
                     appImportHistory.unshift({ 
@@ -881,12 +836,9 @@
                         <p>🆕 Nuevos abonados: <span class="font-bold text-green-600">${nuevos}</span></p>
                         <p>⚠️ Duplicados omitidos: <span class="font-bold text-yellow-600">${duplicados}</span></p>
                         <p>📊 Total en sistema: <span class="font-bold">${appSubscribers.length}</span></p>
-                        ${nuevos > 0 ? `<p class="text-sm text-blue-600 mt-2">✅ Se importaron ${nuevos} abonados correctamente</p>` : '<p class="text-sm text-yellow-600 mt-2">⚠️ No se encontraron nuevos registros para importar</p>'}
                     </div>`;
-                    
                     setTimeout(() => resultDiv.innerHTML = '', 8000);
                     alert(`✅ Importación completada: ${nuevos} abonados nuevos, ${duplicados} duplicados omitidos`);
-                    
                 } catch (error) {
                     console.error("Error al importar:", error);
                     alert('Error al importar el archivo. Verifique el formato.\n' + error.message);
@@ -896,7 +848,7 @@
             reader.readAsArrayBuffer(file);
         };
 
-        // ==================== FUNCIONES DE RENDER ====================
+        // ==================== RENDER FUNCTIONS ====================
         function renderEquiposList() {
             const container = document.getElementById('equiposList');
             if (!container) return;
@@ -1004,77 +956,75 @@
         window.setAbonadosFilter = function(filter) { currentAbonadosFilter = filter; const pendingBtn = document.getElementById('showPendingAbonadosBtn'); const allBtn = document.getElementById('showAllAbonadosBtn'); if (pendingBtn) pendingBtn.className = filter === 'pendiente' ? 'px-2 sm:px-3 py-1 rounded text-xs sm:text-sm border filter-active' : 'px-2 sm:px-3 py-1 rounded text-xs sm:text-sm border'; if (allBtn) allBtn.className = filter === 'todos' ? 'px-2 sm:px-3 py-1 rounded text-xs sm:text-sm border filter-active' : 'px-2 sm:px-3 py-1 rounded text-xs sm:text-sm border'; renderAbonadosList(); };
         function setupSearchAndFilters() { const searchInput = document.getElementById('searchAbonado'); const statusFilter = document.getElementById('filterAbonadoStatus'); const coFilter = document.getElementById('filterAbonadoCO'); const interesFilter = document.getElementById('filterAbonadoInteres'); if (searchInput) searchInput.addEventListener('input', () => renderAbonadosList()); if (statusFilter) statusFilter.addEventListener('change', () => renderAbonadosList()); if (coFilter) coFilter.addEventListener('change', () => renderAbonadosList()); if (interesFilter) interesFilter.addEventListener('change', () => renderAbonadosList()); }
         
+        // Inicializar Firebase y el sistema
         async function init() {
             console.log("🚀 Iniciando sistema...");
             
             const statusMsg = document.getElementById('firebaseStatusMsg');
-            if (statusMsg) {
-                statusMsg.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Conectando a la nube...';
-            }
             
-            try {
-                // Cargar datos desde Firebase primero
-                console.log("📡 Cargando datos desde Firebase...");
-                await loadAllDataFromFirebase();
+            // Esperar a que Firebase esté disponible
+            await new Promise(resolve => {
+                const checkFirebase = setInterval(() => {
+                    if (window.firebaseDB && window.firebaseHelpers) {
+                        clearInterval(checkFirebase);
+                        resolve();
+                    }
+                }, 100);
+                setTimeout(() => {
+                    clearInterval(checkFirebase);
+                    resolve();
+                }, 5000);
+            });
+            
+            if (window.firebaseDB && window.firebaseHelpers) {
+                console.log("✅ Firebase disponible");
+                if (statusMsg) {
+                    statusMsg.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Cargando datos desde la nube...';
+                }
                 
-                console.log(`✅ Datos cargados: ${appRecoveries.length} equipos, ${appSubscribers.length} abonados`);
-                
-                // Si Firebase no tiene datos, intentar con localStorage como respaldo
-                if (appRecoveries.length === 0 && appSubscribers.length === 0) {
-                    console.log("📁 Firebase sin datos, verificando localStorage...");
-                    
-                    const storedRecoveries = localStorage.getItem('ocad_recoveries_v17');
-                    if (storedRecoveries) {
-                        appRecoveries = JSON.parse(storedRecoveries);
-                        console.log(`📦 Cargados ${appRecoveries.length} equipos desde localStorage`);
-                    }
-                    
-                    const storedSubscribers = localStorage.getItem('ocad_subscribers_v17');
-                    if (storedSubscribers) {
-                        appSubscribers = JSON.parse(storedSubscribers);
-                        console.log(`📦 Cargados ${appSubscribers.length} abonados desde localStorage`);
-                    }
-                    
-                    const storedTechnicians = localStorage.getItem('ocad_technicians_v17');
-                    if (storedTechnicians) appTechnicians = JSON.parse(storedTechnicians);
-                    
-                    const storedLogs = localStorage.getItem('ocad_recovery_logs_v17');
-                    if (storedLogs) appActivityLog = JSON.parse(storedLogs);
-                    
-                    const storedImports = localStorage.getItem('ocad_import_history_v17');
-                    if (storedImports) appImportHistory = JSON.parse(storedImports);
-                    
-                    // Sincronizar datos de localStorage a Firebase si hay datos locales
-                    if (appRecoveries.length > 0 || appSubscribers.length > 0) {
-                        console.log("☁️ Sincronizando datos locales a Firebase...");
-                        await syncAllData();
-                        if (statusMsg) {
-                            statusMsg.innerHTML = '<i class="fas fa-check-circle text-green-500"></i> Datos sincronizados con la nube';
-                            setTimeout(() => { if (statusMsg) statusMsg.style.display = 'none'; }, 3000);
-                        }
-                    } else {
-                        if (statusMsg) {
-                            statusMsg.innerHTML = '<i class="fas fa-info-circle text-blue-500"></i> Sistema listo para importar datos';
-                            setTimeout(() => { if (statusMsg) statusMsg.style.display = 'none'; }, 3000);
-                        }
-                    }
-                } else {
+                try {
+                    await loadAllDataFromFirebase();
                     if (statusMsg) {
                         statusMsg.innerHTML = `<i class="fas fa-check-circle text-green-500"></i> Datos cargados: ${appRecoveries.length} equipos, ${appSubscribers.length} abonados`;
                         setTimeout(() => { if (statusMsg) statusMsg.style.display = 'none'; }, 3000);
                     }
+                } catch (error) {
+                    console.error("Error cargando datos:", error);
+                    if (statusMsg) {
+                        statusMsg.innerHTML = '<i class="fas fa-exclamation-triangle text-yellow-500"></i> Usando datos locales';
+                        setTimeout(() => { if (statusMsg) statusMsg.style.display = 'none'; }, 3000);
+                    }
                 }
-                
-            } catch (error) {
-                console.error("❌ Error en inicialización:", error);
+            } else {
+                console.warn("⚠️ Firebase no disponible, usando solo localStorage");
                 if (statusMsg) {
-                    statusMsg.innerHTML = '<i class="fas fa-exclamation-triangle text-red-500"></i> Error de conexión, usando datos locales';
-                    statusMsg.className = 'text-center text-sm text-red-500 mb-3';
-                    setTimeout(() => { if (statusMsg) statusMsg.style.display = 'none'; }, 5000);
+                    statusMsg.innerHTML = '<i class="fas fa-database"></i> Modo local - sin sincronización en la nube';
+                    setTimeout(() => { if (statusMsg) statusMsg.style.display = 'none'; }, 3000);
                 }
             }
             
-            // Configurar la interfaz
+            // Cargar datos desde localStorage como respaldo
+            const storedRecoveries = localStorage.getItem('ocad_recoveries_v17');
+            if (storedRecoveries && appRecoveries.length === 0) {
+                appRecoveries = JSON.parse(storedRecoveries);
+                console.log(`📦 Cargados ${appRecoveries.length} equipos desde localStorage`);
+            }
+            
+            const storedSubscribers = localStorage.getItem('ocad_subscribers_v17');
+            if (storedSubscribers && appSubscribers.length === 0) {
+                appSubscribers = JSON.parse(storedSubscribers);
+                console.log(`📦 Cargados ${appSubscribers.length} abonados desde localStorage`);
+            }
+            
+            const storedTechnicians = localStorage.getItem('ocad_technicians_v17');
+            if (storedTechnicians && appTechnicians.length === 0) appTechnicians = JSON.parse(storedTechnicians);
+            
+            const storedLogs = localStorage.getItem('ocad_recovery_logs_v17');
+            if (storedLogs && appActivityLog.length === 0) appActivityLog = JSON.parse(storedLogs);
+            
+            const storedImports = localStorage.getItem('ocad_import_history_v17');
+            if (storedImports && appImportHistory.length === 0) appImportHistory = JSON.parse(storedImports);
+            
             updateLoginSelect();
             setupSearchAndFilters();
             await refreshAllViews();
@@ -1083,7 +1033,10 @@
             console.log("✅ Sistema inicializado correctamente");
         }
         
-        // Iniciar el sistema
+        // Exponer funciones globales
+        window.doLogin = doLogin;
+        
+        // Iniciar
         init();
     </script>
 </body>

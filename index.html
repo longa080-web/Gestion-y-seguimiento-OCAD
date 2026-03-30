@@ -12,7 +12,7 @@
     <!-- Firebase SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
-        import { getFirestore, collection, doc, getDocs, getDoc, setDoc, updateDoc, deleteDoc, query, where, orderBy, limit, Timestamp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+        import { getFirestore, collection, doc, getDocs, getDoc, setDoc, updateDoc, deleteDoc, query, orderBy, Timestamp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
         
         // Firebase configuration
         const firebaseConfig = {
@@ -63,7 +63,7 @@
         .metric-card:hover { transform: translateY(-4px); box-shadow: 0 12px 20px rgba(0,0,0,0.1); }
         .tab-active { color: #4f46e5 !important; border-bottom-color: #4f46e5 !important; border-bottom-width: 2px !important; font-weight: 600 !important; }
         .tab-inactive { color: #6b7280 !important; border-bottom-color: transparent !important; }
-        .assign-btn, .edit-btn, .delete-btn, .attend-btn, .reactivate-btn, .gestionar-btn, .history-btn { padding: 6px 12px; border-radius: 8px; font-size: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; border: none; }
+        .assign-btn, .edit-btn, .delete-btn, .attend-btn, .reactivate-btn, .gestionar-btn, .history-btn, .sync-force-btn { padding: 6px 12px; border-radius: 8px; font-size: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; border: none; }
         .assign-btn { background: #8b5cf6; color: white; }
         .assign-btn:hover { background: #7c3aed; }
         .edit-btn { background: #3b82f6; color: white; }
@@ -78,6 +78,8 @@
         .gestionar-btn:hover { background: #0891b2; }
         .history-btn { background: #6b7280; color: white; }
         .history-btn:hover { background: #4b5563; }
+        .sync-force-btn { background: #10b981; color: white; }
+        .sync-force-btn:hover { background: #059669; }
         .clear-data-btn { background: #dc2626; color: white; padding: 8px 16px; border-radius: 8px; font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; border: none; margin-top: 10px; }
         .clear-data-btn:hover { background: #b91c1c; }
         .sync-btn { background: #3b82f6; color: white; padding: 8px 16px; border-radius: 8px; font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; border: none; margin-top: 10px; }
@@ -122,6 +124,9 @@
                 <h2 class="text-2xl font-bold mt-2">OCAD Inter</h2>
                 <p class="text-gray-500">Sistema de Gestión de Recupero de Equipos</p>
             </div>
+            <div id="firebaseStatusMsg" class="text-center text-sm text-blue-500 mb-3">
+                <i class="fas fa-spinner fa-spin"></i> Conectando a la nube...
+            </div>
             <form id="loginForm" onsubmit="return false;">
                 <label class="block text-sm font-medium text-gray-700 mb-2">Seleccione su perfil</label>
                 <select id="loginUserSelect" class="w-full border rounded-lg px-4 py-2 mb-4" required>
@@ -142,7 +147,6 @@
                 <p>👑 Administrador</p>
                 <p>📊 Supervisor - Contraseña: <span class="font-mono">Inter1234</span></p>
                 <p>📞 Agente OCAD - Contraseña: <span class="font-mono">Inter1234</span></p>
-                <p class="text-xs text-gray-500 mt-2">🔒 La contraseña de Administrador es confidencial</p>
                 <p class="text-xs text-blue-500 mt-2"><i class="fas fa-cloud-upload-alt"></i> Datos sincronizados en la nube</p>
             </div>
         </div>
@@ -161,6 +165,9 @@
                         <i class="fas fa-cloud-upload-alt"></i>
                         <span>Sincronizado</span>
                     </div>
+                    <button onclick="forceSyncFromFirebase()" class="sync-force-btn text-xs py-1 px-2">
+                        <i class="fas fa-sync-alt"></i> Forzar
+                    </button>
                     <span id="userRoleDisplay" class="text-xs sm:text-sm bg-indigo-600 px-2 sm:px-3 py-1 rounded-full">
                         <i class="fas fa-user mr-1"></i><span id="currentUserName"></span>
                     </span>
@@ -407,10 +414,6 @@
         let searchTerm = '', filterStatus = '', filterCO = '', filterInteres = '';
         let isSyncing = false;
 
-        // Firebase references
-        let db = null;
-        let collections = null;
-
         function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
         function generateSubscriberKey(nombre, cedula, telefono) { return `${nombre}|${cedula}|${telefono}`.toLowerCase().trim(); }
         function generateEquipmentKey(nombre, telefono, direccion) { return `${nombre}|${telefono}|${direccion}`.toLowerCase().trim(); }
@@ -430,7 +433,7 @@
 
         async function loadAllDataFromFirebase() {
             if (!window.firebaseDB) {
-                console.warn("Firebase not initialized yet");
+                console.warn("⚠️ Firebase no inicializado");
                 return false;
             }
             
@@ -443,10 +446,12 @@
                 // Load recoveries
                 const recoveriesSnapshot = await getDocs(collection(db, "recoveries"));
                 appRecoveries = recoveriesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                console.log(`📊 Recuperados ${appRecoveries.length} equipos desde Firebase`);
                 
                 // Load subscribers
                 const subscribersSnapshot = await getDocs(collection(db, "subscribers"));
                 appSubscribers = subscribersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                console.log(`👥 Recuperados ${appSubscribers.length} abonados desde Firebase`);
                 
                 // Load technicians
                 const techniciansSnapshot = await getDocs(collection(db, "technicians"));
@@ -461,11 +466,17 @@
                 appImportHistory = importSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
                 
                 updateSyncStatus('synced', 'Sincronizado');
-                console.log(`✅ Datos sincronizados: ${appRecoveries.length} equipos, ${appSubscribers.length} abonados`);
                 return true;
             } catch (error) {
-                console.error("Error loading from Firebase:", error);
-                updateSyncStatus('error', 'Error de sincronización');
+                console.error("❌ Error cargando desde Firebase:", error);
+                updateSyncStatus('error', 'Error de conexión');
+                
+                if (error.code === 'permission-denied') {
+                    console.error("🔒 Error de permisos - verifica las reglas de Firestore");
+                } else if (error.code === 'unavailable') {
+                    console.error("🌐 Servicio no disponible - verifica tu conexión a internet");
+                }
+                
                 return false;
             } finally {
                 isSyncing = false;
@@ -530,6 +541,32 @@
             updateSyncStatus('synced', 'Sincronizado');
             console.log("✅ Todos los datos sincronizados con Firebase");
         }
+
+        // Forzar sincronización manual
+        window.forceSyncFromFirebase = async function() {
+            const btn = event?.target;
+            if (btn) {
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sincronizando...';
+                btn.disabled = true;
+                
+                const success = await loadAllDataFromFirebase();
+                await refreshAllViews();
+                
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                
+                if (success) {
+                    alert(`✅ Sincronización completada:\n📦 ${appRecoveries.length} equipos\n👥 ${appSubscribers.length} abonados`);
+                } else {
+                    alert('❌ Error al sincronizar. Verifica tu conexión a internet.');
+                }
+            } else {
+                await loadAllDataFromFirebase();
+                await refreshAllViews();
+                alert(`✅ Sincronizado: ${appRecoveries.length} equipos, ${appSubscribers.length} abonados`);
+            }
+        };
 
         function addLog(action, details) {
             if (!appCurrentUser) return;
@@ -597,57 +634,7 @@
             await syncAllData();
         }
 
-        async function initializeDefaultData() {
-            const firebaseLoaded = await loadAllDataFromFirebase();
-            
-            if (!firebaseLoaded || (appRecoveries.length === 0 && appSubscribers.length === 0)) {
-                const storedRecoveries = localStorage.getItem('ocad_recoveries_v17');
-                if (storedRecoveries) appRecoveries = JSON.parse(storedRecoveries);
-                else appRecoveries = [];
-                
-                const storedSubscribers = localStorage.getItem('ocad_subscribers_v17');
-                if (storedSubscribers) appSubscribers = JSON.parse(storedSubscribers);
-                else appSubscribers = [];
-                
-                const storedTechnicians = localStorage.getItem('ocad_technicians_v17');
-                if (storedTechnicians) appTechnicians = JSON.parse(storedTechnicians);
-                else appTechnicians = [];
-                
-                const storedLogs = localStorage.getItem('ocad_recovery_logs_v17');
-                if (storedLogs) appActivityLog = JSON.parse(storedLogs);
-                else appActivityLog = [];
-                
-                const storedImports = localStorage.getItem('ocad_import_history_v17');
-                if (storedImports) appImportHistory = JSON.parse(storedImports);
-                else appImportHistory = [];
-                
-                if (appRecoveries.length > 0 || appSubscribers.length > 0) {
-                    await syncAllData();
-                }
-            }
-            
-            saveAll();
-        }
-
-        window.clearAllData = async function() {
-            if (!isAdmin()) { alert('Solo el Administrador puede eliminar todos los datos'); return; }
-            if (confirm('⚠️ ¿ESTÁ SEGURO? Esta acción eliminará TODOS los datos del sistema (equipos, abonados, técnicos, historial).')) {
-                const confirmText = prompt('Escriba "ELIMINAR" para confirmar:');
-                if (confirmText === 'ELIMINAR') {
-                    appRecoveries = [];
-                    appSubscribers = [];
-                    appTechnicians = [];
-                    appActivityLog = [];
-                    appImportHistory = [];
-                    await saveAll();
-                    addLog('Limpiar Datos', 'Se eliminaron TODOS los datos del sistema');
-                    await refreshAllViews();
-                    alert('✅ Todos los datos han sido eliminados. El sistema está limpio y listo para importar nuevos datos.');
-                } else { alert('Operación cancelada.'); }
-            }
-        };
-
-        // ==================== IMPORTAR EQUIPOS (CORREGIDO) ====================
+        // ==================== IMPORTAR EQUIPOS ====================
         window.importRecoveryExcel = async function() {
             const file = document.getElementById('recoveryExcelUpload').files[0];
             if (!file) return alert('Seleccione un archivo Excel');
@@ -665,7 +652,6 @@
                     const existingKeys = new Set();
                     appRecoveries.forEach(e => existingKeys.add(generateEquipmentKey(e.nombre, e.telefono, e.direccion)));
                     
-                    // Buscar encabezados en la primera fila
                     const headers = rows[0] || [];
                     const colIndex = {
                         CLIENTE: headers.findIndex(h => h && h.toString().toUpperCase().includes('CLIENTE')),
@@ -749,7 +735,7 @@
             reader.readAsArrayBuffer(file);
         };
 
-        // ==================== IMPORTAR ABONADOS (CORREGIDO PARA REZAGADOS 2.xlsx) ====================
+        // ==================== IMPORTAR ABONADOS ====================
         window.importSubscriberExcel = async function() {
             const file = document.getElementById('subscriberExcelUpload').files[0];
             if (!file) return alert('Seleccione un archivo Excel');
@@ -765,7 +751,6 @@
                     console.log("📊 Filas del archivo:", rows.length);
                     console.log("📋 Encabezados encontrados:", rows[0]);
                     
-                    // Buscar los índices de las columnas según el archivo REZAGADOS 2.xlsx
                     const headers = rows[0] || [];
                     const colIndices = {
                         IDENTIFICADOR: headers.findIndex(h => h === 'CLIENTE'),
@@ -786,12 +771,10 @@
                     const existingKeys = new Set();
                     appSubscribers.forEach(s => existingKeys.add(generateSubscriberKey(s.nombre, s.cedula, s.telefono)));
                     
-                    // Comenzar desde la fila 1 (índice 1) para saltar encabezados
                     for (let i = 1; i < rows.length; i++) {
                         const row = rows[i];
                         if (!row || row.length === 0) continue;
                         
-                        // Extraer teléfono - buscar el primero disponible
                         let telefono = '';
                         if (colIndices.TELEFONO_1 >= 0 && row[colIndices.TELEFONO_1] && row[colIndices.TELEFONO_1].toString().trim()) {
                             telefono = row[colIndices.TELEFONO_1].toString().trim();
@@ -802,7 +785,6 @@
                         }
                         if (!telefono) telefono = 'Sin teléfono';
                         
-                        // Obtener nombre
                         let nombre = '';
                         if (colIndices.NOMBRE >= 0 && row[colIndices.NOMBRE]) {
                             nombre = row[colIndices.NOMBRE].toString().trim();
@@ -812,19 +794,16 @@
                         }
                         if (!nombre) continue;
                         
-                        // Obtener cédula/RIF
                         let cedula = 'N/A';
                         if (colIndices.DOCUMENTO >= 0 && row[colIndices.DOCUMENTO]) {
                             cedula = row[colIndices.DOCUMENTO].toString().trim();
                         }
                         
-                        // Obtener plan
                         let plan = 'No especificado';
                         if (colIndices.PLAN >= 0 && row[colIndices.PLAN]) {
                             plan = row[colIndices.PLAN].toString().trim();
                         }
                         
-                        // Determinar centro de operaciones basado en EMPRESA
                         let centroOp = 'SIN ASIGNAR';
                         if (colIndices.CENTRO_OP >= 0 && row[colIndices.CENTRO_OP]) {
                             const empresa = row[colIndices.CENTRO_OP].toString().toUpperCase();
@@ -834,7 +813,6 @@
                             else if (empresa.includes('PARAISO')) centroOp = 'PARAISO';
                         }
                         
-                        // Obtener fecha de corte
                         let fechaCorte = '';
                         if (colIndices.FECHA_CORTE >= 0 && row[colIndices.FECHA_CORTE]) {
                             fechaCorte = row[colIndices.FECHA_CORTE];
@@ -874,7 +852,6 @@
                         existingKeys.add(key); 
                         nuevos++;
                         
-                        // Log cada 100 registros para mostrar progreso
                         if (nuevos % 100 === 0) {
                             console.log(`📥 Procesados ${nuevos} registros...`);
                         }
@@ -919,7 +896,7 @@
             reader.readAsArrayBuffer(file);
         };
 
-        // ==================== FUNCIONES DE RENDER (MANTENIDAS IGUAL) ====================
+        // ==================== FUNCIONES DE RENDER ====================
         function renderEquiposList() {
             const container = document.getElementById('equiposList');
             if (!container) return;
@@ -1018,7 +995,7 @@
         window.exportFullReportPDF = function() { const { jsPDF } = window.jspdf; const doc = new jsPDF({ orientation: 'landscape' }); doc.text('Reporte OCAD Inter', 14, 15); doc.text(new Date().toLocaleString(), 14, 25); const body = [...appRecoveries.map(r => [r.nombre.substring(0, 25), r.telefono, r.centroOp, r.status]), ...appSubscribers.map(s => [s.nombre.substring(0, 25), s.telefono, s.centroOp, s.status])]; doc.autoTable({ head: [['Nombre', 'Teléfono', 'CO', 'Estado']], body: body, startY: 35 }); doc.save(`reporte_${new Date().toISOString().slice(0,10)}.pdf`); };
         
         function updateLoginSelect() { const select = document.getElementById('loginUserSelect'); if (select) select.innerHTML = '<option value="">-- Seleccionar perfil --</option>' + appUsers.map(u => `<option value="${u.id}">${u.fullName} (${u.role === 'admin' ? 'Administrador' : u.role === 'supervisor' ? 'Supervisor' : 'Agente OCAD'})</option>`).join(''); }
-        window.togglePassword = function() { const input = document.getElementById('loginPassword'); const icon = document.querySelector('.toggle-password'); if (input.type === 'password') { input.type = 'text'; icon.classList.replace('fa-eye', 'fa-eye-slash'); } else { input.type = 'password'; icon.classList.replace('fa-eye-slash', 'fa-eye'); } }
+        window.togglePassword = function() { const input = document.getElementById('loginPassword'); const icon = document.querySelector('.fa-eye'); if (input.type === 'password') { input.type = 'text'; icon.classList.remove('fa-eye'); icon.classList.add('fa-eye-slash'); } else { input.type = 'password'; icon.classList.remove('fa-eye-slash'); icon.classList.add('fa-eye'); } }
         function doLogin() { const userId = parseInt(document.getElementById('loginUserSelect').value); const password = document.getElementById('loginPassword').value; const user = appUsers.find(u => u.id === userId); const errorDiv = document.getElementById('loginError'); if (!userId || isNaN(userId)) { errorDiv.textContent = 'Seleccione un perfil'; errorDiv.classList.remove('hidden'); return; } if (!user) { errorDiv.textContent = 'Perfil no válido'; errorDiv.classList.remove('hidden'); return; } if (user.password === password) { appCurrentUser = user; document.getElementById('loginModal').classList.add('hidden'); document.getElementById('mainContent').classList.remove('hidden'); document.getElementById('currentUserName').innerText = appCurrentUser.fullName; const isAdminUser = appCurrentUser.role === 'admin'; document.getElementById('reportsTabBtn').classList.toggle('hidden', !isAdminUser); addLog('Inicio de sesión', 'Ingresó al sistema'); refreshAllViews(); errorDiv.classList.add('hidden'); showTab('dashboard'); } else { errorDiv.textContent = 'Contraseña incorrecta'; errorDiv.classList.remove('hidden'); } }
         document.getElementById('logoutBtn').addEventListener('click', () => { if (appCurrentUser) addLog('Cierre de sesión', 'Cerró sesión'); appCurrentUser = null; document.getElementById('mainContent').classList.add('hidden'); document.getElementById('loginModal').classList.remove('hidden'); document.getElementById('loginPassword').value = ''; document.getElementById('loginUserSelect').value = ''; updateLoginSelect(); });
         function highlightActiveTab(tabName) { const tabs = ['dashboard', 'import', 'equipos', 'abonados', 'technicians', 'history', 'reports']; tabs.forEach(tab => { const btn = document.getElementById(`tab-${tab}-btn`); if (btn) { if (tab === tabName) { btn.classList.add('tab-active'); btn.classList.remove('tab-inactive'); } else { btn.classList.remove('tab-active'); btn.classList.add('tab-inactive'); } } }); }
@@ -1028,14 +1005,85 @@
         function setupSearchAndFilters() { const searchInput = document.getElementById('searchAbonado'); const statusFilter = document.getElementById('filterAbonadoStatus'); const coFilter = document.getElementById('filterAbonadoCO'); const interesFilter = document.getElementById('filterAbonadoInteres'); if (searchInput) searchInput.addEventListener('input', () => renderAbonadosList()); if (statusFilter) statusFilter.addEventListener('change', () => renderAbonadosList()); if (coFilter) coFilter.addEventListener('change', () => renderAbonadosList()); if (interesFilter) interesFilter.addEventListener('change', () => renderAbonadosList()); }
         
         async function init() {
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            await initializeDefaultData();
+            console.log("🚀 Iniciando sistema...");
+            
+            const statusMsg = document.getElementById('firebaseStatusMsg');
+            if (statusMsg) {
+                statusMsg.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Conectando a la nube...';
+            }
+            
+            try {
+                // Cargar datos desde Firebase primero
+                console.log("📡 Cargando datos desde Firebase...");
+                await loadAllDataFromFirebase();
+                
+                console.log(`✅ Datos cargados: ${appRecoveries.length} equipos, ${appSubscribers.length} abonados`);
+                
+                // Si Firebase no tiene datos, intentar con localStorage como respaldo
+                if (appRecoveries.length === 0 && appSubscribers.length === 0) {
+                    console.log("📁 Firebase sin datos, verificando localStorage...");
+                    
+                    const storedRecoveries = localStorage.getItem('ocad_recoveries_v17');
+                    if (storedRecoveries) {
+                        appRecoveries = JSON.parse(storedRecoveries);
+                        console.log(`📦 Cargados ${appRecoveries.length} equipos desde localStorage`);
+                    }
+                    
+                    const storedSubscribers = localStorage.getItem('ocad_subscribers_v17');
+                    if (storedSubscribers) {
+                        appSubscribers = JSON.parse(storedSubscribers);
+                        console.log(`📦 Cargados ${appSubscribers.length} abonados desde localStorage`);
+                    }
+                    
+                    const storedTechnicians = localStorage.getItem('ocad_technicians_v17');
+                    if (storedTechnicians) appTechnicians = JSON.parse(storedTechnicians);
+                    
+                    const storedLogs = localStorage.getItem('ocad_recovery_logs_v17');
+                    if (storedLogs) appActivityLog = JSON.parse(storedLogs);
+                    
+                    const storedImports = localStorage.getItem('ocad_import_history_v17');
+                    if (storedImports) appImportHistory = JSON.parse(storedImports);
+                    
+                    // Sincronizar datos de localStorage a Firebase si hay datos locales
+                    if (appRecoveries.length > 0 || appSubscribers.length > 0) {
+                        console.log("☁️ Sincronizando datos locales a Firebase...");
+                        await syncAllData();
+                        if (statusMsg) {
+                            statusMsg.innerHTML = '<i class="fas fa-check-circle text-green-500"></i> Datos sincronizados con la nube';
+                            setTimeout(() => { if (statusMsg) statusMsg.style.display = 'none'; }, 3000);
+                        }
+                    } else {
+                        if (statusMsg) {
+                            statusMsg.innerHTML = '<i class="fas fa-info-circle text-blue-500"></i> Sistema listo para importar datos';
+                            setTimeout(() => { if (statusMsg) statusMsg.style.display = 'none'; }, 3000);
+                        }
+                    }
+                } else {
+                    if (statusMsg) {
+                        statusMsg.innerHTML = `<i class="fas fa-check-circle text-green-500"></i> Datos cargados: ${appRecoveries.length} equipos, ${appSubscribers.length} abonados`;
+                        setTimeout(() => { if (statusMsg) statusMsg.style.display = 'none'; }, 3000);
+                    }
+                }
+                
+            } catch (error) {
+                console.error("❌ Error en inicialización:", error);
+                if (statusMsg) {
+                    statusMsg.innerHTML = '<i class="fas fa-exclamation-triangle text-red-500"></i> Error de conexión, usando datos locales';
+                    statusMsg.className = 'text-center text-sm text-red-500 mb-3';
+                    setTimeout(() => { if (statusMsg) statusMsg.style.display = 'none'; }, 5000);
+                }
+            }
+            
+            // Configurar la interfaz
             updateLoginSelect();
             setupSearchAndFilters();
             await refreshAllViews();
             showTab('dashboard');
+            
+            console.log("✅ Sistema inicializado correctamente");
         }
         
+        // Iniciar el sistema
         init();
     </script>
 </body>

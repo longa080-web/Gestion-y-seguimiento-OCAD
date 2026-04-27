@@ -87,7 +87,7 @@
         .info-supervisor i { margin-right: 4px; }
         .info-admin-hidden { background: #fef3c7; border: 1px solid #fde68a; border-radius: 8px; padding: 6px; margin-top: 8px; text-align: center; }
         .info-admin-hidden p { font-size: 10px; color: #92400e; margin: 0; }
-        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; display: flex; justify-content: center; align-items: center; }
+        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; display: flex; justify-content: center; align-items: center; }
         .loading-spinner { background: white; padding: 20px; border-radius: 12px; text-align: center; }
     </style>
 </head>
@@ -97,7 +97,7 @@
     <div id="loadingOverlay" class="loading-overlay hidden">
         <div class="loading-spinner">
             <i class="fas fa-spinner fa-spin text-2xl text-indigo-600 mb-2"></i>
-            <p class="text-sm">Cargando datos desde Firebase...</p>
+            <p class="text-sm">Cargando datos desde la nube...</p>
         </div>
     </div>
 
@@ -141,9 +141,8 @@
         </div>
     </div>
 
-    <!-- Main Content (igual que antes - se omite por brevedad pero va igual) -->
+    <!-- Main Content -->
     <div id="mainContent" class="hidden">
-        <!-- TODO: Copiar todo el contenido del main del archivo original -->
         <nav class="bg-indigo-800 text-white shadow-lg sticky top-0 z-50">
             <div class="px-3 py-2 flex justify-between items-center flex-wrap gap-2">
                 <div class="flex items-center space-x-2">
@@ -200,7 +199,7 @@
                 <div class="bg-white rounded-xl shadow-md p-3"><h3 class="font-bold text-sm mb-2"><i class="fas fa-trophy text-yellow-500 mr-2"></i>Top Agentes del Mes</h3><div id="topAgentsList" class="space-y-1"></div></div>
             </div>
 
-            <!-- Resto de tabs (igual que el original, por brevedad no se repite todo pero es IDÉNTICO) -->
+            <!-- Listado clientes rezagados Tab -->
             <div id="rezagadosTab" class="tab-content hidden">
                 <div class="bg-white rounded-xl shadow-md p-3 mb-3">
                     <div class="flex flex-wrap justify-between items-center gap-2 mb-2">
@@ -215,13 +214,16 @@
                     </div>
                 </div>
                 <div class="table-container desktop-table">
-                    <table class="customers-table"><thead><tr><th>✅</th><th>ID</th><th>Nombre</th><th>Documento</th><th>Teléfono</th><th>Plan</th><th>CO</th><th>Fecha Corte</th><th>Estado</th><th>Bloqueado</th><th>Acciones</th></tr></thead>
-                    <tbody id="rezagadosTableBodyDesktop"></tbody></table>
+                    <table class="customers-table">
+                        <thead><tr><th>✅</th><th>ID</th><th>Nombre</th><th>Documento</th><th>Teléfono</th><th>Plan</th><th>CO</th><th>Fecha Corte</th><th>Estado</th><th>Bloqueado</th><th>Acciones</th></tr></thead>
+                        <tbody id="rezagadosTableBodyDesktop"></tbody>
+                    </table>
                 </div>
                 <div id="rezagadosMobileList" class="mobile-cards"></div>
                 <div id="rezagadosPagination" class="flex justify-center items-center gap-1 mt-3"></div>
             </div>
 
+            <!-- Listado clientes Perdidos Tab -->
             <div id="perdidosTab" class="tab-content hidden">
                 <div class="bg-white rounded-xl shadow-md p-3 mb-3">
                     <div class="flex flex-wrap justify-between items-center gap-2 mb-2">
@@ -236,13 +238,16 @@
                     </div>
                 </div>
                 <div class="table-container desktop-table">
-                    <table class="customers-table"><thead><tr><th>✅</th><th>ID</th><th>Nombre</th><th>Documento</th><th>Teléfono</th><th>Plan</th><th>CO</th><th>Fecha Corte</th><th>Estado</th><th>Bloqueado</th><th>Acciones</th></tr></thead>
-                    <tbody id="perdidosTableBodyDesktop"></tbody></table>
+                    <table class="customers-table">
+                        <thead><tr><th>✅</th><th>ID</th><th>Nombre</th><th>Documento</th><th>Teléfono</th><th>Plan</th><th>CO</th><th>Fecha Corte</th><th>Estado</th><th>Bloqueado</th><th>Acciones</th></tr></thead>
+                        <tbody id="perdidosTableBodyDesktop"></tbody>
+                    </table>
                 </div>
                 <div id="perdidosMobileList" class="mobile-cards"></div>
                 <div id="perdidosPagination" class="flex justify-center items-center gap-1 mt-3"></div>
             </div>
 
+            <!-- Reconectar abonados Tab -->
             <div id="recuperadosTab" class="tab-content hidden">
                 <div class="bg-white rounded-xl shadow-md p-3 mb-3">
                     <h3 class="font-bold text-sm"><i class="fas fa-check-circle text-green-500 mr-1"></i>Reconectar abonados</h3>
@@ -250,12 +255,15 @@
                     <div class="text-right text-xs text-gray-500 mt-1"><span id="recuperadosTotalCount" class="font-bold">0</span> reconectados</div>
                 </div>
                 <div class="table-container desktop-table">
-                    <table class="customers-table"><thead><tr><th>ID</th><th>Nombre</th><th>Documento</th><th>Teléfono</th><th>Plan</th><th>Fecha Recup.</th><th>Agente</th></tr></thead>
-                    <tbody id="recuperadosTableBody"></tbody></table>
+                    <table class="customers-table">
+                        <thead><tr><th>ID</th><th>Nombre</th><th>Documento</th><th>Teléfono</th><th>Plan</th><th>Fecha Recup.</th><th>Agente</th></tr></thead>
+                        <tbody id="recuperadosTableBody"></tbody>
+                    </table>
                 </div>
                 <div id="recuperadosMobileList" class="mobile-cards"></div>
             </div>
 
+            <!-- Retirar equipos Tab -->
             <div id="perdidosFinalTab" class="tab-content hidden">
                 <div class="bg-white rounded-xl shadow-md p-3 mb-3">
                     <h3 class="font-bold text-sm"><i class="fas fa-truck text-red-500 mr-1"></i>Retirar equipos</h3>
@@ -263,12 +271,15 @@
                     <div class="text-right text-xs text-gray-500 mt-1"><span id="perdidosFinalTotalCount" class="font-bold">0</span> para retiro</div>
                 </div>
                 <div class="table-container desktop-table">
-                    <table class="customers-table"><thead><tr><th>ID</th><th>Nombre</th><th>Documento</th><th>Teléfono</th><th>Plan</th><th>Motivo</th><th>Fecha Baja</th><th>Agente</th></tr></thead>
-                    <tbody id="perdidosFinalTableBody"></tbody></table>
+                    <table class="customers-table">
+                        <thead><tr><th>ID</th><th>Nombre</th><th>Documento</th><th>Teléfono</th><th>Plan</th><th>Motivo</th><th>Fecha Baja</th><th>Agente</th></tr></thead>
+                        <tbody id="perdidosFinalTableBody"></tbody>
+                    </table>
                 </div>
                 <div id="perdidosFinalMobileList" class="mobile-cards"></div>
             </div>
 
+            <!-- Visita técnica Pendiente Tab -->
             <div id="equiposTab" class="tab-content hidden">
                 <div class="bg-white rounded-xl shadow-md p-3 mb-3">
                     <div class="flex flex-wrap justify-between items-center gap-2">
@@ -281,12 +292,15 @@
                     </div>
                 </div>
                 <div class="table-container desktop-table">
-                    <table class="customers-table"><thead><tr><th>Cliente</th><th>Teléfono</th><th>Dirección</th><th>Técnico</th><th>Fecha</th><th>Estado</th><th>Acciones</th></tr></thead>
-                    <tbody id="equiposTableBody"></tbody></table>
+                    <table class="customers-table">
+                        <thead><tr><th>Cliente</th><th>Teléfono</th><th>Dirección</th><th>Técnico</th><th>Fecha</th><th>Estado</th><th>Acciones</th></tr></thead>
+                        <tbody id="equiposTableBody"></tbody>
+                    </table>
                 </div>
                 <div id="equiposMobileList" class="mobile-cards"></div>
             </div>
 
+            <!-- Visita técnica Finalizada Tab -->
             <div id="visitasTab" class="tab-content hidden">
                 <div class="bg-white rounded-xl shadow-md p-3 mb-3">
                     <div class="flex flex-wrap justify-between items-center gap-2">
@@ -299,12 +313,15 @@
                     </div>
                 </div>
                 <div class="table-container desktop-table">
-                    <table class="customers-table"><thead><tr><th>Cliente</th><th>Teléfono</th><th>Dirección</th><th>Motivo</th><th>Técnico</th><th>Fecha/Hora</th><th>Estado</th><th>Acciones</th></tr></thead>
-                    <tbody id="visitasTableBody"></tbody></table>
+                    <table class="customers-table">
+                        <thead><tr><th>Cliente</th><th>Teléfono</th><th>Dirección</th><th>Motivo</th><th>Técnico</th><th>Fecha/Hora</th><th>Estado</th><th>Acciones</th></tr></thead>
+                        <tbody id="visitasTableBody"></tbody>
+                    </table>
                 </div>
                 <div id="visitasMobileList" class="mobile-cards"></div>
             </div>
 
+            <!-- Técnicos Tab -->
             <div id="tecnicosTab" class="tab-content hidden">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
                     <div class="bg-white rounded-xl shadow-md p-3">
@@ -324,6 +341,7 @@
                 </div>
             </div>
 
+            <!-- Importar Tab -->
             <div id="importarTab" class="tab-content hidden">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
                     <div class="import-card bg-white">
@@ -339,7 +357,7 @@
                         <div class="text-center mb-2"><i class="fas fa-skull-crosswalk text-3xl text-red-500 mb-1"></i><h3 class="text-base font-bold">Importar Perdidos</h3><p class="text-xs text-gray-500">Clientes ya desconectados</p></div>
                         <input type="file" id="perdidosExcel" accept=".xlsx, .xls, .csv" class="border rounded-lg px-2 py-1 w-full text-xs mb-2" onchange="previewPerdidosFile(this)">
                         <div id="perdidosPreview" class="mt-2 hidden">
-                            <div class="overflow-x-auto max-h-48 mb-2"><table id="previewPerdidosTable" class="preview-table"></td></div>
+                            <div class="overflow-x-auto max-h-48 mb-2"><table id="previewPerdidosTable" class="preview-table"></table></div>
                             <button onclick="importPerdidosDirect()" class="w-full bg-red-600 text-white py-1 rounded-lg text-sm"><i class="fas fa-upload mr-1"></i>Importar Perdidos</button>
                         </div>
                         <div id="perdidosImportResult" class="mt-2 text-xs"></div>
@@ -347,6 +365,7 @@
                 </div>
             </div>
 
+            <!-- Reportes Tab -->
             <div id="reportesTab" class="tab-content hidden">
                 <div class="bg-white rounded-xl shadow-md p-3">
                     <h3 class="font-bold text-sm mb-2"><i class="fas fa-file-pdf text-red-500 mr-1"></i>Generar Reporte Diario</h3>
@@ -364,6 +383,7 @@
                 </div>
             </div>
 
+            <!-- Configuración Tab -->
             <div id="configTab" class="tab-content hidden">
                 <div class="bg-white rounded-xl shadow-md p-3">
                     <h3 class="font-bold text-sm mb-2 text-red-600"><i class="fas fa-trash-alt mr-1"></i>LIMPIEZA DE DATOS</h3>
@@ -435,15 +455,9 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         
-        console.log("Firebase conectado correctamente");
-        
         // Configurar persistencia offline
         db.enablePersistence({ synchronizeTabs: true })
-            .catch(err => {
-                if (err.code === 'failed-precondition') {
-                    console.log('Múltiples tabs abiertas, persistencia limitada');
-                }
-            });
+            .catch(err => console.log('Persistencia offline:', err.code));
 
         // ==================== REFERENCIAS A COLECCIONES ====================
         const colecciones = {
@@ -483,208 +497,125 @@
         let selectedPerdidosList = new Set();
         
         let datosCargados = false;
+        let contadorCargas = 0;
+        const TOTAL_COLECCIONES = 9;
 
-        // ==================== FUNCIONES DE CARGA DE FIRESTORE ====================
-        async function cargarDatosFirestore() {
-            showLoading(true);
-            console.log("Cargando datos desde Firestore...");
-            
-            try {
-                // Cargar rezagados
-                const rezagadosSnap = await colecciones.rezagados.get();
-                clientesRezagados = [];
-                rezagadosSnap.forEach(doc => {
-                    clientesRezagados.push({ id: doc.id, ...doc.data() });
-                });
-                console.log(`✅ Rezagados cargados: ${clientesRezagados.length}`);
-                
-                // Cargar perdidos
-                const perdidosSnap = await colecciones.perdidos.get();
-                clientesPerdidos = [];
-                perdidosSnap.forEach(doc => {
-                    clientesPerdidos.push({ id: doc.id, ...doc.data() });
-                });
-                console.log(`✅ Perdidos cargados: ${clientesPerdidos.length}`);
-                
-                // Cargar recuperados
-                const recuperadosSnap = await colecciones.recuperados.get();
-                clientesRecuperados = [];
-                recuperadosSnap.forEach(doc => {
-                    clientesRecuperados.push({ id: doc.id, ...doc.data() });
-                });
-                console.log(`✅ Recuperados cargados: ${clientesRecuperados.length}`);
-                
-                // Cargar perdidosFinal
-                const perdidosFinalSnap = await colecciones.perdidosFinal.get();
-                clientesPerdidosFinal = [];
-                perdidosFinalSnap.forEach(doc => {
-                    clientesPerdidosFinal.push({ id: doc.id, ...doc.data() });
-                });
-                console.log(`✅ PerdidosFinal cargados: ${clientesPerdidosFinal.length}`);
-                
-                // Cargar ordenesEquipos
-                const equiposSnap = await colecciones.ordenesEquipos.get();
-                ordenesEquipos = [];
-                equiposSnap.forEach(doc => {
-                    ordenesEquipos.push({ id: doc.id, ...doc.data() });
-                });
-                console.log(`✅ OrdenesEquipos cargados: ${ordenesEquipos.length}`);
-                
-                // Cargar visitasTecnicas
-                const visitasSnap = await colecciones.visitasTecnicas.get();
-                visitasTecnicas = [];
-                visitasSnap.forEach(doc => {
-                    visitasTecnicas.push({ id: doc.id, ...doc.data() });
-                });
-                console.log(`✅ VisitasTecnicas cargadas: ${visitasTecnicas.length}`);
-                
-                // Cargar technicians
-                const techSnap = await colecciones.technicians.get();
-                technicians = [];
-                techSnap.forEach(doc => {
-                    technicians.push({ id: doc.id, ...doc.data() });
-                });
-                console.log(`✅ Technicians cargados: ${technicians.length}`);
-                
-                // Cargar callLogs
-                const logsSnap = await colecciones.callLogs.get();
-                callLogs = [];
-                logsSnap.forEach(doc => {
-                    callLogs.push({ id: doc.id, ...doc.data() });
-                });
-                console.log(`✅ CallLogs cargados: ${callLogs.length}`);
-                
-                // Cargar lockedCustomers
-                const lockedSnap = await colecciones.lockedCustomers.get();
-                lockedCustomers.clear();
-                lockedSnap.forEach(doc => {
-                    lockedCustomers.set(doc.id, doc.data());
-                });
-                console.log(`✅ LockedCustomers cargados: ${lockedCustomers.size}`);
-                
+        // ==================== FUNCIONES DE CARGA Y LISTENERS ====================
+        function verificarCargaCompleta() {
+            contadorCargas++;
+            if (contadorCargas >= TOTAL_COLECCIONES && !datosCargados) {
                 datosCargados = true;
+                showLoading(false);
                 refreshAllViews();
-                showLoading(false);
-                
-                // Configurar listeners en tiempo real después de la carga inicial
-                configurarListeners();
-                
-            } catch (error) {
-                console.error("❌ Error cargando datos:", error);
-                showToast("Error conectando con Firebase. Verifica tu conexión.", "error");
-                showLoading(false);
+                showToast('Datos sincronizados con la nube', 'success');
             }
         }
         
-        function configurarListeners() {
-            // Escuchar cambios en rezagados
+        function cargarDatosIniciales() {
+            showLoading(true);
+            contadorCargas = 0;
+            datosCargados = false;
+            
+            // Escuchar rezagados
             colecciones.rezagados.onSnapshot(snapshot => {
-                snapshot.docChanges().forEach(change => {
-                    if (change.type === 'added') {
-                        console.log("Nuevo rezagado agregado:", change.doc.data().nombre);
-                    } else if (change.type === 'modified') {
-                        console.log("Rezagado modificado:", change.doc.id);
-                    } else if (change.type === 'removed') {
-                        console.log("Rezagado eliminado:", change.doc.id);
-                    }
-                });
-                // Recargar datos
-                colecciones.rezagados.get().then(snap => {
-                    clientesRezagados = [];
-                    snap.forEach(doc => clientesRezagados.push({ id: doc.id, ...doc.data() }));
-                    refreshAllViews();
-                });
-            }, error => console.error("Error en listener rezagados:", error));
+                clientesRezagados = [];
+                snapshot.forEach(doc => clientesRezagados.push({ id: doc.id, ...doc.data() }));
+                refreshAllViews();
+                verificarCargaCompleta();
+            });
             
-            // Escuchar cambios en perdidos
+            // Escuchar perdidos
             colecciones.perdidos.onSnapshot(snapshot => {
-                colecciones.perdidos.get().then(snap => {
-                    clientesPerdidos = [];
-                    snap.forEach(doc => clientesPerdidos.push({ id: doc.id, ...doc.data() }));
-                    refreshAllViews();
-                });
+                clientesPerdidos = [];
+                snapshot.forEach(doc => clientesPerdidos.push({ id: doc.id, ...doc.data() }));
+                refreshAllViews();
+                verificarCargaCompleta();
             });
             
-            // Escuchar cambios en recuperados
+            // Escuchar recuperados
             colecciones.recuperados.onSnapshot(snapshot => {
-                colecciones.recuperados.get().then(snap => {
-                    clientesRecuperados = [];
-                    snap.forEach(doc => clientesRecuperados.push({ id: doc.id, ...doc.data() }));
-                    refreshAllViews();
-                });
+                clientesRecuperados = [];
+                snapshot.forEach(doc => clientesRecuperados.push({ id: doc.id, ...doc.data() }));
+                refreshAllViews();
+                verificarCargaCompleta();
             });
             
-            // Escuchar cambios en perdidosFinal
+            // Escuchar perdidosFinal
             colecciones.perdidosFinal.onSnapshot(snapshot => {
-                colecciones.perdidosFinal.get().then(snap => {
-                    clientesPerdidosFinal = [];
-                    snap.forEach(doc => clientesPerdidosFinal.push({ id: doc.id, ...doc.data() }));
-                    refreshAllViews();
-                });
+                clientesPerdidosFinal = [];
+                snapshot.forEach(doc => clientesPerdidosFinal.push({ id: doc.id, ...doc.data() }));
+                refreshAllViews();
+                verificarCargaCompleta();
             });
             
-            // Escuchar cambios en ordenesEquipos
+            // Escuchar ordenesEquipos
             colecciones.ordenesEquipos.onSnapshot(snapshot => {
-                colecciones.ordenesEquipos.get().then(snap => {
-                    ordenesEquipos = [];
-                    snap.forEach(doc => ordenesEquipos.push({ id: doc.id, ...doc.data() }));
-                    refreshAllViews();
-                });
+                ordenesEquipos = [];
+                snapshot.forEach(doc => ordenesEquipos.push({ id: doc.id, ...doc.data() }));
+                refreshAllViews();
+                verificarCargaCompleta();
             });
             
-            // Escuchar cambios en visitasTecnicas
+            // Escuchar visitasTecnicas
             colecciones.visitasTecnicas.onSnapshot(snapshot => {
-                colecciones.visitasTecnicas.get().then(snap => {
-                    visitasTecnicas = [];
-                    snap.forEach(doc => visitasTecnicas.push({ id: doc.id, ...doc.data() }));
-                    refreshAllViews();
-                });
+                visitasTecnicas = [];
+                snapshot.forEach(doc => visitasTecnicas.push({ id: doc.id, ...doc.data() }));
+                refreshAllViews();
+                verificarCargaCompleta();
             });
             
-            // Escuchar cambios en technicians
+            // Escuchar technicians
             colecciones.technicians.onSnapshot(snapshot => {
-                colecciones.technicians.get().then(snap => {
-                    technicians = [];
-                    snap.forEach(doc => technicians.push({ id: doc.id, ...doc.data() }));
-                    renderTechniciansList();
-                });
+                technicians = [];
+                snapshot.forEach(doc => technicians.push({ id: doc.id, ...doc.data() }));
+                renderTechniciansList();
+                verificarCargaCompleta();
+            });
+            
+            // Escuchar callLogs
+            colecciones.callLogs.onSnapshot(snapshot => {
+                callLogs = [];
+                snapshot.forEach(doc => callLogs.push({ id: doc.id, ...doc.data() }));
+                verificarCargaCompleta();
+            });
+            
+            // Escuchar lockedCustomers
+            colecciones.lockedCustomers.onSnapshot(snapshot => {
+                lockedCustomers.clear();
+                snapshot.forEach(doc => lockedCustomers.set(doc.id, doc.data()));
+                refreshAllViews();
+                verificarCargaCompleta();
             });
         }
         
         function showLoading(show) {
             const overlay = document.getElementById('loadingOverlay');
-            if (overlay) {
-                if (show) overlay.classList.remove('hidden');
-                else overlay.classList.add('hidden');
-            }
+            if (overlay) overlay.classList.toggle('hidden', !show);
         }
-
-        // ==================== FUNCIONES DE GUARDADO EN FIRESTORE ====================
+        
+        // ==================== FUNCIONES DE FIRESTORE ====================
         async function guardarEnFirestore(coleccion, datos, id = null) {
             try {
                 if (id) {
                     await coleccion.doc(id).set(datos, { merge: true });
-                    console.log(`✅ Documento actualizado: ${id}`);
                 } else {
                     const nuevoId = Date.now().toString();
                     await coleccion.doc(nuevoId).set({ ...datos });
-                    console.log(`✅ Nuevo documento creado: ${nuevoId}`);
                     return nuevoId;
                 }
             } catch (error) {
-                console.error("❌ Error guardando en Firestore:", error);
-                showToast("Error al guardar datos", "error");
+                console.error('Error guardando:', error);
+                showToast('Error al guardar', 'error');
             }
         }
         
         async function eliminarDeFirestore(coleccion, id) {
             try {
                 await coleccion.doc(id).delete();
-                console.log(`✅ Documento eliminado: ${id}`);
-                showToast("Eliminado correctamente");
+                showToast('Eliminado correctamente');
             } catch (error) {
-                console.error("❌ Error eliminando:", error);
-                showToast("Error al eliminar", "error");
+                console.error('Error eliminando:', error);
+                showToast('Error al eliminar', 'error');
             }
         }
 
@@ -692,17 +623,13 @@
         function limpiarTelefono(telefono) {
             if (!telefono) return '';
             let cleaned = String(telefono).replace(/[^\d+]/g, '');
-            if (cleaned.length === 10 && cleaned.match(/^41[246]\d{7}/)) {
-                cleaned = '0' + cleaned;
-            }
+            if (cleaned.length === 10 && cleaned.match(/^41[246]\d{7}/)) cleaned = '0' + cleaned;
             return cleaned;
         }
         
         function convertirFecha(fecha) {
             if (!fecha) return '';
-            if (typeof fecha === 'object' && fecha.toISOString) {
-                return fecha.toISOString().split('T')[0];
-            }
+            if (typeof fecha === 'object' && fecha.toISOString) return fecha.toISOString().split('T')[0];
             if (typeof fecha === 'string') {
                 let fechaStr = fecha.split(' ')[0];
                 if (fechaStr.includes('/')) {
@@ -749,20 +676,16 @@
         // ==================== FUNCIONES DE BLOQUEO ====================
         async function lockCustomer(customerId, customerType) {
             const key = `${customerType}_${customerId}`;
-            const lockRef = colecciones.lockedCustomers.doc(key);
-            const lockDoc = await lockRef.get();
+            const lockDoc = await colecciones.lockedCustomers.doc(key).get();
             
             if (lockDoc.exists) {
                 const lock = lockDoc.data();
                 const timeElapsed = (Date.now() - lock.timestamp) / 1000 / 60;
-                if (timeElapsed < 30) {
-                    return { locked: true, agente: lock.agente };
-                } else {
-                    await lockRef.delete();
-                }
+                if (timeElapsed < 30) return { locked: true, agente: lock.agente };
+                else await colecciones.lockedCustomers.doc(key).delete();
             }
             
-            await lockRef.set({
+            await colecciones.lockedCustomers.doc(key).set({
                 agente: appCurrentUser.fullName,
                 agenteId: appCurrentUser.id,
                 timestamp: Date.now()
@@ -790,17 +713,11 @@
             const now = Date.now();
             const snapshot = await colecciones.lockedCustomers.get();
             const batch = db.batch();
-            let cambios = false;
-            
             snapshot.forEach(doc => {
                 const lock = doc.data();
-                if ((now - lock.timestamp) / 1000 / 60 >= 30) {
-                    batch.delete(doc.ref);
-                    cambios = true;
-                }
+                if ((now - lock.timestamp) / 1000 / 60 >= 30) batch.delete(doc.ref);
             });
-            
-            if (cambios) await batch.commit();
+            await batch.commit();
         }
 
         // ==================== PROCESAR RESULTADO DE LLAMADA ====================
@@ -810,6 +727,7 @@
             const agente = appCurrentUser.fullName;
             
             const registro = {
+                id: Date.now().toString(),
                 clienteId: customer.id,
                 nombre: customer.nombre,
                 documento: customer.documento,
@@ -821,8 +739,7 @@
                 agente: agente,
                 resultado: resultado,
                 observaciones: observaciones,
-                tipoOriginal: customerType,
-                fecha: fechaGestion
+                tipoOriginal: customerType
             };
             
             await guardarEnFirestore(colecciones.callLogs, registro);
@@ -838,6 +755,7 @@
                 await guardarEnFirestore(colecciones.perdidosFinal, registro);
                 
                 const ordenEquipo = {
+                    id: Date.now().toString(),
                     clienteId: customer.id,
                     clienteNombre: customer.nombre,
                     clienteTelefono: customer.telefono1,
@@ -853,10 +771,10 @@
                 };
                 await guardarEnFirestore(colecciones.ordenesEquipos, ordenEquipo);
                 showToast(`Cliente ${customer.nombre} dado de baja - Orden de retiro de equipos creada`);
-                actualizarNotificaciones();
                 
             } else if (resultado === 'visita_tecnica' && visitaData) {
                 const visita = {
+                    id: Date.now().toString(),
                     clienteId: customer.id,
                     clienteNombre: customer.nombre,
                     clienteTelefono: customer.telefono1,
@@ -873,15 +791,13 @@
                     agente: agente
                 };
                 await guardarEnFirestore(colecciones.visitasTecnicas, visita);
-                showToast(`Visita técnica programada para ${customer.nombre} el ${visitaData.fecha} con técnico ${visitaData.tecnicoNombre}`);
-                actualizarNotificaciones();
+                showToast(`Visita técnica programada para ${customer.nombre}`);
             } else if (resultado === 'no_contacto') {
                 showToast(`No se logró contacto con ${customer.nombre}`);
             } else if (resultado === 'promesa_pago') {
                 showToast(`Promesa de pago registrada para ${customer.nombre}`);
             }
             
-            // Eliminar de la lista original
             if (resultado !== 'visita_tecnica') {
                 if (customerType === 'rezagado') {
                     await eliminarDeFirestore(colecciones.rezagados, customer.id);
@@ -893,14 +809,6 @@
             await unlockCustomer(customer.id, customerType);
             closeRegisterCallModal();
             showTab('dashboard');
-        }
-        
-        function actualizarNotificaciones() {
-            const equiposPendientes = ordenesEquipos.filter(o => o.estado === 'pendiente').length;
-            const visitasPendientes = visitasTecnicas.filter(v => v.estado === 'pendiente').length;
-            
-            lastEquiposCount = equiposPendientes;
-            lastVisitasCount = visitasPendientes;
         }
 
         // ==================== FUNCIONES DE IMPORTACIÓN ====================
@@ -928,7 +836,7 @@
                     if (rows.length < 2) { alert('El archivo no contiene datos'); return; }
                     rezagadosHeaders = rows[0].map(h => String(h || '').trim());
                     rezagadosRawData = rows.slice(1).filter(row => row && row.length > 0 && row.some(cell => cell && String(cell).trim() !== ''));
-                    let previewHtml = '<thead><table>';
+                    let previewHtml = '<thead><tr>';
                     for(let i = 0; i < Math.min(rezagadosHeaders.length, 8); i++) {
                         previewHtml += `<th class="text-xs">${escapeHtml(rezagadosHeaders[i]).substring(0, 20)}</th>`;
                     }
@@ -941,10 +849,8 @@
                         previewHtml += '</tr>';
                     }
                     previewHtml += '</tbody>';
-                    const previewTable = document.getElementById('previewRezagadosTable');
-                    if (previewTable) previewTable.innerHTML = previewHtml;
-                    const previewDiv = document.getElementById('rezagadosPreview');
-                    if (previewDiv) previewDiv.classList.remove('hidden');
+                    document.getElementById('previewRezagadosTable').innerHTML = previewHtml;
+                    document.getElementById('rezagadosPreview').classList.remove('hidden');
                 } catch (error) { alert('Error: ' + error.message); }
             };
             reader.readAsArrayBuffer(file);
@@ -973,9 +879,7 @@
                 const fila = rezagadosRawData[i];
                 
                 let identificador = '';
-                if (fila[idCol]) {
-                    identificador = String(fila[idCol]).trim();
-                }
+                if (fila[idCol]) identificador = String(fila[idCol]).trim();
                 if (!identificador) continue;
                 
                 let nombre = 'Sin nombre';
@@ -1021,6 +925,7 @@
                 if (fila[direccionCol]) direccion = String(fila[direccionCol]).trim();
                 
                 const nuevoCliente = {
+                    id: identificador,
                     identificador: identificador,
                     nombre: nombre,
                     documento: documento,
@@ -1040,21 +945,16 @@
                 nuevos++;
             }
             
-            let resultHtml = `<div class="p-2 rounded-lg bg-green-50 border-l-4 border-green-500">
+            document.getElementById('rezagadosImportResult').innerHTML = `<div class="p-2 rounded-lg bg-green-50 border-l-4 border-green-500">
                 <p class="text-xs">Nuevos importados: ${nuevos}</p>
-                <p class="text-xs">Total rezagados en Firebase: ${clientesRezagados.length + nuevos}</p>
-                <p class="text-xs text-green-600 mt-1">Teléfonos encontrados: ${telefonosEncontrados}</p>
-                <p class="text-xs text-green-600">Fechas de corte encontradas: ${fechasEncontradas}</p>
+                <p class="text-xs">Teléfonos encontrados: ${telefonosEncontrados}</p>
+                <p class="text-xs">Fechas de corte encontradas: ${fechasEncontradas}</p>
             </div>`;
-            const resultDiv = document.getElementById('rezagadosImportResult');
-            if (resultDiv) resultDiv.innerHTML = resultHtml;
-            showToast(`Importados ${nuevos} clientes rezagados a Firebase`);
+            showToast(`Importados ${nuevos} clientes rezagados`);
             
-            const fileInput = document.getElementById('rezagadosExcel');
-            if (fileInput) fileInput.value = '';
+            document.getElementById('rezagadosExcel').value = '';
             rezagadosRawData = null;
-            const previewDiv = document.getElementById('rezagadosPreview');
-            if (previewDiv) previewDiv.classList.add('hidden');
+            document.getElementById('rezagadosPreview').classList.add('hidden');
         }
         
         function previewPerdidosFile(fileInput) {
@@ -1070,13 +970,11 @@
                     if (rows.length < 2) { alert('El archivo no contiene datos'); return; }
                     perdidosHeaders = rows[0].map(h => String(h || '').trim());
                     perdidosRawData = rows.slice(1).filter(row => row && row.length > 0 && row.some(cell => cell && String(cell).trim() !== ''));
-                    let previewHtml = '<thead><tr>' + perdidosHeaders.slice(0, 6).map(h => `<th class="text-xs">${escapeHtml(h).substring(0, 15)}</th>`).join('') + '</table></thead><tbody>';
+                    let previewHtml = '<thead><tr>' + perdidosHeaders.slice(0, 6).map(h => `<th class="text-xs">${escapeHtml(h).substring(0, 15)}</th>`).join('') + '<tr></thead><tbody>';
                     previewHtml += perdidosRawData.slice(0, 3).map(row => '<tr>' + row.slice(0, 6).map(cell => `<td class="text-xs">${escapeHtml(String(cell || '').substring(0, 20))}</td>`).join('') + '</tr>').join('');
                     previewHtml += '</tbody>';
-                    const previewTable = document.getElementById('previewPerdidosTable');
-                    if (previewTable) previewTable.innerHTML = previewHtml;
-                    const previewDiv = document.getElementById('perdidosPreview');
-                    if (previewDiv) previewDiv.classList.remove('hidden');
+                    document.getElementById('previewPerdidosTable').innerHTML = previewHtml;
+                    document.getElementById('perdidosPreview').classList.remove('hidden');
                 } catch (error) { alert('Error: ' + error.message); }
             };
             reader.readAsArrayBuffer(file);
@@ -1145,6 +1043,7 @@
                 const direccion = construirDireccion(fila, mapeo);
                 
                 const nuevoCliente = {
+                    id: identificador,
                     identificador: identificador,
                     nombre: nombre,
                     documento: documento,
@@ -1164,19 +1063,14 @@
                 nuevos++;
             }
             
-            let resultHtml = `<div class="p-2 rounded-lg bg-green-50 border-l-4 border-green-500">
+            document.getElementById('perdidosImportResult').innerHTML = `<div class="p-2 rounded-lg bg-green-50 border-l-4 border-green-500">
                 <p class="text-xs">Nuevos importados: ${nuevos}</p>
-                <p class="text-xs">Total perdidos en Firebase: ${clientesPerdidos.length + nuevos}</p>
             </div>`;
-            const resultDiv = document.getElementById('perdidosImportResult');
-            if (resultDiv) resultDiv.innerHTML = resultHtml;
-            showToast(`Importados ${nuevos} clientes perdidos a Firebase`);
+            showToast(`Importados ${nuevos} clientes perdidos`);
             
-            const fileInput = document.getElementById('perdidosExcel');
-            if (fileInput) fileInput.value = '';
+            document.getElementById('perdidosExcel').value = '';
             perdidosRawData = null;
-            const previewDiv = document.getElementById('perdidosPreview');
-            if (previewDiv) previewDiv.classList.add('hidden');
+            document.getElementById('perdidosPreview').classList.add('hidden');
         }
 
         // ==================== FUNCIONES DE ACCIONES ====================
@@ -1204,7 +1098,6 @@
                 }
                 await unlockCustomer(customerId, customerType);
                 showToast(`Cliente "${customer.nombre}" eliminado`);
-                updateConfigCounters();
             }
         }
         
@@ -1222,7 +1115,11 @@
                 return;
             }
             
-            await guardarEnFirestore(colecciones[`${customerType}s`], { estado: 'en_gestion' }, customerId);
+            if (customerType === 'rezagado') {
+                await guardarEnFirestore(colecciones.rezagados, { estado: 'en_gestion' }, customerId);
+            } else {
+                await guardarEnFirestore(colecciones.perdidos, { estado: 'en_gestion' }, customerId);
+            }
             
             document.getElementById('callCustomerId').value = customerId;
             document.getElementById('callCustomerType').value = customerType;
@@ -1232,83 +1129,72 @@
                 <div class="text-xs text-gray-500">Dirección: ${escapeHtml(customer.direccion)}</div>`;
             
             const phoneSelect = document.getElementById('callPhoneUsed');
-            if (phoneSelect) {
-                phoneSelect.innerHTML = '';
-                const phones = [customer.telefono1, customer.telefono2, customer.telefono3].filter(p => p && p !== '');
-                if (phones.length === 0) phones.push('Sin teléfono');
-                phones.forEach(p => { const opt = document.createElement('option'); opt.value = p; opt.textContent = p; phoneSelect.appendChild(opt); });
-            }
+            phoneSelect.innerHTML = '';
+            const phones = [customer.telefono1, customer.telefono2, customer.telefono3].filter(p => p && p !== '');
+            if (phones.length === 0) phones.push('Sin teléfono');
+            phones.forEach(p => { const opt = document.createElement('option'); opt.value = p; opt.textContent = p; phoneSelect.appendChild(opt); });
             
             const techSelect = document.getElementById('visitTechnician');
-            if (techSelect) {
-                techSelect.innerHTML = '<option value="">Seleccionar técnico</option>' + technicians.map(t => `<option value="${t.id}">${escapeHtml(t.nombre)} - ${t.co}</option>`).join('');
-            }
+            techSelect.innerHTML = '<option value="">Seleccionar técnico</option>' + technicians.map(t => `<option value="${t.id}">${escapeHtml(t.nombre)} - ${t.co}</option>`).join('');
             
-            const callResult = document.getElementById('callResult');
-            if (callResult) callResult.value = '';
-            const bajaReasonDiv = document.getElementById('bajaReasonDiv');
-            if (bajaReasonDiv) bajaReasonDiv.classList.add('hidden');
-            const visitaFields = document.getElementById('visitaFields');
-            if (visitaFields) visitaFields.classList.add('hidden');
-            const callObservations = document.getElementById('callObservations');
-            if (callObservations) callObservations.value = '';
-            const visitDate = document.getElementById('visitDate');
-            if (visitDate) visitDate.value = new Date().toISOString().split('T')[0];
-            const modal = document.getElementById('registerCallModal');
-            if (modal) modal.classList.remove('hidden');
+            document.getElementById('callResult').value = '';
+            document.getElementById('bajaReasonDiv').classList.add('hidden');
+            document.getElementById('visitaFields').classList.add('hidden');
+            document.getElementById('callObservations').value = '';
+            document.getElementById('visitDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('registerCallModal').classList.remove('hidden');
         }
         
         window.closeRegisterCallModal = async function() {
-            const id = document.getElementById('callCustomerId')?.value;
-            const type = document.getElementById('callCustomerType')?.value;
+            const id = document.getElementById('callCustomerId').value;
+            const type = document.getElementById('callCustomerType').value;
             if (id && type) {
                 const customer = type === 'rezagado' ? clientesRezagados.find(c => c.id === id) : clientesPerdidos.find(c => c.id === id);
                 if (customer && customer.estado === 'en_gestion') {
-                    await guardarEnFirestore(colecciones[`${type}s`], { estado: 'pendiente' }, id);
+                    if (type === 'rezagado') {
+                        await guardarEnFirestore(colecciones.rezagados, { estado: 'pendiente' }, id);
+                    } else {
+                        await guardarEnFirestore(colecciones.perdidos, { estado: 'pendiente' }, id);
+                    }
                 }
                 await unlockCustomer(id, type);
             }
-            const modal = document.getElementById('registerCallModal');
-            if (modal) modal.classList.add('hidden');
+            document.getElementById('registerCallModal').classList.add('hidden');
         }
         
         window.saveCall = async function() {
-            const customerId = document.getElementById('callCustomerId')?.value;
-            const customerType = document.getElementById('callCustomerType')?.value;
+            const customerId = document.getElementById('callCustomerId').value;
+            const customerType = document.getElementById('callCustomerType').value;
             const customer = customerType === 'rezagado' ? clientesRezagados.find(c => c.id === customerId) : clientesPerdidos.find(c => c.id === customerId);
             if (!customer) return;
             
-            const resultado = document.getElementById('callResult')?.value;
-            const observaciones = document.getElementById('callObservations')?.value || '';
+            const resultado = document.getElementById('callResult').value;
+            const observaciones = document.getElementById('callObservations').value;
             if (!resultado) { alert('Seleccione un resultado'); return; }
             
             let visitaData = null;
             if (resultado === 'visita_tecnica') {
-                const fecha = document.getElementById('visitDate')?.value;
+                const fecha = document.getElementById('visitDate').value;
                 if (!fecha) { alert('Seleccione fecha de visita'); return; }
-                const tecnicoId = document.getElementById('visitTechnician')?.value;
+                const tecnicoId = document.getElementById('visitTechnician').value;
                 if (!tecnicoId) { alert('Seleccione un técnico para la visita'); return; }
                 const tecnico = technicians.find(t => t.id === tecnicoId);
                 visitaData = {
-                    motivo: document.getElementById('visitReason')?.value || 'falla',
+                    motivo: document.getElementById('visitReason').value,
                     fecha: fecha,
-                    hora: document.getElementById('visitTime')?.value || '08:00-10:00',
+                    hora: document.getElementById('visitTime').value,
                     tecnicoId: tecnicoId,
                     tecnicoNombre: tecnico ? tecnico.nombre : 'No asignado',
-                    instrucciones: document.getElementById('visitInstructions')?.value || ''
+                    instrucciones: document.getElementById('visitInstructions').value
                 };
             }
             
-            const motivoBaja = resultado === 'dado_baja' ? (document.getElementById('bajaMotivo')?.value || 'other') : '';
+            const motivoBaja = resultado === 'dado_baja' ? document.getElementById('bajaMotivo').value : '';
             
             await processCallResult(customer, customerType, resultado, observaciones, motivoBaja, visitaData);
-            await unlockCustomer(customerId, customerType);
         }
         
-        window.closeCompleteOrderModal = function() { 
-            const modal = document.getElementById('completeOrderModal');
-            if (modal) modal.classList.add('hidden');
-        }
+        window.closeCompleteOrderModal = function() { document.getElementById('completeOrderModal').classList.add('hidden'); }
         
         window.openCompleteOrderModal = function(orderId, type) {
             let order, info;
@@ -1320,25 +1206,19 @@
                 info = `Cliente: ${order?.clienteNombre}\nMotivo: ${order?.motivo}\nTécnico: ${order?.tecnicoNombre || 'No asignado'}`;
             }
             if (!order) return;
-            const completeOrderId = document.getElementById('completeOrderId');
-            const completeOrderType = document.getElementById('completeOrderType');
-            const orderInfo = document.getElementById('orderInfo');
-            if (completeOrderId) completeOrderId.value = orderId;
-            if (completeOrderType) completeOrderType.value = type;
-            if (orderInfo) orderInfo.innerHTML = `<div class="text-sm whitespace-pre-wrap">${escapeHtml(info)}</div>`;
-            const orderResult = document.getElementById('orderResult');
-            const orderObservations = document.getElementById('orderObservations');
-            if (orderResult) orderResult.value = '';
-            if (orderObservations) orderObservations.value = '';
-            const modal = document.getElementById('completeOrderModal');
-            if (modal) modal.classList.remove('hidden');
+            document.getElementById('completeOrderId').value = orderId;
+            document.getElementById('completeOrderType').value = type;
+            document.getElementById('orderInfo').innerHTML = `<div class="text-sm whitespace-pre-wrap">${escapeHtml(info)}</div>`;
+            document.getElementById('orderResult').value = '';
+            document.getElementById('orderObservations').value = '';
+            document.getElementById('completeOrderModal').classList.remove('hidden');
         }
         
         window.completeOrder = async function() {
-            const orderId = document.getElementById('completeOrderId')?.value;
-            const type = document.getElementById('completeOrderType')?.value;
-            const resultado = document.getElementById('orderResult')?.value;
-            const observaciones = document.getElementById('orderObservations')?.value || '';
+            const orderId = document.getElementById('completeOrderId').value;
+            const type = document.getElementById('completeOrderType').value;
+            const resultado = document.getElementById('orderResult').value;
+            const observaciones = document.getElementById('orderObservations').value;
             if (!resultado) { alert('Seleccione un resultado'); return; }
             
             if (type === 'equipo') {
@@ -1350,7 +1230,7 @@
                     };
                     if (resultado === 'completada') updates.fechaCompletado = new Date().toISOString();
                     await guardarEnFirestore(colecciones.ordenesEquipos, updates, orderId);
-                    showToast(`Visita técnica ${resultado === 'completada' ? 'completada' : 'actualizada'}`);
+                    showToast(`Orden ${resultado === 'completada' ? 'completada' : 'actualizada'}`);
                 }
             } else {
                 const visita = visitasTecnicas.find(v => v.id === orderId);
@@ -1361,12 +1241,10 @@
                     };
                     if (resultado === 'completada') updates.fechaCompletado = new Date().toISOString();
                     await guardarEnFirestore(colecciones.visitasTecnicas, updates, orderId);
-                    showToast(`Visita técnica ${resultado === 'completada' ? 'completada' : 'actualizada'}`);
+                    showToast(`Visita ${resultado === 'completada' ? 'completada' : 'actualizada'}`);
                 }
             }
-            
-            window.closeCompleteOrderModal();
-            actualizarNotificaciones();
+            closeCompleteOrderModal();
         }
         
         window.openAssignTechnicianModal = async function(orderId, type) {
@@ -1377,33 +1255,27 @@
                 if (idx >= 0 && idx < technicians.length) {
                     const tech = technicians[idx];
                     if (type === 'equipo') {
-                        const order = ordenesEquipos.find(o => o.id === orderId);
-                        if (order) {
-                            await guardarEnFirestore(colecciones.ordenesEquipos, {
-                                tecnico: tech.nombre,
-                                tecnicoId: tech.id,
-                                fechaAsignacion: new Date().toISOString().split('T')[0]
-                            }, orderId);
-                            showToast(`Técnico ${tech.nombre} asignado a la visita técnica`);
-                        }
+                        await guardarEnFirestore(colecciones.ordenesEquipos, {
+                            tecnico: tech.nombre,
+                            tecnicoId: tech.id,
+                            fechaAsignacion: new Date().toISOString().split('T')[0]
+                        }, orderId);
+                        showToast(`Técnico ${tech.nombre} asignado`);
                     } else if (type === 'visita') {
-                        const visita = visitasTecnicas.find(v => v.id === orderId);
-                        if (visita) {
-                            await guardarEnFirestore(colecciones.visitasTecnicas, {
-                                tecnicoId: tech.id,
-                                tecnicoNombre: tech.nombre
-                            }, orderId);
-                            showToast(`Técnico ${tech.nombre} asignado a la visita técnica`);
-                        }
+                        await guardarEnFirestore(colecciones.visitasTecnicas, {
+                            tecnicoId: tech.id,
+                            tecnicoNombre: tech.nombre
+                        }, orderId);
+                        showToast(`Técnico ${tech.nombre} asignado`);
                     }
                 }
             }
         }
         
         window.addTechnician = async function() {
-            const nombre = document.getElementById('techName')?.value.trim();
-            const co = document.getElementById('techCO')?.value;
-            const telefono = document.getElementById('techPhone')?.value.trim();
+            const nombre = document.getElementById('techName').value.trim();
+            const co = document.getElementById('techCO').value;
+            const telefono = document.getElementById('techPhone').value.trim();
             if (!nombre || !co) { alert('Complete los campos'); return; }
             const nuevoId = Date.now().toString();
             await guardarEnFirestore(colecciones.technicians, {
@@ -1412,11 +1284,9 @@
                 co: co,
                 telefono: telefono || 'Sin teléfono'
             }, nuevoId);
-            const techName = document.getElementById('techName');
-            const techPhone = document.getElementById('techPhone');
-            if (techName) techName.value = '';
-            if (techPhone) techPhone.value = '';
-            showToast(`Técnico ${nombre} agregado a Firebase`);
+            document.getElementById('techName').value = '';
+            document.getElementById('techPhone').value = '';
+            showToast(`Técnico ${nombre} agregado`);
         }
         
         window.deleteTechnician = async function(techId) {
@@ -1471,8 +1341,8 @@
         
         function renderRezagadosTable() {
             const items = getFilteredRezagados();
-            const totalCount = document.getElementById('rezagadosTotalCount');
-            if (totalCount) totalCount.innerText = items.length;
+            const totalCountSpan = document.getElementById('rezagadosTotalCount');
+            if (totalCountSpan) totalCountSpan.innerText = items.length;
             const totalPages = Math.ceil(items.length / ITEMS_PER_PAGE);
             if (rezagadosPage > totalPages) rezagadosPage = 1;
             const pageItems = items.slice((rezagadosPage-1)*ITEMS_PER_PAGE, rezagadosPage*ITEMS_PER_PAGE);
@@ -1491,7 +1361,7 @@
                         const statusText = getStatusText(c.estado);
                         return `<tr>
                             <td><input type="checkbox" onchange="toggleSelectRezagado('${c.id}', this.checked)"></td>
-                            <td class="truncate-text">${escapeHtml(c.identificador)}</td>
+                            <td class="truncate-text">${escapeHtml(c.identificador || c.id)}</td>
                             <td><span class="font-medium">${escapeHtml(c.nombre)}</span></td>
                             <td class="truncate-text">${escapeHtml(c.documento)}</td>
                             <td>${hasPhone ? escapeHtml(c.telefono1) : '-'}</td>
@@ -1500,7 +1370,7 @@
                             <td>${c.fechaCorte || '-'}</td>
                             <td><span class="status-badge ${statusClass}">${statusText}</span></td>
                             <td>${isLocked ? `<span class="blocked-badge"><i class="fas fa-lock"></i> ${lockInfo.agente}</span>` : '-'}</td>
-                            <td>
+                            <td class="action-cell">
                                 ${(!isLocked || lockedByMe) && hasPhone ? `<button onclick="openRegisterCallModal('${c.id}', 'rezagado')" class="call-btn"><i class="fas fa-phone-alt"></i> Gestionar</button>` : `<button class="call-btn opacity-50" disabled>${!hasPhone ? 'Sin teléfono' : 'Bloqueado'}</button>`}
                                 ${hasPhone ? `<a href="tel:${c.telefono1}" class="call-link"><i class="fas fa-phone"></i></a><a href="https://wa.me/${c.telefono1.replace(/[^0-9]/g,'')}" target="_blank" class="whatsapp-link"><i class="fab fa-whatsapp"></i></a>` : ''}
                                 <button onclick="deleteSingleCustomer('${c.id}', 'rezagado')" class="delete-single-btn"><i class="fas fa-trash-alt"></i></button>
@@ -1522,9 +1392,9 @@
                         const hasPhone = c.telefono1 && c.telefono1 !== '';
                         const statusClass = getStatusClass(c.estado);
                         const statusText = getStatusText(c.estado);
-                        return `<div class="customer-card-mobile ${isLocked && !lockedByMe ? 'blocked' : ''}">
+                        return `<div class="customer-card-mobile">
                             <div class="flex justify-between items-start mb-2">
-                                <div><div class="font-bold text-sm">${escapeHtml(c.nombre)}</div><div class="text-xs text-gray-500">ID: ${escapeHtml(c.identificador)}</div></div>
+                                <div><div class="font-bold text-sm">${escapeHtml(c.nombre)}</div><div class="text-xs text-gray-500">ID: ${escapeHtml(c.identificador || c.id)}</div></div>
                                 <span class="status-badge ${statusClass}">${statusText}</span>
                             </div>
                             <div class="info-row-mobile"><span class="info-label">Documento:</span><span class="info-value">${escapeHtml(c.documento)}</span></div>
@@ -1551,8 +1421,8 @@
         
         function renderPerdidosTable() {
             const items = getFilteredPerdidos();
-            const totalCount = document.getElementById('perdidosTotalCount');
-            if (totalCount) totalCount.innerText = items.length;
+            const totalCountSpan = document.getElementById('perdidosTotalCount');
+            if (totalCountSpan) totalCountSpan.innerText = items.length;
             const totalPages = Math.ceil(items.length / ITEMS_PER_PAGE);
             if (perdidosPage > totalPages) perdidosPage = 1;
             const pageItems = items.slice((perdidosPage-1)*ITEMS_PER_PAGE, perdidosPage*ITEMS_PER_PAGE);
@@ -1560,7 +1430,7 @@
             const tbodyDesktop = document.getElementById('perdidosTableBodyDesktop');
             if (tbodyDesktop) {
                 if (items.length === 0) {
-                    tbodyDesktop.innerHTML = '<tr><td colspan="11" class="text-center py-4 text-gray-500 text-xs">No hay clientes perdidos pendientes</span></tr>';
+                    tbodyDesktop.innerHTML = '<tr><td colspan="11" class="text-center py-4 text-gray-500 text-xs">No hay clientes perdidos pendientes</td></tr>';
                 } else {
                     tbodyDesktop.innerHTML = pageItems.map(c => {
                         const lockInfo = getCustomerLockInfo(c.id, 'perdido');
@@ -1570,21 +1440,21 @@
                         const statusClass = getStatusClass(c.estado);
                         const statusText = getStatusText(c.estado);
                         return `<tr>
-                            <td><input type="checkbox" onchange="toggleSelectPerdido('${c.id}', this.checked)"></tr>
-                            <td class="truncate-text">${escapeHtml(c.identificador)}</span></td>
-                            <td><span class="font-medium">${escapeHtml(c.nombre)}</span></span></td>
-                            <td class="truncate-text">${escapeHtml(c.documento)}</span></span></td>
-                            <td>${hasPhone ? escapeHtml(c.telefono1) : '-'}</span></span></td>
-                            <td class="truncate-text">${escapeHtml(c.plan)}</span></span></td>
-                            <td>${escapeHtml(c.centroOp)}</span></span></td>
-                            <td>${c.fechaCorte || '-'}</span></span></td>
-                            <td><span class="status-badge ${statusClass}">${statusText}</span></span></td>
-                            <td>${isLocked ? `<span class="blocked-badge"><i class="fas fa-lock"></i> ${lockInfo.agente}</span>` : '-'}</span></td>
-                            <td>
+                            <td><input type="checkbox" onchange="toggleSelectPerdido('${c.id}', this.checked)"></td>
+                            <td class="truncate-text">${escapeHtml(c.identificador || c.id)}</td>
+                            <td><span class="font-medium">${escapeHtml(c.nombre)}</span></td>
+                            <td class="truncate-text">${escapeHtml(c.documento)}</td>
+                            <td>${hasPhone ? escapeHtml(c.telefono1) : '-'}</td>
+                            <td class="truncate-text">${escapeHtml(c.plan)}</td>
+                            <td>${escapeHtml(c.centroOp)}</td>
+                            <td>${c.fechaCorte || '-'}</td>
+                            <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                            <td>${isLocked ? `<span class="blocked-badge"><i class="fas fa-lock"></i> ${lockInfo.agente}</span>` : '-'}</td>
+                            <td class="action-cell">
                                 ${(!isLocked || lockedByMe) && hasPhone ? `<button onclick="openRegisterCallModal('${c.id}', 'perdido')" class="call-btn"><i class="fas fa-phone-alt"></i> Gestionar</button>` : `<button class="call-btn opacity-50" disabled>${!hasPhone ? 'Sin teléfono' : 'Bloqueado'}</button>`}
                                 ${hasPhone ? `<a href="tel:${c.telefono1}" class="call-link"><i class="fas fa-phone"></i></a><a href="https://wa.me/${c.telefono1.replace(/[^0-9]/g,'')}" target="_blank" class="whatsapp-link"><i class="fab fa-whatsapp"></i></a>` : ''}
                                 <button onclick="deleteSingleCustomer('${c.id}', 'perdido')" class="delete-single-btn"><i class="fas fa-trash-alt"></i></button>
-                            </span>
+                            </td>
                           </tr>`;
                     }).join('');
                 }
@@ -1602,9 +1472,9 @@
                         const hasPhone = c.telefono1 && c.telefono1 !== '';
                         const statusClass = getStatusClass(c.estado);
                         const statusText = getStatusText(c.estado);
-                        return `<div class="customer-card-mobile ${isLocked && !lockedByMe ? 'blocked' : ''}">
+                        return `<div class="customer-card-mobile">
                             <div class="flex justify-between items-start mb-2">
-                                <div><div class="font-bold text-sm">${escapeHtml(c.nombre)}</div><div class="text-xs text-gray-500">ID: ${escapeHtml(c.identificador)}</div></div>
+                                <div><div class="font-bold text-sm">${escapeHtml(c.nombre)}</div><div class="text-xs text-gray-500">ID: ${escapeHtml(c.identificador || c.id)}</div></div>
                                 <span class="status-badge ${statusClass}">${statusText}</span>
                             </div>
                             <div class="info-row-mobile"><span class="info-label">Documento:</span><span class="info-value">${escapeHtml(c.documento)}</span></div>
@@ -1632,8 +1502,8 @@
         function renderRecuperadosTable() {
             const search = document.getElementById('searchRecuperado')?.value.toLowerCase() || '';
             let items = clientesRecuperados.filter(c => (c.nombre || '').toLowerCase().includes(search));
-            const totalCount = document.getElementById('recuperadosTotalCount');
-            if (totalCount) totalCount.innerText = items.length;
+            const totalCountSpan = document.getElementById('recuperadosTotalCount');
+            if (totalCountSpan) totalCountSpan.innerText = items.length;
             
             const tbody = document.getElementById('recuperadosTableBody');
             if (tbody) {
@@ -1651,30 +1521,13 @@
                     </tr>`).join('');
                 }
             }
-            
-            const mobileContainer = document.getElementById('recuperadosMobileList');
-            if (mobileContainer) {
-                if (items.length === 0) {
-                    mobileContainer.innerHTML = '<div class="text-center py-4 text-gray-500 text-xs">No hay clientes reconectados</div>';
-                } else {
-                    mobileContainer.innerHTML = items.slice(0, ITEMS_PER_PAGE).map(c => `<div class="customer-card-mobile">
-                        <div class="font-bold text-sm mb-1">${escapeHtml(c.nombre)}</div>
-                        <div class="info-row-mobile"><span class="info-label">ID:</span><span class="info-value">${escapeHtml(c.clienteId)}</span></div>
-                        <div class="info-row-mobile"><span class="info-label">Documento:</span><span class="info-value">${escapeHtml(c.documento)}</span></div>
-                        <div class="info-row-mobile"><span class="info-label">Teléfono:</span><span class="info-value">${escapeHtml(c.telefono)}</span></div>
-                        <div class="info-row-mobile"><span class="info-label">Plan:</span><span class="info-value">${escapeHtml(c.plan)}</span></div>
-                        <div class="info-row-mobile"><span class="info-label">Fecha Recup.:</span><span class="info-value">${new Date(c.fechaGestion).toLocaleDateString()}</span></div>
-                        <div class="info-row-mobile"><span class="info-label">Agente:</span><span class="info-value">${escapeHtml(c.agente)}</span></div>
-                    </div>`).join('');
-                }
-            }
         }
         
         function renderPerdidosFinalTable() {
             const search = document.getElementById('searchPerdidoFinal')?.value.toLowerCase() || '';
             let items = clientesPerdidosFinal.filter(c => (c.nombre || '').toLowerCase().includes(search));
-            const totalCount = document.getElementById('perdidosFinalTotalCount');
-            if (totalCount) totalCount.innerText = items.length;
+            const totalCountSpan = document.getElementById('perdidosFinalTotalCount');
+            if (totalCountSpan) totalCountSpan.innerText = items.length;
             
             const tbody = document.getElementById('perdidosFinalTableBody');
             if (tbody) {
@@ -1693,24 +1546,6 @@
                     </tr>`).join('');
                 }
             }
-            
-            const mobileContainer = document.getElementById('perdidosFinalMobileList');
-            if (mobileContainer) {
-                if (items.length === 0) {
-                    mobileContainer.innerHTML = '<div class="text-center py-4 text-gray-500 text-xs">No hay clientes para retiro de equipos</div>';
-                } else {
-                    mobileContainer.innerHTML = items.slice(0, ITEMS_PER_PAGE).map(c => `<div class="customer-card-mobile">
-                        <div class="font-bold text-sm mb-1">${escapeHtml(c.nombre)}</div>
-                        <div class="info-row-mobile"><span class="info-label">ID:</span><span class="info-value">${escapeHtml(c.clienteId)}</span></div>
-                        <div class="info-row-mobile"><span class="info-label">Documento:</span><span class="info-value">${escapeHtml(c.documento)}</span></div>
-                        <div class="info-row-mobile"><span class="info-label">Teléfono:</span><span class="info-value">${escapeHtml(c.telefono)}</span></div>
-                        <div class="info-row-mobile"><span class="info-label">Plan:</span><span class="info-value">${escapeHtml(c.plan)}</span></div>
-                        <div class="info-row-mobile"><span class="info-label">Motivo:</span><span class="info-value">${escapeHtml(c.motivoBaja || '-')}</span></div>
-                        <div class="info-row-mobile"><span class="info-label">Fecha Baja:</span><span class="info-value">${new Date(c.fechaGestion).toLocaleDateString()}</span></div>
-                        <div class="info-row-mobile"><span class="info-label">Agente:</span><span class="info-value">${escapeHtml(c.agente)}</span></div>
-                    </div>`).join('');
-                }
-            }
         }
         
         function renderEquiposTable() {
@@ -1722,7 +1557,7 @@
             const tbody = document.getElementById('equiposTableBody');
             if (tbody) {
                 if (items.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-gray-500 text-xs">No hay órdenes de retiro de equipos</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-gray-500 text-xs">No hay órdenes de retiro</td></tr>';
                 } else {
                     tbody.innerHTML = items.slice(0, ITEMS_PER_PAGE).map(o => `<tr>
                         <td><span class="font-medium">${escapeHtml(o.clienteNombre)}</span></td>
@@ -1733,22 +1568,6 @@
                         <td><span class="status-badge ${o.estado === 'pendiente' ? 'bg-pendiente' : 'bg-recuperado'}">${o.estado === 'pendiente' ? 'PENDIENTE' : 'COMPLETADA'}</span></td>
                         <td class="action-cell">${o.estado === 'pendiente' ? `<button onclick="openAssignTechnicianModal('${o.id}', 'equipo')" class="assign-btn"><i class="fas fa-user-cog"></i> Asignar</button><button onclick="openCompleteOrderModal('${o.id}', 'equipo')" class="call-btn bg-green-600"><i class="fas fa-check"></i> Completar</button>` : '-'}</td>
                     </tr>`).join('');
-                }
-            }
-            
-            const mobileContainer = document.getElementById('equiposMobileList');
-            if (mobileContainer) {
-                if (items.length === 0) {
-                    mobileContainer.innerHTML = '<div class="text-center py-4 text-gray-500 text-xs">No hay órdenes de retiro de equipos</div>';
-                } else {
-                    mobileContainer.innerHTML = items.slice(0, ITEMS_PER_PAGE).map(o => `<div class="customer-card-mobile">
-                        <div class="font-bold text-sm mb-1">${escapeHtml(o.clienteNombre)}</div>
-                        <div class="info-row-mobile"><span class="info-label">Teléfono:</span><span class="info-value">${escapeHtml(o.clienteTelefono)}</span></div>
-                        <div class="info-row-mobile"><span class="info-label">Dirección:</span><span class="info-value">${escapeHtml(o.direccion)}</span></div>
-                        <div class="info-row-mobile"><span class="info-label">Técnico:</span><span class="info-value">${o.tecnico ? escapeHtml(o.tecnico) : 'No asignado'}</span></div>
-                        <div class="info-row-mobile"><span class="info-label">Estado:</span><span class="info-value"><span class="status-badge ${o.estado === 'pendiente' ? 'bg-pendiente' : 'bg-recuperado'}">${o.estado === 'pendiente' ? 'PENDIENTE' : 'COMPLETADA'}</span></span></div>
-                        <div class="action-buttons-mobile">${o.estado === 'pendiente' ? `<button onclick="openAssignTechnicianModal('${o.id}', 'equipo')" class="assign-btn"><i class="fas fa-user-cog"></i> Asignar</button><button onclick="openCompleteOrderModal('${o.id}', 'equipo')" class="call-btn bg-green-600"><i class="fas fa-check"></i> Completar</button>` : ''}</div>
-                    </div>`).join('');
                 }
             }
         }
@@ -1776,33 +1595,12 @@
                     </tr>`).join('');
                 }
             }
-            
-            const mobileContainer = document.getElementById('visitasMobileList');
-            if (mobileContainer) {
-                if (items.length === 0) {
-                    mobileContainer.innerHTML = '<div class="text-center py-4 text-gray-500 text-xs">No hay visitas técnicas</div>';
-                } else {
-                    mobileContainer.innerHTML = items.slice(0, ITEMS_PER_PAGE).map(v => `<div class="customer-card-mobile">
-                        <div class="font-bold text-sm mb-1">${escapeHtml(v.clienteNombre)}</div>
-                        <div class="info-row-mobile"><span class="info-label">Teléfono:</span><span class="info-value">${escapeHtml(v.clienteTelefono)}</span></div>
-                        <div class="info-row-mobile"><span class="info-label">Dirección:</span><span class="info-value">${escapeHtml(v.direccion)}</span></div>
-                        <div class="info-row-mobile"><span class="info-label">Motivo:</span><span class="info-value">${v.motivo === 'recupero_equipo' ? 'Equipos' : (v.motivo === 'falla' ? 'Falla' : 'Instalacion')}</span></div>
-                        <div class="info-row-mobile"><span class="info-label">Técnico:</span><span class="info-value">${v.tecnicoNombre || 'No asignado'}</span></div>
-                        <div class="info-row-mobile"><span class="info-label">Fecha/Hora:</span><span class="info-value">${v.fechaVisita} ${v.horaVisita || ''}</span></div>
-                        <div class="info-row-mobile"><span class="info-label">Estado:</span><span class="info-value"><span class="status-badge ${v.estado === 'pendiente' ? 'bg-pendiente' : 'bg-recuperado'}">${v.estado === 'pendiente' ? 'PENDIENTE' : 'COMPLETADA'}</span></span></div>
-                        <div class="action-buttons-mobile">${v.estado === 'pendiente' ? `<button onclick="openAssignTechnicianModal('${v.id}', 'visita')" class="assign-btn"><i class="fas fa-user-cog"></i> Asignar</button><button onclick="openCompleteOrderModal('${v.id}', 'visita')" class="call-btn bg-green-600"><i class="fas fa-check"></i> Completar</button>` : ''}</div>
-                    </div>`).join('');
-                }
-            }
         }
         
         function renderTechniciansList() {
             const container = document.getElementById('techniciansList');
             if (!container) return;
-            if (technicians.length === 0) { 
-                container.innerHTML = '<div class="text-center py-2 text-gray-500 text-xs">Sin técnicos registrados</div>'; 
-                return; 
-            }
+            if (technicians.length === 0) { container.innerHTML = '<div class="text-center py-2 text-gray-500 text-xs">Sin técnicos registrados</div>'; return; }
             container.innerHTML = technicians.map(t => `<div class="flex justify-between items-center p-2 border rounded text-xs">
                 <div><div class="font-medium">${escapeHtml(t.nombre)}</div><div class="text-gray-500">${escapeHtml(t.co)} | ${escapeHtml(t.telefono)}</div></div>
                 <button onclick="deleteTechnician('${t.id}')" class="text-red-500 hover:text-red-700"><i class="fas fa-trash-alt"></i></button>
@@ -1813,7 +1611,7 @@
         function exportRezagadosToExcel() {
             const items = getFilteredRezagados();
             const data = [['ID', 'Nombre', 'Documento', 'Teléfono', 'Plan', 'CO', 'Fecha Corte', 'Estado', 'Dirección']];
-            items.forEach(c => data.push([c.identificador, c.nombre, c.documento, c.telefono1, c.plan, c.centroOp, c.fechaCorte, c.estado, c.direccion]));
+            items.forEach(c => data.push([c.identificador || c.id, c.nombre, c.documento, c.telefono1, c.plan, c.centroOp, c.fechaCorte, c.estado, c.direccion]));
             const ws = XLSX.utils.aoa_to_sheet(data);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'Rezagados');
@@ -1824,7 +1622,7 @@
         function exportPerdidosToExcel() {
             const items = getFilteredPerdidos();
             const data = [['ID', 'Nombre', 'Documento', 'Teléfono', 'Plan', 'CO', 'Fecha Corte', 'Estado', 'Dirección']];
-            items.forEach(c => data.push([c.identificador, c.nombre, c.documento, c.telefono1, c.plan, c.centroOp, c.fechaCorte, c.estado, c.direccion]));
+            items.forEach(c => data.push([c.identificador || c.id, c.nombre, c.documento, c.telefono1, c.plan, c.centroOp, c.fechaCorte, c.estado, c.direccion]));
             const ws = XLSX.utils.aoa_to_sheet(data);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'Perdidos');
@@ -1888,7 +1686,7 @@
             doc.setFont(undefined, 'normal');
             doc.text('* Total de llamadas realizadas: ' + llamadasHoy.length, 20, 70);
             doc.text('* Clientes reconectados: ' + recuperadosHoy.length, 20, 78);
-            doc.text('* Clientes dados de baja (retiro equipos): ' + perdidosHoy.length, 20, 86);
+            doc.text('* Clientes dados de baja: ' + perdidosHoy.length, 20, 86);
             doc.text('* Visitas tecnicas programadas: ' + visitasHoy.length, 20, 94);
             doc.text('* Visitas tecnicas completadas: ' + equiposHoy.filter(e => e.estado === 'completada').length, 20, 102);
             doc.text('* Visitas tecnicas pendientes: ' + equiposHoy.filter(e => e.estado === 'pendiente').length, 20, 110);
@@ -1920,11 +1718,7 @@
                 theme: 'striped',
                 headStyles: { fillColor: [79, 70, 229], textColor: [255, 255, 255], fontStyle: 'bold' },
                 bodyStyles: { fontSize: 9 },
-                columnStyles: {
-                    0: { cellWidth: 60 },
-                    1: { cellWidth: 30, halign: 'center' },
-                    2: { cellWidth: 30, halign: 'center' }
-                },
+                columnStyles: { 0: { cellWidth: 60 }, 1: { cellWidth: 30, halign: 'center' }, 2: { cellWidth: 30, halign: 'center' } },
                 margin: { left: 14 }
             });
             
@@ -1938,18 +1732,10 @@
                 doc.autoTable({
                     startY: yPos + 4,
                     head: [['ID', 'Nombre', 'Documento', 'Telefono', 'Plan', 'Agente']],
-                    body: recuperadosHoy.slice(0, 20).map(c => [
-                        c.clienteId || c.id || '-',
-                        (c.nombre || '').substring(0, 25),
-                        (c.documento || '-').substring(0, 15),
-                        c.telefono || '-',
-                        (c.plan || '-').substring(0, 20),
-                        c.agente || '-'
-                    ]),
+                    body: recuperadosHoy.slice(0, 20).map(c => [c.clienteId || '-', (c.nombre || '').substring(0, 25), (c.documento || '-').substring(0, 15), c.telefono || '-', (c.plan || '-').substring(0, 20), c.agente || '-']),
                     theme: 'striped',
                     headStyles: { fillColor: [16, 185, 129], textColor: [255, 255, 255], fontStyle: 'bold' },
                     bodyStyles: { fontSize: 8 },
-                    styles: { cellPadding: 2 },
                     margin: { left: 14 }
                 });
                 yPos = doc.lastAutoTable.finalY + 10;
@@ -1959,50 +1745,14 @@
                 if (yPos > 250) { doc.addPage(); yPos = 20; }
                 doc.setFontSize(11);
                 doc.setFont(undefined, 'bold');
-                doc.text('CLIENTES DADOS DE BAJA (RETIRO EQUIPOS)', 14, yPos);
+                doc.text('CLIENTES DADOS DE BAJA', 14, yPos);
                 doc.autoTable({
                     startY: yPos + 4,
                     head: [['ID', 'Nombre', 'Telefono', 'Plan', 'Motivo', 'Agente']],
-                    body: perdidosHoy.slice(0, 20).map(c => [
-                        c.clienteId || c.id || '-',
-                        (c.nombre || '').substring(0, 25),
-                        c.telefono || '-',
-                        (c.plan || '-').substring(0, 20),
-                        c.motivoBaja === 'price' ? 'Precio' :
-                        c.motivoBaja === 'service_issues' ? 'Problemas servicio' :
-                        c.motivoBaja === 'relocation' ? 'Mudanza' :
-                        c.motivoBaja === 'deceased' ? 'Fallecimiento' : (c.motivoBaja || '-'),
-                        c.agente || '-'
-                    ]),
+                    body: perdidosHoy.slice(0, 20).map(c => [c.clienteId || '-', (c.nombre || '').substring(0, 25), c.telefono || '-', (c.plan || '-').substring(0, 20), c.motivoBaja === 'price' ? 'Precio' : c.motivoBaja === 'service_issues' ? 'Problemas servicio' : c.motivoBaja === 'relocation' ? 'Mudanza' : c.motivoBaja === 'deceased' ? 'Fallecimiento' : (c.motivoBaja || '-'), c.agente || '-']),
                     theme: 'striped',
                     headStyles: { fillColor: [239, 68, 68], textColor: [255, 255, 255], fontStyle: 'bold' },
                     bodyStyles: { fontSize: 8 },
-                    styles: { cellPadding: 2 },
-                    margin: { left: 14 }
-                });
-                yPos = doc.lastAutoTable.finalY + 10;
-            }
-            
-            if (visitasHoy.length > 0) {
-                if (yPos > 250) { doc.addPage(); yPos = 20; }
-                doc.setFontSize(11);
-                doc.setFont(undefined, 'bold');
-                doc.text('VISITAS TECNICAS PROGRAMADAS', 14, yPos);
-                doc.autoTable({
-                    startY: yPos + 4,
-                    head: [['Cliente', 'Telefono', 'Direccion', 'Motivo', 'Tecnico', 'Estado']],
-                    body: visitasHoy.slice(0, 20).map(v => [
-                        (v.clienteNombre || '').substring(0, 25),
-                        v.clienteTelefono || '-',
-                        (v.direccion || '').substring(0, 35),
-                        v.motivo === 'recupero_equipo' ? 'Equipos' : (v.motivo === 'falla' ? 'Falla' : 'Instalacion'),
-                        v.tecnicoNombre || 'No asignado',
-                        v.estado === 'pendiente' ? 'PENDIENTE' : 'COMPLETADA'
-                    ]),
-                    theme: 'striped',
-                    headStyles: { fillColor: [59, 130, 246], textColor: [255, 255, 255], fontStyle: 'bold' },
-                    bodyStyles: { fontSize: 7 },
-                    styles: { cellPadding: 2 },
                     margin: { left: 14 }
                 });
                 yPos = doc.lastAutoTable.finalY + 10;
@@ -2010,14 +1760,11 @@
             
             const agentStats = new Map();
             llamadasHoy.forEach(l => {
-                if (!agentStats.has(l.agente)) {
-                    agentStats.set(l.agente, { llamadas: 0, recuperados: 0, bajas: 0, visitas: 0 });
-                }
+                if (!agentStats.has(l.agente)) agentStats.set(l.agente, { llamadas: 0, recuperados: 0, bajas: 0 });
                 const stats = agentStats.get(l.agente);
                 stats.llamadas++;
                 if (l.resultado === 'recuperado') stats.recuperados++;
                 if (l.resultado === 'dado_baja') stats.bajas++;
-                if (l.resultado === 'visita_tecnica') stats.visitas++;
             });
             
             if (agentStats.size > 0) {
@@ -2027,26 +1774,11 @@
                 doc.text('ESTADISTICAS POR AGENTE', 14, yPos);
                 doc.autoTable({
                     startY: yPos + 4,
-                    head: [['Agente', 'Llamadas', 'Reconectados', 'Bajas', 'Visitas', 'Efectividad']],
-                    body: Array.from(agentStats.entries()).map(([agente, stats]) => [
-                        agente.substring(0, 25),
-                        stats.llamadas.toString(),
-                        stats.recuperados.toString(),
-                        stats.bajas.toString(),
-                        stats.visitas.toString(),
-                        (stats.llamadas > 0 ? Math.round((stats.recuperados / stats.llamadas) * 100) : 0) + '%'
-                    ]),
+                    head: [['Agente', 'Llamadas', 'Reconectados', 'Bajas', 'Efectividad']],
+                    body: Array.from(agentStats.entries()).map(([agente, stats]) => [agente.substring(0, 25), stats.llamadas.toString(), stats.recuperados.toString(), stats.bajas.toString(), (stats.llamadas > 0 ? Math.round((stats.recuperados / stats.llamadas) * 100) : 0) + '%']),
                     theme: 'striped',
                     headStyles: { fillColor: [100, 100, 100], textColor: [255, 255, 255], fontStyle: 'bold' },
                     bodyStyles: { fontSize: 8 },
-                    columnStyles: {
-                        0: { cellWidth: 50 },
-                        1: { cellWidth: 20, halign: 'center' },
-                        2: { cellWidth: 25, halign: 'center' },
-                        3: { cellWidth: 20, halign: 'center' },
-                        4: { cellWidth: 20, halign: 'center' },
-                        5: { cellWidth: 25, halign: 'center' }
-                    },
                     margin: { left: 14 }
                 });
                 yPos = doc.lastAutoTable.finalY + 10;
@@ -2063,12 +1795,11 @@
             doc.setFont(undefined, 'normal');
             doc.text('Total clientes gestionados: ' + llamadasHoy.length, 14, yPos + 8);
             doc.text('Tasa de reconexion: ' + (llamadasHoy.length > 0 ? Math.round((recuperadosHoy.length / llamadasHoy.length) * 100) : 0) + '%', 14, yPos + 14);
-            doc.text('Tasa de retencion (no bajas): ' + (llamadasHoy.length > 0 ? Math.round(((llamadasHoy.length - perdidosHoy.length) / llamadasHoy.length) * 100) : 0) + '%', 14, yPos + 20);
+            doc.text('Tasa de retencion: ' + (llamadasHoy.length > 0 ? Math.round(((llamadasHoy.length - perdidosHoy.length) / llamadasHoy.length) * 100) : 0) + '%', 14, yPos + 20);
             
             doc.setFontSize(8);
             doc.setTextColor(150, 150, 150);
             doc.text('Reporte generado por sistema OCAD Inter - Gestion de Recupero', 14, yPos + 32);
-            doc.text('www.ocadinter.com - Version 2.0', 14, yPos + 38);
             
             doc.save('reporte_gestion_' + fecha + '.pdf');
             showToast('Reporte generado exitosamente');
@@ -2083,18 +1814,18 @@
             const perdidosFinal = clientesPerdidosFinal.length;
             const equiposPendientes = ordenesEquipos.filter(o => o.estado === 'pendiente').length;
             
-            const dashboardRezagadosCount = document.getElementById('dashboardRezagadosCount');
-            if (dashboardRezagadosCount) dashboardRezagadosCount.innerText = rezagadosPendientes;
-            const dashboardPerdidosCount = document.getElementById('dashboardPerdidosCount');
-            if (dashboardPerdidosCount) dashboardPerdidosCount.innerText = perdidosPendientes;
-            const inProgressCount = document.getElementById('inProgressCount');
-            if (inProgressCount) inProgressCount.innerText = inProgress;
-            const dashboardRecuperadosCount = document.getElementById('dashboardRecuperadosCount');
-            if (dashboardRecuperadosCount) dashboardRecuperadosCount.innerText = recuperados;
-            const dashboardPerdidosFinalCount = document.getElementById('dashboardPerdidosFinalCount');
-            if (dashboardPerdidosFinalCount) dashboardPerdidosFinalCount.innerText = perdidosFinal;
-            const dashboardEquiposCount = document.getElementById('dashboardEquiposCount');
-            if (dashboardEquiposCount) dashboardEquiposCount.innerText = equiposPendientes;
+            const dashRezagados = document.getElementById('dashboardRezagadosCount');
+            if (dashRezagados) dashRezagados.innerText = rezagadosPendientes;
+            const dashPerdidos = document.getElementById('dashboardPerdidosCount');
+            if (dashPerdidos) dashPerdidos.innerText = perdidosPendientes;
+            const inProgressSpan = document.getElementById('inProgressCount');
+            if (inProgressSpan) inProgressSpan.innerText = inProgress;
+            const dashRecuperados = document.getElementById('dashboardRecuperadosCount');
+            if (dashRecuperados) dashRecuperados.innerText = recuperados;
+            const dashPerdidosFinal = document.getElementById('dashboardPerdidosFinalCount');
+            if (dashPerdidosFinal) dashPerdidosFinal.innerText = perdidosFinal;
+            const dashEquipos = document.getElementById('dashboardEquiposCount');
+            if (dashEquipos) dashEquipos.innerText = equiposPendientes;
             
             const hoy = new Date().toISOString().split('T')[0];
             const reportSummary = document.getElementById('reportSummary');
@@ -2108,33 +1839,17 @@
                 `;
             }
             updateCharts();
-            actualizarNotificaciones();
         }
         
         function updateCharts() {
             const last7Days = [], recoveredData = [];
-            for (let i = 6; i >= 0; i--) { 
-                const d = new Date(); 
-                d.setDate(d.getDate()-i); 
-                const ds = d.toISOString().split('T')[0]; 
-                last7Days.push(ds.slice(5)); 
-                recoveredData.push(clientesRecuperados.filter(r => r.fechaGestion?.split('T')[0] === ds).length); 
-            }
+            for (let i = 6; i >= 0; i--) { const d = new Date(); d.setDate(d.getDate()-i); const ds = d.toISOString().split('T')[0]; last7Days.push(ds.slice(5)); recoveredData.push(clientesRecuperados.filter(r => r.fechaGestion?.split('T')[0] === ds).length); }
             const ctxTrend = document.getElementById('recoveryTrendChart')?.getContext('2d');
-            if (ctxTrend) { 
-                if (recoveryChart) recoveryChart.destroy(); 
-                recoveryChart = new Chart(ctxTrend, { type: 'line', data: { labels: last7Days, datasets: [{ label: 'Reconectados', data: recoveredData, borderColor: '#10b981', fill: true }] }, options: { responsive: true, maintainAspectRatio: true } }); 
-            }
+            if (ctxTrend) { if (recoveryChart) recoveryChart.destroy(); recoveryChart = new Chart(ctxTrend, { type: 'line', data: { labels: last7Days, datasets: [{ label: 'Reconectados', data: recoveredData, borderColor: '#10b981', fill: true }] }, options: { responsive: true, maintainAspectRatio: true } }); }
             const motivos = { price: 0, service_issues: 0, relocation: 0, deceased: 0, other: 0 };
-            clientesPerdidosFinal.forEach(c => { 
-                if (motivos[c.motivoBaja] !== undefined) motivos[c.motivoBaja]++; 
-                else motivos.other++; 
-            });
+            clientesPerdidosFinal.forEach(c => { if (motivos[c.motivoBaja] !== undefined) motivos[c.motivoBaja]++; else motivos.other++; });
             const ctxMotivos = document.getElementById('bajaMotivosChart')?.getContext('2d');
-            if (ctxMotivos) { 
-                if (bajaMotivosChart) bajaMotivosChart.destroy(); 
-                bajaMotivosChart = new Chart(ctxMotivos, { type: 'pie', data: { labels: ['Precio', 'Problemas servicio', 'Mudanza', 'Fallecimiento', 'Otros'], datasets: [{ data: [motivos.price, motivos.service_issues, motivos.relocation, motivos.deceased, motivos.other], backgroundColor: ['#f59e0b', '#ef4444', '#3b82f6', '#8b5cf6', '#6b7280'] }] }, options: { responsive: true, maintainAspectRatio: true } }); 
-            }
+            if (ctxMotivos) { if (bajaMotivosChart) bajaMotivosChart.destroy(); bajaMotivosChart = new Chart(ctxMotivos, { type: 'pie', data: { labels: ['Precio', 'Problemas servicio', 'Mudanza', 'Fallecimiento', 'Otros'], datasets: [{ data: [motivos.price, motivos.service_issues, motivos.relocation, motivos.deceased, motivos.other], backgroundColor: ['#f59e0b', '#ef4444', '#3b82f6', '#8b5cf6', '#6b7280'] }] }, options: { responsive: true, maintainAspectRatio: true } }); }
         }
         
         function renderTopAgents() {
@@ -2152,92 +1867,14 @@
         }
 
         // ==================== ELIMINACIONES ====================
-        async function deleteAllTechnicians() { 
-            if (confirm('Eliminar todos los técnicos?')) { 
-                const snapshot = await colecciones.technicians.get();
-                const batch = db.batch();
-                snapshot.forEach(doc => batch.delete(doc.ref));
-                await batch.commit();
-                showToast('Técnicos eliminados'); 
-            } 
-        }
-        
-        async function deleteAllRezagados() { 
-            if (confirm('Eliminar todos los clientes rezagados?')) { 
-                const snapshot = await colecciones.rezagados.get();
-                const batch = db.batch();
-                snapshot.forEach(doc => batch.delete(doc.ref));
-                await batch.commit();
-                showToast('Rezagados eliminados'); 
-            } 
-        }
-        
-        async function deleteAllPerdidos() { 
-            if (confirm('Eliminar todos los clientes perdidos?')) { 
-                const snapshot = await colecciones.perdidos.get();
-                const batch = db.batch();
-                snapshot.forEach(doc => batch.delete(doc.ref));
-                await batch.commit();
-                showToast('Perdidos eliminados'); 
-            } 
-        }
-        
-        async function deleteAllRecuperados() { 
-            if (confirm('Eliminar todos los clientes reconectados?')) { 
-                const snapshot = await colecciones.recuperados.get();
-                const batch = db.batch();
-                snapshot.forEach(doc => batch.delete(doc.ref));
-                await batch.commit();
-                showToast('Reconectados eliminados'); 
-            } 
-        }
-        
-        async function deleteAllPerdidosFinal() { 
-            if (confirm('Eliminar todos los clientes de retiro de equipos?')) { 
-                const snapshot = await colecciones.perdidosFinal.get();
-                const batch = db.batch();
-                snapshot.forEach(doc => batch.delete(doc.ref));
-                await batch.commit();
-                showToast('Clientes de retiro eliminados'); 
-            } 
-        }
-        
-        async function deleteAllEquipos() { 
-            if (confirm('Eliminar todas las órdenes de equipos?')) { 
-                const snapshot = await colecciones.ordenesEquipos.get();
-                const batch = db.batch();
-                snapshot.forEach(doc => batch.delete(doc.ref));
-                await batch.commit();
-                showToast('Órdenes de equipos eliminadas'); 
-            } 
-        }
-        
-        async function deleteAllVisitas() { 
-            if (confirm('Eliminar todas las visitas técnicas?')) { 
-                const snapshot = await colecciones.visitasTecnicas.get();
-                const batch = db.batch();
-                snapshot.forEach(doc => batch.delete(doc.ref));
-                await batch.commit();
-                showToast('Visitas eliminadas'); 
-            } 
-        }
-        
-        async function deleteAllData() { 
-            if (confirm('ELIMINAR TODOS LOS DATOS DE FIRESTORE?')) { 
-                const coleccionesList = [
-                    colecciones.rezagados, colecciones.perdidos, colecciones.recuperados,
-                    colecciones.perdidosFinal, colecciones.ordenesEquipos, colecciones.visitasTecnicas,
-                    colecciones.technicians, colecciones.callLogs, colecciones.lockedCustomers
-                ];
-                for (const coleccion of coleccionesList) {
-                    const snapshot = await coleccion.get();
-                    const batch = db.batch();
-                    snapshot.forEach(doc => batch.delete(doc.ref));
-                    await batch.commit();
-                }
-                showToast('Todos los datos eliminados de Firebase'); 
-            } 
-        }
+        async function deleteAllTechnicians() { if (confirm('Eliminar todos los técnicos?')) { const snap = await colecciones.technicians.get(); const batch = db.batch(); snap.forEach(doc => batch.delete(doc.ref)); await batch.commit(); showToast('Técnicos eliminados'); } }
+        async function deleteAllRezagados() { if (confirm('Eliminar todos los rezagados?')) { const snap = await colecciones.rezagados.get(); const batch = db.batch(); snap.forEach(doc => batch.delete(doc.ref)); await batch.commit(); showToast('Rezagados eliminados'); } }
+        async function deleteAllPerdidos() { if (confirm('Eliminar todos los perdidos?')) { const snap = await colecciones.perdidos.get(); const batch = db.batch(); snap.forEach(doc => batch.delete(doc.ref)); await batch.commit(); showToast('Perdidos eliminados'); } }
+        async function deleteAllRecuperados() { if (confirm('Eliminar todos los reconectados?')) { const snap = await colecciones.recuperados.get(); const batch = db.batch(); snap.forEach(doc => batch.delete(doc.ref)); await batch.commit(); showToast('Reconectados eliminados'); } }
+        async function deleteAllPerdidosFinal() { if (confirm('Eliminar todos los retiros?')) { const snap = await colecciones.perdidosFinal.get(); const batch = db.batch(); snap.forEach(doc => batch.delete(doc.ref)); await batch.commit(); showToast('Retiros eliminados'); } }
+        async function deleteAllEquipos() { if (confirm('Eliminar todas las órdenes?')) { const snap = await colecciones.ordenesEquipos.get(); const batch = db.batch(); snap.forEach(doc => batch.delete(doc.ref)); await batch.commit(); showToast('Órdenes eliminadas'); } }
+        async function deleteAllVisitas() { if (confirm('Eliminar todas las visitas?')) { const snap = await colecciones.visitasTecnicas.get(); const batch = db.batch(); snap.forEach(doc => batch.delete(doc.ref)); await batch.commit(); showToast('Visitas eliminadas'); } }
+        async function deleteAllData() { if (confirm('ELIMINAR TODOS LOS DATOS?')) { const col = [colecciones.rezagados, colecciones.perdidos, colecciones.recuperados, colecciones.perdidosFinal, colecciones.ordenesEquipos, colecciones.visitasTecnicas, colecciones.technicians, colecciones.callLogs, colecciones.lockedCustomers]; for (const c of col) { const snap = await c.get(); const batch = db.batch(); snap.forEach(doc => batch.delete(doc.ref)); await batch.commit(); } showToast('Todos los datos eliminados'); } }
         
         function updateConfigCounters() {
             const container = document.getElementById('configButtonsContainer');
@@ -2247,11 +1884,11 @@
                     <button onclick="deleteAllPerdidos()" class="delete-all-btn bg-orange-600"><i class="fas fa-trash mr-1"></i>Eliminar Perdidos (${clientesPerdidos.length})</button>
                     <button onclick="deleteAllRecuperados()" class="delete-all-btn bg-green-600"><i class="fas fa-trash mr-1"></i>Eliminar Reconectados (${clientesRecuperados.length})</button>
                     <button onclick="deleteAllPerdidosFinal()" class="delete-all-btn bg-red-600"><i class="fas fa-trash mr-1"></i>Eliminar Retiro Equipos (${clientesPerdidosFinal.length})</button>
-                    <button onclick="deleteAllEquipos()" class="delete-all-btn bg-purple-600"><i class="fas fa-trash mr-1"></i>Eliminar Órdenes Equipos (${ordenesEquipos.length})</button>
-                    <button onclick="deleteAllVisitas()" class="delete-all-btn bg-blue-600"><i class="fas fa-trash mr-1"></i>Eliminar Visitas (${visitasTecnicas.length})</button>
-                    <button onclick="deleteAllTechnicians()" class="delete-all-btn bg-gray-600"><i class="fas fa-trash mr-1"></i>Eliminar Técnicos (${technicians.length})</button>
+                    <button onclick="deleteAllEquipos()" class="delete-all-btn bg-purple-600"><i class="fas fa-trash mr-1"></i>Eliminar Visitas Pendientes (${ordenesEquipos.length})</button>
+                    <button onclick="deleteAllVisitas()" class="delete-all-btn bg-blue-600"><i class="fas fa-trash mr-1"></i>Eliminar Visitas Finalizadas (${visitasTecnicas.length})</button>
+                    <button onclick="deleteAllTechnicians()" class="delete-all-btn bg-gray-600"><i class="fas fa-trash mr-1"></i>Eliminar Tecnicos (${technicians.length})</button>
                     <div class="border-t my-1"></div>
-                    <button onclick="deleteAllData()" class="delete-all-btn bg-red-900"><i class="fas fa-database mr-1"></i>ELIMINAR TODOS LOS DATOS DE FIRESTORE</button>
+                    <button onclick="deleteAllData()" class="delete-all-btn bg-red-900"><i class="fas fa-database mr-1"></i>ELIMINAR TODOS LOS DATOS</button>
                 `;
             }
         }
@@ -2268,7 +1905,6 @@
             updateDashboardMetrics(); 
             renderTopAgents(); 
             updateConfigCounters(); 
-            actualizarNotificaciones();
         }
         
         function changeRezagadosPage(delta) { rezagadosPage += delta; renderRezagadosTable(); }
@@ -2280,18 +1916,12 @@
                 const tabElement = document.getElementById(`${tab}Tab`);
                 if (tabElement) tabElement.classList.add('hidden');
                 const btn = document.getElementById(`tab-${tab}-btn`);
-                if (btn) {
-                    btn.classList.remove('tab-active');
-                    btn.classList.add('tab-inactive');
-                }
+                if (btn) { btn.classList.remove('tab-active'); btn.classList.add('tab-inactive'); }
             });
             const activeTab = document.getElementById(`${tabName}Tab`);
             if (activeTab) activeTab.classList.remove('hidden');
             const activeBtn = document.getElementById(`tab-${tabName}-btn`);
-            if (activeBtn) {
-                activeBtn.classList.add('tab-active');
-                activeBtn.classList.remove('tab-inactive');
-            }
+            if (activeBtn) { activeBtn.classList.add('tab-active'); activeBtn.classList.remove('tab-inactive'); }
             if (tabName === 'rezagados') renderRezagadosTable();
             if (tabName === 'perdidos') renderPerdidosTable();
             if (tabName === 'recuperados') renderRecuperadosTable();
@@ -2304,11 +1934,7 @@
             if (tabName === 'config') updateConfigCounters();
         }
         
-        function escapeHtml(str) { 
-            if (!str) return ''; 
-            return String(str).replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;'); 
-        }
-        
+        function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;'); }
         function showToast(msg, type = 'success') { 
             const toast = document.createElement('div'); 
             toast.className = 'toast-notification'; 
@@ -2336,111 +1962,53 @@
             const password = document.getElementById('loginPassword').value;
             const user = appUsers.find(u => u.id === userId);
             if (!userId || !user) { 
-                const loginError = document.getElementById('loginError');
-                if (loginError) {
-                    loginError.textContent = 'Perfil inválido'; 
-                    loginError.classList.remove('hidden');
-                }
+                document.getElementById('loginError').textContent = 'Perfil inválido'; 
+                document.getElementById('loginError').classList.remove('hidden');
                 return; 
             }
             if (user.password === password) {
                 appCurrentUser = user;
-                const loginModal = document.getElementById('loginModal');
-                const mainContent = document.getElementById('mainContent');
-                const currentUserName = document.getElementById('currentUserName');
-                const userRoleBadge = document.getElementById('userRoleBadge');
-                const userAvatar = document.getElementById('userAvatar');
-                
-                if (loginModal) loginModal.classList.add('hidden');
-                if (mainContent) mainContent.classList.remove('hidden');
-                if (currentUserName) currentUserName.innerText = user.fullName;
-                if (userRoleBadge) userRoleBadge.innerText = user.role === 'admin' ? 'Administrador' : (user.role === 'supervisor' ? 'Supervisor' : 'Agente OCAD');
-                if (userAvatar) userAvatar.innerHTML = user.fullName.charAt(0).toUpperCase();
-                
-                // Cargar datos desde Firebase
-                cargarDatosFirestore();
-                
+                document.getElementById('loginModal').classList.add('hidden');
+                document.getElementById('mainContent').classList.remove('hidden');
+                document.getElementById('currentUserName').innerText = user.fullName;
+                document.getElementById('userRoleBadge').innerText = user.role === 'admin' ? 'Administrador' : (user.role === 'supervisor' ? 'Supervisor' : 'Agente OCAD');
+                document.getElementById('userAvatar').innerHTML = user.fullName.charAt(0).toUpperCase();
+                cargarDatosIniciales();
                 showTab('dashboard');
             } else {
-                const loginError = document.getElementById('loginError');
-                if (loginError) {
-                    loginError.textContent = 'Contraseña incorrecta';
-                    loginError.classList.remove('hidden');
-                }
+                document.getElementById('loginError').textContent = 'Contraseña incorrecta';
+                document.getElementById('loginError').classList.remove('hidden');
             }
         }
         
         // Event Listeners
-        const logoutBtn = document.getElementById('logoutBtn');
-        if (logoutBtn) {
-            logoutBtn.addEventListener('click', () => { 
-                appCurrentUser = null; 
-                const mainContent = document.getElementById('mainContent');
-                const loginModal = document.getElementById('loginModal');
-                if (mainContent) mainContent.classList.add('hidden'); 
-                if (loginModal) loginModal.classList.remove('hidden');
-            });
-        }
+        document.getElementById('logoutBtn')?.addEventListener('click', () => { 
+            appCurrentUser = null; 
+            document.getElementById('mainContent').classList.add('hidden'); 
+            document.getElementById('loginModal').classList.remove('hidden');
+        });
         
-        const searchRezagado = document.getElementById('searchRezagado');
-        if (searchRezagado) searchRezagado.addEventListener('input', () => { rezagadosPage = 1; renderRezagadosTable(); });
+        document.getElementById('searchRezagado')?.addEventListener('input', () => { rezagadosPage = 1; renderRezagadosTable(); });
+        document.getElementById('searchRezagadoId')?.addEventListener('input', () => { rezagadosPage = 1; renderRezagadosTable(); });
+        document.getElementById('filterRezagadoCO')?.addEventListener('change', () => { rezagadosPage = 1; renderRezagadosTable(); });
+        document.getElementById('searchPerdido')?.addEventListener('input', () => { perdidosPage = 1; renderPerdidosTable(); });
+        document.getElementById('searchPerdidoId')?.addEventListener('input', () => { perdidosPage = 1; renderPerdidosTable(); });
+        document.getElementById('filterPerdidoCO')?.addEventListener('change', () => { perdidosPage = 1; renderPerdidosTable(); });
+        document.getElementById('searchRecuperado')?.addEventListener('input', () => renderRecuperadosTable());
+        document.getElementById('searchPerdidoFinal')?.addEventListener('input', () => renderPerdidosFinalTable());
+        document.getElementById('searchEquipo')?.addEventListener('input', () => renderEquiposTable());
+        document.getElementById('filterEquipoEstado')?.addEventListener('change', () => renderEquiposTable());
+        document.getElementById('searchVisita')?.addEventListener('input', () => renderVisitasTable());
+        document.getElementById('filterVisitaEstado')?.addEventListener('change', () => renderVisitasTable());
         
-        const searchRezagadoId = document.getElementById('searchRezagadoId');
-        if (searchRezagadoId) searchRezagadoId.addEventListener('input', () => { rezagadosPage = 1; renderRezagadosTable(); });
+        document.getElementById('saveCallBtn')?.addEventListener('click', saveCall);
+        document.getElementById('completeOrderBtn')?.addEventListener('click', completeOrder);
+        document.getElementById('callResult')?.addEventListener('change', (e) => {
+            document.getElementById('bajaReasonDiv').classList.toggle('hidden', e.target.value !== 'dado_baja');
+            document.getElementById('visitaFields').classList.toggle('hidden', e.target.value !== 'visita_tecnica');
+        });
         
-        const filterRezagadoCO = document.getElementById('filterRezagadoCO');
-        if (filterRezagadoCO) filterRezagadoCO.addEventListener('change', () => { rezagadosPage = 1; renderRezagadosTable(); });
-        
-        const searchPerdido = document.getElementById('searchPerdido');
-        if (searchPerdido) searchPerdido.addEventListener('input', () => { perdidosPage = 1; renderPerdidosTable(); });
-        
-        const searchPerdidoId = document.getElementById('searchPerdidoId');
-        if (searchPerdidoId) searchPerdidoId.addEventListener('input', () => { perdidosPage = 1; renderPerdidosTable(); });
-        
-        const filterPerdidoCO = document.getElementById('filterPerdidoCO');
-        if (filterPerdidoCO) filterPerdidoCO.addEventListener('change', () => { perdidosPage = 1; renderPerdidosTable(); });
-        
-        const searchRecuperado = document.getElementById('searchRecuperado');
-        if (searchRecuperado) searchRecuperado.addEventListener('input', () => renderRecuperadosTable());
-        
-        const searchPerdidoFinal = document.getElementById('searchPerdidoFinal');
-        if (searchPerdidoFinal) searchPerdidoFinal.addEventListener('input', () => renderPerdidosFinalTable());
-        
-        const searchEquipo = document.getElementById('searchEquipo');
-        if (searchEquipo) searchEquipo.addEventListener('input', () => renderEquiposTable());
-        
-        const filterEquipoEstado = document.getElementById('filterEquipoEstado');
-        if (filterEquipoEstado) filterEquipoEstado.addEventListener('change', () => renderEquiposTable());
-        
-        const searchVisita = document.getElementById('searchVisita');
-        if (searchVisita) searchVisita.addEventListener('input', () => renderVisitasTable());
-        
-        const filterVisitaEstado = document.getElementById('filterVisitaEstado');
-        if (filterVisitaEstado) filterVisitaEstado.addEventListener('change', () => renderVisitasTable());
-        
-        const saveCallBtn = document.getElementById('saveCallBtn');
-        if (saveCallBtn) saveCallBtn.addEventListener('click', saveCall);
-        
-        const completeOrderBtn = document.getElementById('completeOrderBtn');
-        if (completeOrderBtn) completeOrderBtn.addEventListener('click', completeOrder);
-        
-        const callResult = document.getElementById('callResult');
-        if (callResult) {
-            callResult.addEventListener('change', (e) => {
-                const bajaReasonDiv = document.getElementById('bajaReasonDiv');
-                const visitaFields = document.getElementById('visitaFields');
-                if (bajaReasonDiv) bajaReasonDiv.classList.toggle('hidden', e.target.value !== 'dado_baja');
-                if (visitaFields) visitaFields.classList.toggle('hidden', e.target.value !== 'visita_tecnica');
-            });
-        }
-        
-        // Enter key para login
-        const loginPassword = document.getElementById('loginPassword');
-        if (loginPassword) {
-            loginPassword.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') doLogin();
-            });
-        }
+        document.getElementById('loginPassword')?.addEventListener('keypress', (e) => { if (e.key === 'Enter') doLogin(); });
         
         setInterval(cleanExpiredLocks, 60000);
         

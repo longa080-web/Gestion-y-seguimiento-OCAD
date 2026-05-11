@@ -370,7 +370,7 @@
                         <div class="text-center mb-2"><i class="fas fa-hourglass-half text-3xl text-amber-500 mb-1"></i><h3 class="text-base font-bold">Importar Rezagados</h3><p class="text-xs text-gray-500">Clientes en riesgo de corte</p></div>
                         <input type="file" id="rezagadosExcel" accept=".xlsx, .xls, .csv" class="border rounded-lg px-2 py-1 w-full text-xs mb-2" onchange="previewRezagadosFile(this)">
                         <div id="rezagadosPreview" class="mt-2 hidden">
-                            <div class="overflow-x-auto max-h-48 mb-2"><table id="previewRezagadosTable" class="preview-table"></td></div>
+                            <div class="overflow-x-auto max-h-48 mb-2"><table id="previewRezagadosTable" class="preview-table"></table></div>
                             <button onclick="importRezagadosDirect()" class="w-full bg-amber-600 text-white py-1 rounded-lg text-sm mt-2"><i class="fas fa-upload mr-1"></i>Importar Rezagados</button>
                         </div>
                         <div id="rezagadosImportResult" class="mt-2 text-xs"></div>
@@ -432,13 +432,6 @@
                         <option value="no_contacto">No se logró contacto</option>
                         <option value="promesa_pago">Promesa de pago</option>
                         <option value="visita_tecnica">Requiere visita técnica (otro motivo)</option>
-                        <option value="no_aplica">No aplica</option>
-                        <option value="abonado_hfc">Abonado HFC</option>
-                        <option value="extravio_equipos">Extravío de equipos</option>
-                        <option value="ab_ocupado">AB ocupado</option>
-                        <option value="ab_conectado_solvente">AB conectado / solvente</option>
-                        <option value="baja_procesada_oficina">Baja Procesada - entrego equipos en ofc</option>
-                        <option value="venta_inmueble">Venta de inmueble - no tiene acceso a los equipos</option>
                     </select>
                 </div>
                 <div id="bajaReasonDiv" class="hidden mb-2"><label class="block text-xs font-medium mb-1">Motivo de baja</label><select id="bajaMotivo" class="w-full border rounded-lg px-2 py-1 text-sm"><option value="price">Precio / Competencia</option><option value="service_issues">Problemas con el servicio</option><option value="relocation">Mudanza</option><option value="deceased">Fallecimiento</option><option value="other">Otro</option></select></div>
@@ -861,24 +854,6 @@
             
             await guardarEnFirestore(colecciones.callLogs, registro);
             
-            // Mapeo de resultados para mostrar mensajes apropiados
-            const resultadoMap = {
-                'recuperado': 'RECUPERADO - Cliente continúa',
-                'dado_baja': 'DADO DE BAJA',
-                'no_contacto': 'Sin contacto',
-                'promesa_pago': 'Promesa de pago',
-                'visita_tecnica': 'Visita programada',
-                'no_aplica': 'No aplica',
-                'abonado_hfc': 'Abonado HFC',
-                'extravio_equipos': 'Extravío de equipos',
-                'ab_ocupado': 'AB ocupado',
-                'ab_conectado_solvente': 'AB conectado / solvente',
-                'baja_procesada_oficina': 'Baja Procesada - entrego equipos en ofc',
-                'venta_inmueble': 'Venta de inmueble - no tiene acceso a los equipos'
-            };
-            
-            const resultadoTexto = resultadoMap[resultado] || resultado;
-            
             if (resultado === 'recuperado') {
                 registro.fechaRecuperacion = fechaGestion;
                 await guardarEnFirestore(colecciones.recuperados, registro);
@@ -942,18 +917,14 @@
                     agenteId: appCurrentUser.id
                 };
                 await guardarEnFirestore(colecciones.visitasTecnicas, visita);
-                showToast(`Visita técnica programada para ${customer.nombre}`);
-            } else {
-                // Para otros resultados (no_aplica, abonado_hfc, extravio_equipos, etc.)
-                // Solo registramos en el historial pero no movemos el cliente
-                showToast(`${resultadoTexto} registrado para ${customer.nombre}`);
+                showToast(`Visita tecnica programada para ${customer.nombre}`);
+            } else if (resultado === 'no_contacto') {
+                showToast(`No se logro contacto con ${customer.nombre}`);
+            } else if (resultado === 'promesa_pago') {
+                showToast(`Promesa de pago registrada para ${customer.nombre}`);
             }
             
-            // Solo eliminamos al cliente de la lista si NO es un resultado de los nuevos tipos
-            // Los nuevos tipos solo registran en historial pero no eliminan al cliente
-            const resultadosQueNoEliminan = ['no_aplica', 'abonado_hfc', 'extravio_equipos', 'ab_ocupado', 'ab_conectado_solvente', 'baja_procesada_oficina', 'venta_inmueble', 'no_contacto', 'promesa_pago'];
-            
-            if (!resultadosQueNoEliminan.includes(resultado) && resultado !== 'visita_tecnica') {
+            if (resultado !== 'visita_tecnica') {
                 if (customerType === 'rezagado') {
                     await eliminarDeFirestore(colecciones.rezagados, customer.id);
                 } else if (customerType === 'perdido') {
@@ -1102,7 +1073,7 @@
             
             document.getElementById('rezagadosImportResult').innerHTML = `<div class="p-2 rounded-lg bg-green-50 border-l-4 border-green-500">
                 <p class="text-xs">Nuevos importados: ${nuevos}</p>
-                <p class="text-xs">Teléfonos encontrados: ${telefonosEncontrados}</p>
+                <p class="text-xs">Telefonos encontrados: ${telefonosEncontrados}</p>
                 <p class="text-xs">Fechas de corte encontradas: ${fechasEncontradas}</p>
             </div>`;
             showToast(`Importados ${nuevos} clientes rezagados`);
@@ -1280,17 +1251,17 @@
             document.getElementById('callCustomerType').value = customerType;
             document.getElementById('callCustomerInfo').innerHTML = `<div class="font-bold text-sm">${escapeHtml(customer.nombre)}</div>
                 <div class="text-xs">ID: ${escapeHtml(customer.identificador)} | Documento: ${escapeHtml(customer.documento)} | CO: ${escapeHtml(customer.centroOp)}</div>
-                <div class="text-xs">Plan: ${escapeHtml(customer.plan)} | Teléfono: ${escapeHtml(customer.telefono1) || 'No disponible'}</div>
-                <div class="text-xs text-gray-500">Dirección: ${escapeHtml(customer.direccion)}</div>`;
+                <div class="text-xs">Plan: ${escapeHtml(customer.plan)} | Telefono: ${escapeHtml(customer.telefono1) || 'No disponible'}</div>
+                <div class="text-xs text-gray-500">Direccion: ${escapeHtml(customer.direccion)}</div>`;
             
             const phoneSelect = document.getElementById('callPhoneUsed');
             phoneSelect.innerHTML = '';
             const phones = [customer.telefono1, customer.telefono2, customer.telefono3].filter(p => p && p !== '');
-            if (phones.length === 0) phones.push('Sin teléfono');
+            if (phones.length === 0) phones.push('Sin telefono');
             phones.forEach(p => { const opt = document.createElement('option'); opt.value = p; opt.textContent = p; phoneSelect.appendChild(opt); });
             
             const techSelect = document.getElementById('visitTechnician');
-            techSelect.innerHTML = '<option value="">Seleccionar técnico</option>' + technicians.map(t => `<option value="${t.id}">${escapeHtml(t.nombre)} - ${t.co}</option>`).join('');
+            techSelect.innerHTML = '<option value="">Seleccionar tecnico</option>' + technicians.map(t => `<option value="${t.id}">${escapeHtml(t.nombre)} - ${t.co}</option>`).join('');
             
             document.getElementById('callResult').value = '';
             document.getElementById('bajaReasonDiv').classList.add('hidden');
@@ -1332,7 +1303,7 @@
                 const fecha = document.getElementById('visitDate').value;
                 if (!fecha) { alert('Seleccione fecha de visita'); return; }
                 const tecnicoId = document.getElementById('visitTechnician').value;
-                if (!tecnicoId) { alert('Seleccione un técnico para la visita'); return; }
+                if (!tecnicoId) { alert('Seleccione un tecnico para la visita'); return; }
                 const tecnico = technicians.find(t => t.id === tecnicoId);
                 visitaData = {
                     motivo: document.getElementById('visitReason').value,
@@ -1360,7 +1331,7 @@
             let order, info;
             if (type === 'visita') {
                 order = visitasTecnicas.find(v => v.id === orderId);
-                info = `Cliente: ${order?.clienteNombre}\nDirección: ${order?.direccion}\nMotivo: ${order?.motivoTexto || order?.motivo || 'Retiro de equipo'}`;
+                info = `Cliente: ${order?.clienteNombre}\nDireccion: ${order?.direccion}\nMotivo: ${order?.motivoTexto || order?.motivo || 'Retiro de equipo'}`;
             } else {
                 return;
             }
@@ -1388,8 +1359,8 @@
         };
         
         window.openAssignTechnicianModal = async function(orderId, type) {
-            if (technicians.length === 0) { showToast('No hay técnicos registrados', 'error'); return; }
-            const newTech = prompt(`Seleccione un técnico:\n${technicians.map((t,i) => `${i+1}. ${t.nombre} - ${t.co}`).join('\n')}\n\nIngrese el número:`);
+            if (technicians.length === 0) { showToast('No hay tecnicos registrados', 'error'); return; }
+            const newTech = prompt(`Seleccione un tecnico:\n${technicians.map((t,i) => `${i+1}. ${t.nombre} - ${t.co}`).join('\n')}\n\nIngrese el numero:`);
             if (newTech) {
                 const idx = parseInt(newTech) - 1;
                 if (idx >= 0 && idx < technicians.length) {
@@ -1399,7 +1370,7 @@
                             tecnicoId: tech.id,
                             tecnicoNombre: tech.nombre
                         }, orderId);
-                        showToast(`Técnico ${tech.nombre} asignado a la visita`);
+                        showToast(`Tecnico ${tech.nombre} asignado a la visita`);
                     }
                 }
             }
@@ -1415,17 +1386,17 @@
                 id: nuevoId,
                 nombre: nombre,
                 co: co,
-                telefono: telefono || 'Sin teléfono'
+                telefono: telefono || 'Sin telefono'
             }, nuevoId);
             document.getElementById('techName').value = '';
             document.getElementById('techPhone').value = '';
-            showToast(`Técnico ${nombre} agregado`);
+            showToast(`Tecnico ${nombre} agregado`);
         }
         
         window.deleteTechnician = async function(techId) {
-            if (confirm('Eliminar este técnico?')) {
+            if (confirm('Eliminar este tecnico?')) {
                 await eliminarDeFirestore(colecciones.technicians, techId);
-                showToast('Técnico eliminado');
+                showToast('Tecnico eliminado');
             }
         }
 
@@ -1465,7 +1436,7 @@
         function getStatusText(estado) {
             switch(estado) {
                 case 'pendiente': return 'PENDIENTE';
-                case 'en_gestion': return 'EN GESTIÓN';
+                case 'en_gestion': return 'EN GESTION';
                 case 'recuperado': return 'RECUPERADO';
                 case 'dado_baja': return 'DADO DE BAJA';
                 default: return 'PENDIENTE';
@@ -1504,7 +1475,7 @@
                             <td><span class="status-badge ${statusClass}">${statusText}</span></td>
                             <td>${isLocked ? `<span class="blocked-badge"><i class="fas fa-lock"></i> ${lockInfo.agente}</span>` : '-'}</td>
                             <td class="action-cell">
-                                ${(!isLocked || lockedByMe) && hasPhone ? `<button onclick="openRegisterCallModal('${c.id}', 'rezagado')" class="call-btn"><i class="fas fa-phone-alt"></i> Gestionar</button>` : `<button class="call-btn opacity-50" disabled>${!hasPhone ? 'Sin teléfono' : 'Bloqueado'}</button>`}
+                                ${(!isLocked || lockedByMe) && hasPhone ? `<button onclick="openRegisterCallModal('${c.id}', 'rezagado')" class="call-btn"><i class="fas fa-phone-alt"></i> Gestionar</button>` : `<button class="call-btn opacity-50" disabled>${!hasPhone ? 'Sin telefono' : 'Bloqueado'}</button>`}
                                 ${hasPhone ? `<a href="tel:${c.telefono1}" class="call-link"><i class="fas fa-phone"></i></a><a href="https://wa.me/${c.telefono1.replace(/[^0-9]/g,'')}" target="_blank" class="whatsapp-link"><i class="fab fa-whatsapp"></i></a>` : ''}
                                 <button onclick="deleteSingleCustomer('${c.id}', 'rezagado')" class="delete-single-btn"><i class="fas fa-trash-alt"></i></button>
                             </td>
@@ -1531,13 +1502,13 @@
                                 <span class="status-badge ${statusClass}">${statusText}</span>
                             </div>
                             <div class="info-row-mobile"><span class="info-label">Documento:</span><span class="info-value">${escapeHtml(c.documento)}</span></div>
-                            <div class="info-row-mobile"><span class="info-label">Teléfono:</span><span class="info-value">${hasPhone ? escapeHtml(c.telefono1) : '-'}</span></div>
+                            <div class="info-row-mobile"><span class="info-label">Telefono:</span><span class="info-value">${hasPhone ? escapeHtml(c.telefono1) : '-'}</span></div>
                             <div class="info-row-mobile"><span class="info-label">Plan:</span><span class="info-value">${escapeHtml(c.plan)}</span></div>
                             <div class="info-row-mobile"><span class="info-label">Centro Op.:</span><span class="info-value">${escapeHtml(c.centroOp)}</span></div>
                             <div class="info-row-mobile"><span class="info-label">Fecha Corte:</span><span class="info-value">${c.fechaCorte || '-'}</span></div>
                             ${isLocked ? `<div class="info-row-mobile"><span class="info-label">Bloqueado por:</span><span class="info-value text-red-600">${lockInfo.agente}</span></div>` : ''}
                             <div class="action-buttons-mobile">
-                                ${(!isLocked || lockedByMe) && hasPhone ? `<button onclick="openRegisterCallModal('${c.id}', 'rezagado')" class="call-btn"><i class="fas fa-phone-alt"></i> Gestionar</button>` : `<button class="call-btn opacity-50" disabled>${!hasPhone ? 'Sin teléfono' : 'Bloqueado'}</button>`}
+                                ${(!isLocked || lockedByMe) && hasPhone ? `<button onclick="openRegisterCallModal('${c.id}', 'rezagado')" class="call-btn"><i class="fas fa-phone-alt"></i> Gestionar</button>` : `<button class="call-btn opacity-50" disabled>${!hasPhone ? 'Sin telefono' : 'Bloqueado'}</button>`}
                                 ${hasPhone ? `<a href="tel:${c.telefono1}" class="call-link"><i class="fas fa-phone"></i> Llamar</a><a href="https://wa.me/${c.telefono1.replace(/[^0-9]/g,'')}" target="_blank" class="whatsapp-link"><i class="fab fa-whatsapp"></i> WhatsApp</a>` : ''}
                                 <button onclick="deleteSingleCustomer('${c.id}', 'rezagado')" class="delete-single-btn"><i class="fas fa-trash-alt"></i> Eliminar</button>
                             </div>
@@ -1548,7 +1519,7 @@
             
             const pagination = document.getElementById('rezagadosPagination');
             if (pagination) {
-                pagination.innerHTML = totalPages > 1 ? `<button onclick="changeRezagadosPage(-1)" class="pagination-btn">◀</button><span class="text-xs">Pág ${rezagadosPage} de ${totalPages}</span><button onclick="changeRezagadosPage(1)" class="pagination-btn">▶</button>` : '';
+                pagination.innerHTML = totalPages > 1 ? `<button onclick="changeRezagadosPage(-1)" class="pagination-btn">◀</button><span class="text-xs">Pag ${rezagadosPage} de ${totalPages}</span><button onclick="changeRezagadosPage(1)" class="pagination-btn">▶</button>` : '';
             }
         }
         
@@ -1584,7 +1555,7 @@
                             <td><span class="status-badge ${statusClass}">${statusText}</span></div></td>
                             <td>${isLocked ? `<span class="blocked-badge"><i class="fas fa-lock"></i> ${lockInfo.agente}</span>` : '-'}</div></td>
                             <td class="action-cell">
-                                ${(!isLocked || lockedByMe) && hasPhone ? `<button onclick="openRegisterCallModal('${c.id}', 'perdido')" class="call-btn"><i class="fas fa-phone-alt"></i> Gestionar</button>` : `<button class="call-btn opacity-50" disabled>${!hasPhone ? 'Sin teléfono' : 'Bloqueado'}</button>`}
+                                ${(!isLocked || lockedByMe) && hasPhone ? `<button onclick="openRegisterCallModal('${c.id}', 'perdido')" class="call-btn"><i class="fas fa-phone-alt"></i> Gestionar</button>` : `<button class="call-btn opacity-50" disabled>${!hasPhone ? 'Sin telefono' : 'Bloqueado'}</button>`}
                                 ${hasPhone ? `<a href="tel:${c.telefono1}" class="call-link"><i class="fas fa-phone"></i></a><a href="https://wa.me/${c.telefono1.replace(/[^0-9]/g,'')}" target="_blank" class="whatsapp-link"><i class="fab fa-whatsapp"></i></a>` : ''}
                                 <button onclick="deleteSingleCustomer('${c.id}', 'perdido')" class="delete-single-btn"><i class="fas fa-trash-alt"></i></button>
                               </div>
@@ -1611,13 +1582,13 @@
                                 <span class="status-badge ${statusClass}">${statusText}</span>
                             </div>
                             <div class="info-row-mobile"><span class="info-label">Documento:</span><span class="info-value">${escapeHtml(c.documento)}</span></div>
-                            <div class="info-row-mobile"><span class="info-label">Teléfono:</span><span class="info-value">${hasPhone ? escapeHtml(c.telefono1) : '-'}</span></div>
+                            <div class="info-row-mobile"><span class="info-label">Telefono:</span><span class="info-value">${hasPhone ? escapeHtml(c.telefono1) : '-'}</span></div>
                             <div class="info-row-mobile"><span class="info-label">Plan:</span><span class="info-value">${escapeHtml(c.plan)}</span></div>
                             <div class="info-row-mobile"><span class="info-label">Centro Op.:</span><span class="info-value">${escapeHtml(c.centroOp)}</span></div>
                             <div class="info-row-mobile"><span class="info-label">Fecha Corte:</span><span class="info-value">${c.fechaCorte || '-'}</span></div>
                             ${isLocked ? `<div class="info-row-mobile"><span class="info-label">Bloqueado por:</span><span class="info-value text-red-600">${lockInfo.agente}</span></div>` : ''}
                             <div class="action-buttons-mobile">
-                                ${(!isLocked || lockedByMe) && hasPhone ? `<button onclick="openRegisterCallModal('${c.id}', 'perdido')" class="call-btn"><i class="fas fa-phone-alt"></i> Gestionar</button>` : `<button class="call-btn opacity-50" disabled>${!hasPhone ? 'Sin teléfono' : 'Bloqueado'}</button>`}
+                                ${(!isLocked || lockedByMe) && hasPhone ? `<button onclick="openRegisterCallModal('${c.id}', 'perdido')" class="call-btn"><i class="fas fa-phone-alt"></i> Gestionar</button>` : `<button class="call-btn opacity-50" disabled>${!hasPhone ? 'Sin telefono' : 'Bloqueado'}</button>`}
                                 ${hasPhone ? `<a href="tel:${c.telefono1}" class="call-link"><i class="fas fa-phone"></i> Llamar</a><a href="https://wa.me/${c.telefono1.replace(/[^0-9]/g,'')}" target="_blank" class="whatsapp-link"><i class="fab fa-whatsapp"></i> WhatsApp</a>` : ''}
                                 <button onclick="deleteSingleCustomer('${c.id}', 'perdido')" class="delete-single-btn"><i class="fas fa-trash-alt"></i> Eliminar</button>
                             </div>
@@ -1628,7 +1599,7 @@
             
             const pagination = document.getElementById('perdidosPagination');
             if (pagination) {
-                pagination.innerHTML = totalPages > 1 ? `<button onclick="changePerdidosPage(-1)" class="pagination-btn">◀</button><span class="text-xs">Pág ${perdidosPage} de ${totalPages}</span><button onclick="changePerdidosPage(1)" class="pagination-btn">▶</button>` : '';
+                pagination.innerHTML = totalPages > 1 ? `<button onclick="changePerdidosPage(-1)" class="pagination-btn">◀</button><span class="text-xs">Pag ${perdidosPage} de ${totalPages}</span><button onclick="changePerdidosPage(1)" class="pagination-btn">▶</button>` : '';
             }
         }
         
@@ -1693,7 +1664,7 @@
                     permisoMsg.innerHTML = '<i class="fas fa-check-circle text-green-500 mr-1"></i> Tienes permisos para completar visitas (Marina M o Administrador)';
                     permisoMsg.className = 'text-xs text-green-600 mt-1';
                 } else {
-                    permisoMsg.innerHTML = '<i class="fas fa-lock text-red-500 mr-1"></i> Solo Marina M y el Administrador pueden completar visitas de retiro de equipo. Tú puedes gestionar llamadas y asignar técnicos, pero no completar el retiro.';
+                    permisoMsg.innerHTML = '<i class="fas fa-lock text-red-500 mr-1"></i> Solo Marina M y el Administrador pueden completar visitas de retiro de equipo. Tu puedes gestionar llamadas y asignar tecnicos, pero no completar el retiro.';
                     permisoMsg.className = 'text-xs text-red-600 mt-1';
                 }
             }
@@ -1701,7 +1672,7 @@
             const tbody = document.getElementById('equiposTableBody');
             if (tbody) {
                 if (items.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="8" class="text-center py-4 text-gray-500 text-xs">No hay visitas técnicas pendientes de retiro de equipos.</div></td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="8" class="text-center py-4 text-gray-500 text-xs">No hay visitas tecnicas pendientes de retiro de equipos.</div></td></tr>';
                 } else {
                     const puedeCompletar = puedeCompletarVisitas();
                     tbody.innerHTML = items.map(v => `<tr>
@@ -1719,21 +1690,21 @@
                                 `<button class="completar-btn-disabled" disabled title="Solo Marina M y Administrador pueden completar"><i class="fas fa-lock"></i> Solo Admin</button>`}
                             <a href="https://wa.me/${v.clienteTelefono?.replace(/[^0-9]/g,'')}" target="_blank" class="whatsapp-link"><i class="fab fa-whatsapp"></i></a>
                           </div>
-                    <tr>`).join('');
+                    </tr>`).join('');
                 }
             }
             
             const mobileContainer = document.getElementById('equiposMobileList');
             if (mobileContainer) {
                 if (items.length === 0) {
-                    mobileContainer.innerHTML = '<div class="text-center py-4 text-gray-500 text-xs">No hay visitas técnicas pendientes de retiro de equipos.</div>';
+                    mobileContainer.innerHTML = '<div class="text-center py-4 text-gray-500 text-xs">No hay visitas tecnicas pendientes de retiro de equipos.</div>';
                 } else {
                     const puedeCompletar = puedeCompletarVisitas();
                     mobileContainer.innerHTML = items.map(v => `<div class="customer-card-mobile">
                         <div class="font-bold text-sm">${escapeHtml(v.clienteNombre)}</div>
-                        <div class="info-row-mobile"><span class="info-label">Teléfono:</span><span class="info-value">${escapeHtml(v.clienteTelefono)}</span></div>
-                        <div class="info-row-mobile"><span class="info-label">Dirección:</span><span class="info-value">${escapeHtml(v.direccion)}</span></div>
-                        <div class="info-row-mobile"><span class="info-label">Técnico:</span><span class="info-value">${v.tecnicoNombre || 'Por asignar'}</span></div>
+                        <div class="info-row-mobile"><span class="info-label">Telefono:</span><span class="info-value">${escapeHtml(v.clienteTelefono)}</span></div>
+                        <div class="info-row-mobile"><span class="info-label">Direccion:</span><span class="info-value">${escapeHtml(v.direccion)}</span></div>
+                        <div class="info-row-mobile"><span class="info-label">Tecnico:</span><span class="info-value">${v.tecnicoNombre || 'Por asignar'}</span></div>
                         <div class="info-row-mobile"><span class="info-label">Fecha:</span><span class="info-value">${v.fechaVisita || '-'}</span></div>
                         <div class="info-row-mobile"><span class="info-label">Motivo:</span><span class="info-value text-xs">${v.motivoTexto || (v.motivo === 'retiro_equipo_por_baja' ? 'Retiro de equipo por baja' : (v.motivo || '-'))}</span></div>
                         <div class="info-row-mobile"><span class="info-label">Estado:</span><span class="info-value"><span class="status-badge bg-pendiente">PENDIENTE</span></span></div>
@@ -1758,7 +1729,7 @@
             const tbody = document.getElementById('visitasTableBody');
             if (tbody) {
                 if (items.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="8" class="text-center py-4 text-gray-500 text-xs">No hay visitas técnicas finalizadas.</div><tr></tr>';
+                    tbody.innerHTML = '<tr><td colspan="8" class="text-center py-4 text-gray-500 text-xs">No hay visitas tecnicas finalizadas.</div></td></tr>';
                 } else {
                     tbody.innerHTML = items.slice(0, ITEMS_PER_PAGE).map(v => `<tr>
                         <td><span class="font-medium">${escapeHtml(v.clienteNombre)}</span></div></td>
@@ -1776,13 +1747,13 @@
             const mobileContainer = document.getElementById('visitasMobileList');
             if (mobileContainer) {
                 if (items.length === 0) {
-                    mobileContainer.innerHTML = '<div class="text-center py-4 text-gray-500 text-xs">No hay visitas técnicas finalizadas.</div>';
+                    mobileContainer.innerHTML = '<div class="text-center py-4 text-gray-500 text-xs">No hay visitas tecnicas finalizadas.</div>';
                 } else {
                     mobileContainer.innerHTML = items.slice(0, ITEMS_PER_PAGE).map(v => `<div class="customer-card-mobile">
                         <div class="font-bold text-sm">${escapeHtml(v.clienteNombre)}</div>
-                        <div class="info-row-mobile"><span class="info-label">Teléfono:</span><span class="info-value">${escapeHtml(v.clienteTelefono)}</span></div>
-                        <div class="info-row-mobile"><span class="info-label">Dirección:</span><span class="info-value">${escapeHtml(v.direccion)}</span></div>
-                        <div class="info-row-mobile"><span class="info-label">Técnico:</span><span class="info-value">${v.tecnicoNombre || 'No asignado'}</span></div>
+                        <div class="info-row-mobile"><span class="info-label">Telefono:</span><span class="info-value">${escapeHtml(v.clienteTelefono)}</span></div>
+                        <div class="info-row-mobile"><span class="info-label">Direccion:</span><span class="info-value">${escapeHtml(v.direccion)}</span></div>
+                        <div class="info-row-mobile"><span class="info-label">Tecnico:</span><span class="info-value">${v.tecnicoNombre || 'No asignado'}</span></div>
                         <div class="info-row-mobile"><span class="info-label">Fecha/Hora:</span><span class="info-value">${v.fechaVisita || '-'} ${v.horaVisita || ''}</span></div>
                         <div class="info-row-mobile"><span class="info-label">Completado por:</span><span class="info-value">${v.completadoPor || v.agente || '-'}</span></div>
                         <div class="info-row-mobile"><span class="info-label">Estado:</span><span class="info-value"><span class="status-badge bg-recuperado">EQUIPO RETIRADO</span></span></div>
@@ -1794,7 +1765,7 @@
         function renderTechniciansList() {
             const container = document.getElementById('techniciansList');
             if (!container) return;
-            if (technicians.length === 0) { container.innerHTML = '<div class="text-center py-2 text-gray-500 text-xs">Sin técnicos registrados</div>'; return; }
+            if (technicians.length === 0) { container.innerHTML = '<div class="text-center py-2 text-gray-500 text-xs">Sin tecnicos registrados</div>'; return; }
             container.innerHTML = technicians.map(t => `<div class="flex justify-between items-center p-2 border rounded text-xs">
                 <div><div class="font-medium">${escapeHtml(t.nombre)}</div><div class="text-gray-500">${escapeHtml(t.co)} | ${escapeHtml(t.telefono)}</div></div>
                 <button onclick="deleteTechnician('${t.id}')" class="text-red-500 hover:text-red-700"><i class="fas fa-trash-alt"></i></button>
@@ -1846,15 +1817,7 @@
                               log.resultado === 'dado_baja' ? 'DADO DE BAJA' :
                               log.resultado === 'no_contacto' ? 'SIN CONTACTO' :
                               log.resultado === 'promesa_pago' ? 'PROMESA DE PAGO' :
-                              log.resultado === 'visita_tecnica' ? 'VISITA PROGRAMADA' :
-                              log.resultado === 'no_aplica' ? 'NO APLICA' :
-                              log.resultado === 'abonado_hfc' ? 'ABONADO HFC' :
-                              log.resultado === 'extravio_equipos' ? 'EXTRAVÍO DE EQUIPOS' :
-                              log.resultado === 'ab_ocupado' ? 'AB OCUPADO' :
-                              log.resultado === 'ab_conectado_solvente' ? 'AB CONECTADO / SOLVENTE' :
-                              log.resultado === 'baja_procesada_oficina' ? 'BAJA PROCESADA - ENTREGÓ EQUIPOS EN OFC' :
-                              log.resultado === 'venta_inmueble' ? 'VENTA DE INMUEBLE - SIN ACCESO A EQUIPOS' :
-                              (log.resultado || '').toUpperCase(),
+                              log.resultado === 'visita_tecnica' ? 'VISITA PROGRAMADA' : log.resultado,
                     telefono: log.telefono,
                     plan: log.plan,
                     co: log.centroOp
@@ -1867,7 +1830,7 @@
                     agente: r.agente,
                     agenteId: r.agenteId,
                     cliente: r.nombre,
-                    tipo: 'Reconexión',
+                    tipo: 'Reconexion',
                     resultado: 'RECUPERADO',
                     telefono: r.telefono,
                     plan: r.plan,
@@ -1971,7 +1934,7 @@
                 return;
             }
             const registros = getHistorialRegistros();
-            const data = [['Fecha', 'Agente', 'Cliente', 'Tipo Gestión', 'Resultado', 'Teléfono', 'Plan', 'CO']];
+            const data = [['Fecha', 'Agente', 'Cliente', 'Tipo Gestion', 'Resultado', 'Telefono', 'Plan', 'CO']];
             registros.forEach(r => {
                 data.push([
                     new Date(r.fecha).toLocaleString(),
@@ -1986,7 +1949,7 @@
             });
             const ws = XLSX.utils.aoa_to_sheet(data);
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'Historial_Gestión');
+            XLSX.utils.book_append_sheet(wb, ws, 'Historial_Gestion');
             XLSX.writeFile(wb, `historial_gestion_${new Date().toISOString().split('T')[0]}.xlsx`);
             showToast('Exportado a Excel');
         }
@@ -2003,7 +1966,7 @@
             
             doc.setFontSize(16);
             doc.setFont(undefined, 'bold');
-            doc.text('Historial de Gestión por Agente - OCAD Inter', 14, 20);
+            doc.text('Historial de Gestion por Agente - OCAD Inter', 14, 20);
             
             doc.setFontSize(10);
             doc.setFont(undefined, 'normal');
@@ -2039,7 +2002,7 @@
             
             doc.autoTable({
                 startY: 62,
-                head: [['Fecha', 'Agente', 'Cliente', 'Tipo', 'Resultado', 'Teléfono', 'Plan', 'CO']],
+                head: [['Fecha', 'Agente', 'Cliente', 'Tipo', 'Resultado', 'Telefono', 'Plan', 'CO']],
                 body: tableData,
                 theme: 'striped',
                 headStyles: { fillColor: [79, 70, 229], textColor: [255, 255, 255], fontStyle: 'bold' },
@@ -2060,7 +2023,7 @@
             const finalY = doc.lastAutoTable.finalY + 10;
             doc.setFontSize(8);
             doc.setTextColor(150, 150, 150);
-            doc.text('Reporte generado por sistema OCAD Inter - Gestión de Recupero', 14, finalY);
+            doc.text('Reporte generado por sistema OCAD Inter - Gestion de Recupero', 14, finalY);
             
             doc.save(`historial_gestion_${new Date().toISOString().split('T')[0]}.pdf`);
             showToast('Exportado a PDF');
@@ -2069,7 +2032,7 @@
         // ==================== EXPORTACIONES ====================
         function exportRezagadosToExcel() {
             const items = getFilteredRezagados();
-            const data = [['ID', 'Nombre', 'Documento', 'Teléfono', 'Plan', 'CO', 'Fecha Corte', 'Estado', 'Dirección']];
+            const data = [['ID', 'Nombre', 'Documento', 'Telefono', 'Plan', 'CO', 'Fecha Corte', 'Estado', 'Direccion']];
             items.forEach(c => data.push([c.identificador || c.id, c.nombre, c.documento, c.telefono1, c.plan, c.centroOp, c.fechaCorte, c.estado, c.direccion]));
             const ws = XLSX.utils.aoa_to_sheet(data);
             const wb = XLSX.utils.book_new();
@@ -2080,7 +2043,7 @@
         
         function exportPerdidosToExcel() {
             const items = getFilteredPerdidos();
-            const data = [['ID', 'Nombre', 'Documento', 'Teléfono', 'Plan', 'CO', 'Fecha Corte', 'Estado', 'Dirección']];
+            const data = [['ID', 'Nombre', 'Documento', 'Telefono', 'Plan', 'CO', 'Fecha Corte', 'Estado', 'Direccion']];
             items.forEach(c => data.push([c.identificador || c.id, c.nombre, c.documento, c.telefono1, c.plan, c.centroOp, c.fechaCorte, c.estado, c.direccion]));
             const ws = XLSX.utils.aoa_to_sheet(data);
             const wb = XLSX.utils.book_new();
@@ -2090,7 +2053,7 @@
         }
         
         function exportEquiposToExcel() {
-            const data = [['Cliente', 'Teléfono', 'Dirección', 'Técnico', 'Fecha Programada', 'Motivo', 'Estado']];
+            const data = [['Cliente', 'Telefono', 'Direccion', 'Tecnico', 'Fecha Programada', 'Motivo', 'Estado']];
             visitasTecnicas.filter(v => v.estado !== 'completada').forEach(v => data.push([v.clienteNombre, v.clienteTelefono, v.direccion, v.tecnicoNombre || 'No asignado', v.fechaVisita || '-', v.motivoTexto || 'Retiro de equipo', 'PENDIENTE']));
             const ws = XLSX.utils.aoa_to_sheet(data);
             const wb = XLSX.utils.book_new();
@@ -2100,7 +2063,7 @@
         }
         
         function exportVisitasToExcel() {
-            const data = [['Cliente', 'Teléfono', 'Dirección', 'Técnico', 'Fecha Programada', 'Fecha Completado', 'Completado por', 'Estado']];
+            const data = [['Cliente', 'Telefono', 'Direccion', 'Tecnico', 'Fecha Programada', 'Fecha Completado', 'Completado por', 'Estado']];
             visitasFinalizadas.forEach(v => data.push([v.clienteNombre, v.clienteTelefono, v.direccion, v.tecnicoNombre || 'No asignado', v.fechaVisita || '-', v.fechaCompletado ? new Date(v.fechaCompletado).toLocaleDateString() : '-', v.completadoPor || v.agente || '-', 'EQUIPO RETIRADO']));
             const ws = XLSX.utils.aoa_to_sheet(data);
             const wb = XLSX.utils.book_new();
@@ -2109,7 +2072,7 @@
             showToast('Exportado');
         }
 
-        // ==================== REPORTE PDF DIARIO ====================
+        // ==================== REPORTE PDF DIARIO CORREGIDO (SIN EMOJIS) ====================
         async function generateDailyReport() {
             if (!puedeGenerarReportes()) {
                 showToast('No tiene permisos para generar reportes. Solo Administrador y Marina M pueden.', 'error');
@@ -2156,17 +2119,10 @@
                 dado_baja: llamadasHoy.filter(l => l.resultado === 'dado_baja').length,
                 no_contacto: llamadasHoy.filter(l => l.resultado === 'no_contacto').length,
                 promesa_pago: llamadasHoy.filter(l => l.resultado === 'promesa_pago').length,
-                visita_tecnica: llamadasHoy.filter(l => l.resultado === 'visita_tecnica').length,
-                no_aplica: llamadasHoy.filter(l => l.resultado === 'no_aplica').length,
-                abonado_hfc: llamadasHoy.filter(l => l.resultado === 'abonado_hfc').length,
-                extravio_equipos: llamadasHoy.filter(l => l.resultado === 'extravio_equipos').length,
-                ab_ocupado: llamadasHoy.filter(l => l.resultado === 'ab_ocupado').length,
-                ab_conectado_solvente: llamadasHoy.filter(l => l.resultado === 'ab_conectado_solvente').length,
-                baja_procesada_oficina: llamadasHoy.filter(l => l.resultado === 'baja_procesada_oficina').length,
-                venta_inmueble: llamadasHoy.filter(l => l.resultado === 'venta_inmueble').length
+                visita_tecnica: llamadasHoy.filter(l => l.resultado === 'visita_tecnica').length
             };
             
-            // Estadísticas por agente
+            // Estadisticas por agente
             const agentStats = new Map();
             llamadasHoy.forEach(l => {
                 if (!agentStats.has(l.agente)) agentStats.set(l.agente, { llamadas: 0, recuperados: 0, bajas: 0 });
@@ -2199,11 +2155,11 @@
             // Generar PDF
             doc.setFontSize(16);
             doc.setFont(undefined, 'bold');
-            doc.text('Reporte de Gestión Diario - OCAD Inter', 14, 20);
+            doc.text('Reporte de Gestion Diario - OCAD Inter', 14, 20);
             doc.setFontSize(10);
             doc.setFont(undefined, 'normal');
             doc.text('Fecha: ' + fecha, 14, 32);
-            doc.text('Hora generación: ' + new Date().toLocaleTimeString(), 14, 38);
+            doc.text('Hora generacion: ' + new Date().toLocaleTimeString(), 14, 38);
             
             let generadoPor = appCurrentUser?.fullName || 'Sistema';
             if (generadoPor === 'Marina M') generadoPor = 'Marina M';
@@ -2215,45 +2171,41 @@
             
             doc.setFontSize(12);
             doc.setFont(undefined, 'bold');
-            doc.text('RESUMEN GENERAL DE GESTIÓN', 14, 60);
+            doc.text('RESUMEN GENERAL DE GESTION', 14, 60);
             doc.setFontSize(10);
             doc.setFont(undefined, 'normal');
             doc.text('* Total de llamadas realizadas: ' + llamadasHoy.length, 20, 70);
             doc.text('* Clientes reconectados: ' + recuperadosHoy.length, 20, 78);
             doc.text('* Clientes dados de baja: ' + perdidosHoy.length, 20, 86);
-            doc.text('* Visitas técnicas programadas para hoy: ' + visitasProgramadasHoy.length, 20, 94);
+            doc.text('* Visitas tecnicas programadas para hoy: ' + visitasProgramadasHoy.length, 20, 94);
             doc.text('* Visitas completadas (equipos retirados): ' + visitasCompletadasHoy.length, 20, 102);
             doc.text('* Visitas pendientes totales: ' + visitasPendientesTotal, 20, 110);
             
             doc.line(14, 116, 196, 116);
             
-            // Tabla de resultados
-            const totalLlamadas = llamadasHoy.length;
-            const resultadosData = [
-                ['Reconectados', llamadasPorResultado.recuperado.toString(), (totalLlamadas > 0 ? Math.round((llamadasPorResultado.recuperado / totalLlamadas) * 100) : 0) + '%'],
-                ['Dados de baja', llamadasPorResultado.dado_baja.toString(), (totalLlamadas > 0 ? Math.round((llamadasPorResultado.dado_baja / totalLlamadas) * 100) : 0) + '%'],
-                ['Sin contacto', llamadasPorResultado.no_contacto.toString(), (totalLlamadas > 0 ? Math.round((llamadasPorResultado.no_contacto / totalLlamadas) * 100) : 0) + '%'],
-                ['Promesas de pago', llamadasPorResultado.promesa_pago.toString(), (totalLlamadas > 0 ? Math.round((llamadasPorResultado.promesa_pago / totalLlamadas) * 100) : 0) + '%'],
-                ['Visitas programadas', llamadasPorResultado.visita_tecnica.toString(), (totalLlamadas > 0 ? Math.round((llamadasPorResultado.visita_tecnica / totalLlamadas) * 100) : 0) + '%'],
-                ['No aplica', llamadasPorResultado.no_aplica.toString(), (totalLlamadas > 0 ? Math.round((llamadasPorResultado.no_aplica / totalLlamadas) * 100) : 0) + '%'],
-                ['Abonado HFC', llamadasPorResultado.abonado_hfc.toString(), (totalLlamadas > 0 ? Math.round((llamadasPorResultado.abonado_hfc / totalLlamadas) * 100) : 0) + '%'],
-                ['Extravío de equipos', llamadasPorResultado.extravio_equipos.toString(), (totalLlamadas > 0 ? Math.round((llamadasPorResultado.extravio_equipos / totalLlamadas) * 100) : 0) + '%'],
-                ['AB ocupado', llamadasPorResultado.ab_ocupado.toString(), (totalLlamadas > 0 ? Math.round((llamadasPorResultado.ab_ocupado / totalLlamadas) * 100) : 0) + '%'],
-                ['AB conectado / solvente', llamadasPorResultado.ab_conectado_solvente.toString(), (totalLlamadas > 0 ? Math.round((llamadasPorResultado.ab_conectado_solvente / totalLlamadas) * 100) : 0) + '%'],
-                ['Baja procesada (entregó equipos)', llamadasPorResultado.baja_procesada_oficina.toString(), (totalLlamadas > 0 ? Math.round((llamadasPorResultado.baja_procesada_oficina / totalLlamadas) * 100) : 0) + '%'],
-                ['Venta de inmueble', llamadasPorResultado.venta_inmueble.toString(), (totalLlamadas > 0 ? Math.round((llamadasPorResultado.venta_inmueble / totalLlamadas) * 100) : 0) + '%']
-            ];
-            
-            doc.autoTable({
-                startY: 122,
-                head: [['Resultado', 'Cantidad', 'Porcentaje']],
-                body: resultadosData,
-                theme: 'striped',
-                headStyles: { fillColor: [79, 70, 229], textColor: [255, 255, 255], fontStyle: 'bold' },
-                bodyStyles: { fontSize: 9 },
-                columnStyles: { 0: { cellWidth: 70 }, 1: { cellWidth: 30, halign: 'center' }, 2: { cellWidth: 30, halign: 'center' } },
-                margin: { left: 14 }
-            });
+            if (llamadasHoy.length > 0 || recuperadosHoy.length > 0 || perdidosHoy.length > 0) {
+                doc.setFontSize(12);
+                doc.setFont(undefined, 'bold');
+                doc.text('DETALLE DE GESTION POR RESULTADO', 14, 128);
+                
+                const totalLlamadas = llamadasHoy.length;
+                doc.autoTable({
+                    startY: 134,
+                    head: [['Resultado', 'Cantidad', 'Porcentaje']],
+                    body: [
+                        ['Reconectados', llamadasPorResultado.recuperado.toString(), (totalLlamadas > 0 ? Math.round((llamadasPorResultado.recuperado / totalLlamadas) * 100) : 0) + '%'],
+                        ['Dados de baja', llamadasPorResultado.dado_baja.toString(), (totalLlamadas > 0 ? Math.round((llamadasPorResultado.dado_baja / totalLlamadas) * 100) : 0) + '%'],
+                        ['Sin contacto', llamadasPorResultado.no_contacto.toString(), (totalLlamadas > 0 ? Math.round((llamadasPorResultado.no_contacto / totalLlamadas) * 100) : 0) + '%'],
+                        ['Promesas de pago', llamadasPorResultado.promesa_pago.toString(), (totalLlamadas > 0 ? Math.round((llamadasPorResultado.promesa_pago / totalLlamadas) * 100) : 0) + '%'],
+                        ['Visitas programadas', llamadasPorResultado.visita_tecnica.toString(), (totalLlamadas > 0 ? Math.round((llamadasPorResultado.visita_tecnica / totalLlamadas) * 100) : 0) + '%']
+                    ],
+                    theme: 'striped',
+                    headStyles: { fillColor: [79, 70, 229], textColor: [255, 255, 255], fontStyle: 'bold' },
+                    bodyStyles: { fontSize: 9 },
+                    columnStyles: { 0: { cellWidth: 60 }, 1: { cellWidth: 30, halign: 'center' }, 2: { cellWidth: 30, halign: 'center' } },
+                    margin: { left: 14 }
+                });
+            }
             
             let yPos = doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : 140;
             
@@ -2261,7 +2213,7 @@
                 if (yPos > 250) { doc.addPage(); yPos = 20; }
                 doc.setFontSize(11);
                 doc.setFont(undefined, 'bold');
-                doc.text('ESTADÍSTICAS POR AGENTE', 14, yPos);
+                doc.text('ESTADISTICAS POR AGENTE', 14, yPos);
                 
                 const agentData = Array.from(agentStats.entries()).map(([agente, stats]) => {
                     let nombreAgente = agente;
@@ -2297,7 +2249,7 @@
                 
                 doc.autoTable({
                     startY: yPos + 4,
-                    head: [['ID', 'Cliente', 'Teléfono', 'Plan', 'Agente']],
+                    head: [['ID', 'Cliente', 'Telefono', 'Plan', 'Agente']],
                     body: reconectadosData,
                     theme: 'striped',
                     headStyles: { fillColor: [16, 185, 129], textColor: [255, 255, 255], fontStyle: 'bold' },
@@ -2324,7 +2276,7 @@
                 
                 doc.autoTable({
                     startY: yPos + 4,
-                    head: [['ID', 'Cliente', 'Teléfono', 'Plan', 'Motivo', 'Agente']],
+                    head: [['ID', 'Cliente', 'Telefono', 'Plan', 'Motivo', 'Agente']],
                     body: bajasData,
                     theme: 'striped',
                     headStyles: { fillColor: [239, 68, 68], textColor: [255, 255, 255], fontStyle: 'bold' },
@@ -2350,7 +2302,7 @@
                 
                 doc.autoTable({
                     startY: yPos + 4,
-                    head: [['Cliente', 'Teléfono', 'Dirección', 'Técnico', 'Completado por']],
+                    head: [['Cliente', 'Telefono', 'Direccion', 'Tecnico', 'Completado por']],
                     body: equiposData,
                     theme: 'striped',
                     headStyles: { fillColor: [79, 70, 229], textColor: [255, 255, 255], fontStyle: 'bold' },
@@ -2370,7 +2322,7 @@
             doc.text('RESUMEN FINAL:', 14, yPos);
             doc.setFont(undefined, 'normal');
             doc.text('* Total clientes gestionados: ' + llamadasHoy.length, 14, yPos + 8);
-            doc.text('* Tasa de reconexión: ' + (llamadasHoy.length > 0 ? Math.round((recuperadosHoy.length / llamadasHoy.length) * 100) : (recuperadosHoy.length > 0 ? 100 : 0)) + '%', 14, yPos + 14);
+            doc.text('* Tasa de reconexion: ' + (llamadasHoy.length > 0 ? Math.round((recuperadosHoy.length / llamadasHoy.length) * 100) : (recuperadosHoy.length > 0 ? 100 : 0)) + '%', 14, yPos + 14);
             doc.text('* Tasa de bajas: ' + (llamadasHoy.length > 0 ? Math.round((perdidosHoy.length / llamadasHoy.length) * 100) : 0) + '%', 14, yPos + 20);
             doc.text('* Visitas de retiro pendientes: ' + visitasPendientesTotal, 14, yPos + 26);
             doc.text('* Total equipos retirados hasta la fecha: ' + visitasFinalizadas.length, 14, yPos + 32);
@@ -2384,7 +2336,7 @@
             
             doc.setFontSize(8);
             doc.setTextColor(150, 150, 150);
-            doc.text('Reporte generado por sistema OCAD Inter - Gestión de Recupero - ' + new Date().toLocaleString(), 14, yPos + 72);
+            doc.text('Reporte generado por sistema OCAD Inter - Gestion de Recupero - ' + new Date().toLocaleString(), 14, yPos + 72);
             
             const nombreArchivo = `reporte_gestion_${fecha}_${new Date().toLocaleTimeString().replace(/:/g, '-')}.pdf`;
             doc.save(nombreArchivo);
@@ -2449,7 +2401,7 @@
         }
 
         // ==================== ELIMINACIONES ====================
-        async function deleteAllTechnicians() { if (!puedeEliminarDatos()) { showToast('No tiene permisos para eliminar datos', 'error'); return; } if (confirm('Eliminar todos los técnicos?')) { const snap = await colecciones.technicians.get(); const batch = db.batch(); snap.forEach(doc => batch.delete(doc.ref)); await batch.commit(); showToast('Técnicos eliminados'); } }
+        async function deleteAllTechnicians() { if (!puedeEliminarDatos()) { showToast('No tiene permisos para eliminar datos', 'error'); return; } if (confirm('Eliminar todos los tecnicos?')) { const snap = await colecciones.technicians.get(); const batch = db.batch(); snap.forEach(doc => batch.delete(doc.ref)); await batch.commit(); showToast('Tecnicos eliminados'); } }
         async function deleteAllRezagados() { if (!puedeEliminarDatos()) { showToast('No tiene permisos para eliminar datos', 'error'); return; } if (confirm('Eliminar todos los rezagados?')) { const snap = await colecciones.rezagados.get(); const batch = db.batch(); snap.forEach(doc => batch.delete(doc.ref)); await batch.commit(); showToast('Rezagados eliminados'); } }
         async function deleteAllPerdidos() { if (!puedeEliminarDatos()) { showToast('No tiene permisos para eliminar datos', 'error'); return; } if (confirm('Eliminar todos los perdidos?')) { const snap = await colecciones.perdidos.get(); const batch = db.batch(); snap.forEach(doc => batch.delete(doc.ref)); await batch.commit(); showToast('Perdidos eliminados'); } }
         async function deleteAllRecuperados() { if (!puedeEliminarDatos()) { showToast('No tiene permisos para eliminar datos', 'error'); return; } if (confirm('Eliminar todos los reconectados?')) { const snap = await colecciones.recuperados.get(); const batch = db.batch(); snap.forEach(doc => batch.delete(doc.ref)); await batch.commit(); showToast('Reconectados eliminados'); } }
@@ -2462,7 +2414,7 @@
             const container = document.getElementById('configButtonsContainer');
             if (container) {
                 if (!puedeEliminarDatos()) {
-                    container.innerHTML = `<div class="p-3 text-center text-red-600 bg-red-50 rounded-lg"><i class="fas fa-lock mr-1"></i>No tiene permisos para acceder a esta sección. Solo Administrador y Marina M pueden realizar limpieza de datos.</div>`;
+                    container.innerHTML = `<div class="p-3 text-center text-red-600 bg-red-50 rounded-lg"><i class="fas fa-lock mr-1"></i>No tiene permisos para acceder a esta seccion. Solo Administrador y Marina M pueden realizar limpieza de datos.</div>`;
                 } else {
                     container.innerHTML = `
                         <button onclick="deleteAllRezagados()" class="delete-all-btn bg-amber-600"><i class="fas fa-trash mr-1"></i>Eliminar Rezagados (${clientesRezagados.length})</button>
@@ -2471,7 +2423,7 @@
                         <button onclick="deleteAllPerdidosFinal()" class="delete-all-btn bg-red-600"><i class="fas fa-trash mr-1"></i>Eliminar Dados de Baja (${clientesPerdidosFinal.length})</button>
                         <button onclick="deleteAllEquiposVisitas()" class="delete-all-btn bg-purple-600"><i class="fas fa-trash mr-1"></i>Eliminar Visitas Pendientes (${visitasTecnicas.length})</button>
                         <button onclick="deleteAllVisitasFinalizadas()" class="delete-all-btn bg-blue-600"><i class="fas fa-trash mr-1"></i>Eliminar Visitas Finalizadas (${visitasFinalizadas.length})</button>
-                        <button onclick="deleteAllTechnicians()" class="delete-all-btn bg-gray-600"><i class="fas fa-trash mr-1"></i>Eliminar Técnicos (${technicians.length})</button>
+                        <button onclick="deleteAllTechnicians()" class="delete-all-btn bg-gray-600"><i class="fas fa-trash mr-1"></i>Eliminar Tecnicos (${technicians.length})</button>
                         <div class="border-t my-1"></div>
                         <button onclick="deleteAllData()" class="delete-all-btn bg-red-900"><i class="fas fa-database mr-1"></i>ELIMINAR TODOS LOS DATOS</button>
                     `;
@@ -2546,7 +2498,7 @@
                 return;
             }
             if (tabName === 'config' && !puedeEliminarDatos()) {
-                showToast('No tiene permisos para acceder a configuración', 'error');
+                showToast('No tiene permisos para acceder a configuracion', 'error');
                 return;
             }
             
@@ -2583,7 +2535,7 @@
             const password = document.getElementById('loginPassword').value;
             const user = appUsers.find(u => u.id === userId);
             if (!userId || !user) { 
-                document.getElementById('loginError').textContent = 'Perfil inválido'; 
+                document.getElementById('loginError').textContent = 'Perfil invalido'; 
                 document.getElementById('loginError').classList.remove('hidden');
                 return; 
             }

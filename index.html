@@ -92,6 +92,8 @@
         .completar-btn { background: #10b981; color: white; padding: 4px 8px; border-radius: 6px; font-size: 10px; cursor: pointer; border: none; }
         .completar-btn:hover { background: #059669; }
         .completar-btn-disabled { background: #9ca3af; color: white; padding: 4px 8px; border-radius: 6px; font-size: 10px; border: none; cursor: not-allowed; }
+        .datetime-picker { display: flex; gap: 8px; flex-wrap: wrap; }
+        .datetime-picker input, .datetime-picker select { flex: 1; min-width: 120px; }
     </style>
 </head>
 <body class="bg-gray-100 font-sans">
@@ -253,7 +255,7 @@
                 </div>
                 <div class="table-container desktop-table">
                     <table class="customers-table">
-                        <thead><tr><th>ID</th><th>Nombre</th><th>Documento</th><th>Teléfono</th><th>Plan</th><th>Fecha Recup.</th><th>Agente</th></tr></thead>
+                        <thead><tr><th>ID</th><th>Nombre</th><th>Documento</th><th>Teléfono</th><th>Plan</th><th>Dirección</th><th>Zona/CO</th><th>Fecha Recup.</th><th>Agente</th></tr></thead>
                         <tbody id="recuperadosTableBody"></tbody>
                     </table>
                 </div>
@@ -269,7 +271,7 @@
                 </div>
                 <div class="table-container desktop-table">
                     <table class="customers-table">
-                        <thead><tr><th>ID</th><th>Nombre</th><th>Documento</th><th>Teléfono</th><th>Plan</th><th>Motivo</th><th>Fecha Baja</th><th>Agente</th></tr></thead>
+                        <thead><tr><th>ID</th><th>Nombre</th><th>Documento</th><th>Teléfono</th><th>Plan</th><th>Dirección</th><th>Zona/CO</th><th>Motivo</th><th>Fecha Baja</th><th>Agente</th></tr></thead>
                         <tbody id="perdidosFinalTableBody"></tbody>
                     </table>
                 </div>
@@ -290,7 +292,7 @@
                 </div>
                 <div class="table-container desktop-table">
                     <table class="customers-table">
-                        <thead><tr><th>Cliente</th><th>Teléfono</th><th>Dirección</th><th>Técnico</th><th>Fecha Programada</th><th>Motivo</th><th>Estado</th><th>Acciones</th></tr></thead>
+                        <thead><tr><th>Cliente</th><th>Teléfono</th><th>Dirección</th><th>Zona/CO</th><th>Técnico</th><th>Fecha</th><th>Hora</th><th>Motivo</th><th>Estado</th><th>Acciones</th></tr></thead>
                         <tbody id="equiposTableBody"></tbody>
                     </table>
                 </div>
@@ -310,7 +312,7 @@
                 </div>
                 <div class="table-container desktop-table">
                     <table class="customers-table">
-                        <thead><tr><th>Cliente</th><th>Teléfono</th><th>Dirección</th><th>Técnico</th><th>Fecha/Hora</th><th>Fecha Completado</th><th>Completado por</th><th>Estado</th></tr></thead>
+                        <thead><tr><th>Cliente</th><th>Teléfono</th><th>Dirección</th><th>Zona/CO</th><th>Técnico</th><th>Fecha/Hora</th><th>Fecha Completado</th><th>Completado por</th><th>Estado</th></tr></thead>
                         <tbody id="visitasTableBody"></tbody>
                     </table>
                 </div>
@@ -432,15 +434,45 @@
                         <option value="no_contacto">No se logró contacto</option>
                         <option value="promesa_pago">Promesa de pago</option>
                         <option value="visita_tecnica">Requiere visita técnica (otro motivo)</option>
+                        <option value="no_aplica">No aplica</option>
+                        <option value="abonado_hfc">Abonado HFC</option>
+                        <option value="extravio_equipos">Extravío de equipos</option>
+                        <option value="ab_ocupado">AB ocupado</option>
+                        <option value="ab_conectado_solvente">AB conectado / solvente</option>
+                        <option value="baja_procesada_oficina">Baja Procesada - entrego equipos en ofc</option>
+                        <option value="venta_inmueble">Venta de inmueble - no tiene acceso a los equipos</option>
+                        <option value="numero_desconocido">Número desconocido - No es el titular</option>
                     </select>
                 </div>
                 <div id="bajaReasonDiv" class="hidden mb-2"><label class="block text-xs font-medium mb-1">Motivo de baja</label><select id="bajaMotivo" class="w-full border rounded-lg px-2 py-1 text-sm"><option value="price">Precio / Competencia</option><option value="service_issues">Problemas con el servicio</option><option value="relocation">Mudanza</option><option value="deceased">Fallecimiento</option><option value="other">Otro</option></select></div>
                 <div id="visitaFields" class="hidden mb-2">
-                    <label class="block text-xs font-medium mb-1">Fecha de Visita</label><input type="date" id="visitDate" class="w-full border rounded-lg px-2 py-1 text-sm mb-1">
-                    <label class="block text-xs font-medium mb-1">Hora</label><select id="visitTime" class="w-full border rounded-lg px-2 py-1 text-sm mb-1"><option value="08:00-10:00">08:00-10:00</option><option value="10:00-12:00">10:00-12:00</option><option value="12:00-14:00">12:00-14:00</option><option value="14:00-16:00">14:00-16:00</option><option value="16:00-18:00">16:00-18:00</option></select>
-                    <label class="block text-xs font-medium mb-1">Técnico *</label><select id="visitTechnician" class="w-full border rounded-lg px-2 py-1 text-sm mb-1" required></select>
-                    <label class="block text-xs font-medium mb-1">Motivo visita</label><select id="visitReason" class="w-full border rounded-lg px-2 py-1 text-sm mb-1"><option value="retiro_equipo">Retiro de equipo por baja</option><option value="falla">Falla técnica</option><option value="instalacion">Instalación</option></select>
-                    <label class="block text-xs font-medium mb-1">Observaciones</label><textarea id="visitInstructions" rows="2" class="w-full border rounded-lg px-2 py-1 text-sm"></textarea>
+                    <label class="block text-xs font-medium mb-1">Fecha de Visita *</label>
+                    <input type="date" id="visitDate" class="w-full border rounded-lg px-2 py-1 text-sm mb-1" required>
+                    <label class="block text-xs font-medium mb-1">Hora de Visita *</label>
+                    <select id="visitTime" class="w-full border rounded-lg px-2 py-1 text-sm mb-1" required>
+                        <option value="">Seleccionar hora</option>
+                        <option value="08:00">08:00 AM</option>
+                        <option value="09:00">09:00 AM</option>
+                        <option value="10:00">10:00 AM</option>
+                        <option value="11:00">11:00 AM</option>
+                        <option value="12:00">12:00 PM</option>
+                        <option value="13:00">01:00 PM</option>
+                        <option value="14:00">02:00 PM</option>
+                        <option value="15:00">03:00 PM</option>
+                        <option value="16:00">04:00 PM</option>
+                        <option value="17:00">05:00 PM</option>
+                    </select>
+                    <label class="block text-xs font-medium mb-1">Técnico *</label>
+                    <select id="visitTechnician" class="w-full border rounded-lg px-2 py-1 text-sm mb-1" required></select>
+                    <label class="block text-xs font-medium mb-1">Motivo visita</label>
+                    <select id="visitReason" class="w-full border rounded-lg px-2 py-1 text-sm mb-1">
+                        <option value="retiro_equipo">Retiro de equipo por baja</option>
+                        <option value="falla">Falla técnica</option>
+                        <option value="instalacion">Instalación</option>
+                        <option value="reconexion">Reconexión</option>
+                    </select>
+                    <label class="block text-xs font-medium mb-1">Observaciones</label>
+                    <textarea id="visitInstructions" rows="2" class="w-full border rounded-lg px-2 py-1 text-sm"></textarea>
                     <p class="text-xs text-blue-500 mt-1"><i class="fas fa-info-circle"></i> La visita se programará automáticamente en la pestaña "Visita técnica Pendiente"</p>
                 </div>
                 <div class="mb-2"><label class="block text-xs font-medium mb-1">Observaciones</label><textarea id="callObservations" rows="2" class="w-full border rounded-lg px-2 py-1 text-sm"></textarea></div>
@@ -843,6 +875,7 @@
                 telefono: customer.telefono1,
                 plan: customer.plan,
                 centroOp: customer.centroOp,
+                direccion: customer.direccion,
                 fechaCorte: customer.fechaCorte,
                 fechaGestion: fechaGestion,
                 agente: agente,
@@ -854,10 +887,37 @@
             
             await guardarEnFirestore(colecciones.callLogs, registro);
             
+            const resultadoMap = {
+                'recuperado': 'RECUPERADO - Cliente continúa',
+                'dado_baja': 'DADO DE BAJA',
+                'no_contacto': 'Sin contacto',
+                'promesa_pago': 'Promesa de pago',
+                'visita_tecnica': 'Visita programada',
+                'no_aplica': 'No aplica',
+                'abonado_hfc': 'Abonado HFC',
+                'extravio_equipos': 'Extravío de equipos',
+                'ab_ocupado': 'AB ocupado',
+                'ab_conectado_solvente': 'AB conectado / solvente',
+                'baja_procesada_oficina': 'Baja Procesada - entrego equipos en ofc',
+                'venta_inmueble': 'Venta de inmueble - no tiene acceso a los equipos',
+                'numero_desconocido': 'Número desconocido - No es el titular'
+            };
+            
+            const resultadoTexto = resultadoMap[resultado] || resultado;
+            
+            // *** CORRECCIÓN 1: ABONADO SOLVENTE Y NÚMERO DESCONOCIDO - ELIMINAN DE LA LISTA ***
+            const resultadosQueNoEliminan = ['no_contacto', 'promesa_pago', 'visita_tecnica', 'no_aplica', 'abonado_hfc', 'extravio_equipos', 'ab_ocupado', 'baja_procesada_oficina', 'venta_inmueble'];
+            
             if (resultado === 'recuperado') {
                 registro.fechaRecuperacion = fechaGestion;
                 await guardarEnFirestore(colecciones.recuperados, registro);
                 showToast(`Cliente ${customer.nombre} reconectado exitosamente`);
+                // ELIMINAR DE LA LISTA ORIGINAL
+                if (customerType === 'rezagado') {
+                    await eliminarDeFirestore(colecciones.rezagados, customer.id);
+                } else if (customerType === 'perdido') {
+                    await eliminarDeFirestore(colecciones.perdidos, customer.id);
+                }
                 
             } else if (resultado === 'dado_baja') {
                 registro.fechaBaja = fechaGestion;
@@ -865,38 +925,45 @@
                 registro.tipo = 'baja_servicio';
                 await guardarEnFirestore(colecciones.perdidosFinal, registro);
                 
-                const fechaVisita = new Date();
-                fechaVisita.setDate(fechaVisita.getDate() + 3);
-                const fechaFormateada = fechaVisita.toISOString().split('T')[0];
-                
-                const visitaRetiro = {
-                    id: Date.now().toString(),
-                    clienteId: customer.id,
-                    clienteNombre: customer.nombre,
-                    clienteTelefono: customer.telefono1,
-                    clienteDocumento: customer.documento,
-                    direccion: customer.direccion || 'Dirección no registrada',
-                    plan: customer.plan,
-                    centroOp: customer.centroOp,
-                    motivo: 'retiro_equipo_por_baja',
-                    motivoTexto: 'Retiro de equipo por baja del servicio',
-                    tecnicoId: null,
-                    tecnicoNombre: 'Por asignar',
-                    fechaVisita: fechaFormateada,
-                    horaVisita: '09:00-12:00',
-                    instrucciones: `Cliente dado de baja. Motivo: ${motivoBaja === 'price' ? 'Precio' : motivoBaja === 'service_issues' ? 'Problemas servicio' : motivoBaja === 'relocation' ? 'Mudanza' : motivoBaja === 'deceased' ? 'Fallecimiento' : 'Otro'}. Realizar retiro de equipos (ONT, router, cable modem, etc.)`,
-                    estado: 'pendiente',
-                    tipoVisita: 'retiro_equipo',
-                    fechaCreacion: fechaGestion,
-                    agente: agente,
-                    agenteId: appCurrentUser.id,
-                    observacionesGestion: observaciones
-                };
-                
-                await guardarEnFirestore(colecciones.visitasTecnicas, visitaRetiro);
-                showToast(`Cliente ${customer.nombre} dado de baja - Visita para retiro de equipo creada`);
+                // Crear visita con fecha y hora seleccionadas por el usuario
+                if (visitaData && visitaData.fecha) {
+                    const visitaRetiro = {
+                        id: Date.now().toString(),
+                        clienteId: customer.id,
+                        clienteNombre: customer.nombre,
+                        clienteTelefono: customer.telefono1,
+                        clienteDocumento: customer.documento,
+                        direccion: customer.direccion || 'Dirección no registrada',
+                        zona: customer.centroOp || 'No especificada',
+                        plan: customer.plan,
+                        centroOp: customer.centroOp,
+                        motivo: 'retiro_equipo_por_baja',
+                        motivoTexto: 'Retiro de equipo por baja del servicio',
+                        tecnicoId: visitaData.tecnicoId || null,
+                        tecnicoNombre: visitaData.tecnicoNombre || 'Por asignar',
+                        fechaVisita: visitaData.fecha,
+                        horaVisita: visitaData.hora,
+                        instrucciones: visitaData.instrucciones || `Cliente dado de baja. Motivo: ${motivoBaja === 'price' ? 'Precio' : motivoBaja === 'service_issues' ? 'Problemas servicio' : motivoBaja === 'relocation' ? 'Mudanza' : motivoBaja === 'deceased' ? 'Fallecimiento' : 'Otro'}. Realizar retiro de equipos (ONT, router, cable modem, etc.)`,
+                        estado: 'pendiente',
+                        tipoVisita: 'retiro_equipo',
+                        fechaCreacion: fechaGestion,
+                        agente: agente,
+                        agenteId: appCurrentUser.id,
+                        observacionesGestion: observaciones
+                    };
+                    
+                    await guardarEnFirestore(colecciones.visitasTecnicas, visitaRetiro);
+                    showToast(`Cliente ${customer.nombre} dado de baja - Visita para retiro de equipo creada para el ${visitaData.fecha} a las ${visitaData.hora}`);
+                }
+                // ELIMINAR DE LA LISTA ORIGINAL
+                if (customerType === 'rezagado') {
+                    await eliminarDeFirestore(colecciones.rezagados, customer.id);
+                } else if (customerType === 'perdido') {
+                    await eliminarDeFirestore(colecciones.perdidos, customer.id);
+                }
                 
             } else if (resultado === 'visita_tecnica' && visitaData) {
+                // Crear visita con fecha y hora seleccionadas
                 const visita = {
                     id: Date.now().toString(),
                     clienteId: customer.id,
@@ -904,7 +971,9 @@
                     clienteTelefono: customer.telefono1,
                     clienteDocumento: customer.documento,
                     direccion: customer.direccion || 'Dirección no registrada',
+                    zona: customer.centroOp || 'No especificada',
                     motivo: visitaData.motivo,
+                    motivoTexto: visitaData.motivo === 'retiro_equipo' ? 'Retiro de equipo' : visitaData.motivo === 'falla' ? 'Falla técnica' : visitaData.motivo === 'instalacion' ? 'Instalación' : 'Reconexión',
                     tecnicoId: visitaData.tecnicoId,
                     tecnicoNombre: visitaData.tecnicoNombre,
                     fechaVisita: visitaData.fecha,
@@ -914,22 +983,37 @@
                     tipoVisita: 'otra',
                     fechaCreacion: fechaGestion,
                     agente: agente,
-                    agenteId: appCurrentUser.id
+                    agenteId: appCurrentUser.id,
+                    centroOp: customer.centroOp
                 };
                 await guardarEnFirestore(colecciones.visitasTecnicas, visita);
-                showToast(`Visita tecnica programada para ${customer.nombre}`);
-            } else if (resultado === 'no_contacto') {
-                showToast(`No se logro contacto con ${customer.nombre}`);
-            } else if (resultado === 'promesa_pago') {
-                showToast(`Promesa de pago registrada para ${customer.nombre}`);
-            }
-            
-            if (resultado !== 'visita_tecnica') {
+                showToast(`Visita técnica programada para ${customer.nombre} el ${visitaData.fecha} a las ${visitaData.hora}`);
+                // NO ELIMINAMOS AL CLIENTE DE LA LISTA EN VISITA TÉCNICA
+                
+            } else if (resultado === 'ab_conectado_solvente') {
+                // *** CORRECCIÓN 1: Cliente solvente - ELIMINAR DE LA LISTA ***
+                showToast(`Cliente ${customer.nombre} registrado como solvente - eliminado de la lista de gestión`);
                 if (customerType === 'rezagado') {
                     await eliminarDeFirestore(colecciones.rezagados, customer.id);
                 } else if (customerType === 'perdido') {
                     await eliminarDeFirestore(colecciones.perdidos, customer.id);
                 }
+                
+            } else if (resultado === 'numero_desconocido') {
+                // *** CORRECCIÓN 4: Número desconocido - ELIMINAR DE LA LISTA ***
+                showToast(`Se ha reportado que el número ${customer.telefono1} no pertenece al titular ${customer.nombre} - eliminado de la lista de gestión`);
+                if (customerType === 'rezagado') {
+                    await eliminarDeFirestore(colecciones.rezagados, customer.id);
+                } else if (customerType === 'perdido') {
+                    await eliminarDeFirestore(colecciones.perdidos, customer.id);
+                }
+                
+            } else if (resultadosQueNoEliminan.includes(resultado)) {
+                // Para otros resultados: solo registramos en el historial
+                showToast(`${resultadoTexto} registrado para ${customer.nombre}`);
+                // NO ELIMINAMOS AL CLIENTE DE LA LISTA
+            } else {
+                showToast(`${resultadoTexto} registrado para ${customer.nombre}`);
             }
             
             await unlockCustomer(customer.id, customerType);
@@ -1073,7 +1157,7 @@
             
             document.getElementById('rezagadosImportResult').innerHTML = `<div class="p-2 rounded-lg bg-green-50 border-l-4 border-green-500">
                 <p class="text-xs">Nuevos importados: ${nuevos}</p>
-                <p class="text-xs">Telefonos encontrados: ${telefonosEncontrados}</p>
+                <p class="text-xs">Teléfonos encontrados: ${telefonosEncontrados}</p>
                 <p class="text-xs">Fechas de corte encontradas: ${fechasEncontradas}</p>
             </div>`;
             showToast(`Importados ${nuevos} clientes rezagados`);
@@ -1096,7 +1180,7 @@
                     if (rows.length < 2) { alert('El archivo no contiene datos'); return; }
                     perdidosHeaders = rows[0].map(h => String(h || '').trim());
                     perdidosRawData = rows.slice(1).filter(row => row && row.length > 0 && row.some(cell => cell && String(cell).trim() !== ''));
-                    let previewHtml = '<thead><tr>' + perdidosHeaders.slice(0, 6).map(h => `<th class="text-xs">${escapeHtml(h).substring(0, 15)}</th>`).join('') + '</tr></thead><tbody>';
+                    let previewHtml = '<thead><tr>' + perdidosHeaders.slice(0, 6).map(h => `<th class="text-xs">${escapeHtml(h).substring(0, 15)}</th>`).join('') + '</td></thead><tbody>';
                     previewHtml += perdidosRawData.slice(0, 3).map(row => '<tr>' + row.slice(0, 6).map(cell => `<td class="text-xs">${escapeHtml(String(cell || '').substring(0, 20))}</td>`).join('') + '</tr>').join('');
                     previewHtml += '</tbody>';
                     document.getElementById('previewPerdidosTable').innerHTML = previewHtml;
@@ -1251,23 +1335,25 @@
             document.getElementById('callCustomerType').value = customerType;
             document.getElementById('callCustomerInfo').innerHTML = `<div class="font-bold text-sm">${escapeHtml(customer.nombre)}</div>
                 <div class="text-xs">ID: ${escapeHtml(customer.identificador)} | Documento: ${escapeHtml(customer.documento)} | CO: ${escapeHtml(customer.centroOp)}</div>
-                <div class="text-xs">Plan: ${escapeHtml(customer.plan)} | Telefono: ${escapeHtml(customer.telefono1) || 'No disponible'}</div>
-                <div class="text-xs text-gray-500">Direccion: ${escapeHtml(customer.direccion)}</div>`;
+                <div class="text-xs">Plan: ${escapeHtml(customer.plan)} | Teléfono: ${escapeHtml(customer.telefono1) || 'No disponible'}</div>
+                <div class="text-xs text-gray-500">Dirección: ${escapeHtml(customer.direccion)}</div>`;
             
             const phoneSelect = document.getElementById('callPhoneUsed');
             phoneSelect.innerHTML = '';
             const phones = [customer.telefono1, customer.telefono2, customer.telefono3].filter(p => p && p !== '');
-            if (phones.length === 0) phones.push('Sin telefono');
+            if (phones.length === 0) phones.push('Sin teléfono');
             phones.forEach(p => { const opt = document.createElement('option'); opt.value = p; opt.textContent = p; phoneSelect.appendChild(opt); });
             
             const techSelect = document.getElementById('visitTechnician');
-            techSelect.innerHTML = '<option value="">Seleccionar tecnico</option>' + technicians.map(t => `<option value="${t.id}">${escapeHtml(t.nombre)} - ${t.co}</option>`).join('');
+            techSelect.innerHTML = '<option value="">Seleccionar técnico</option>' + technicians.map(t => `<option value="${t.id}">${escapeHtml(t.nombre)} - ${t.co}</option>`).join('');
             
             document.getElementById('callResult').value = '';
             document.getElementById('bajaReasonDiv').classList.add('hidden');
             document.getElementById('visitaFields').classList.add('hidden');
             document.getElementById('callObservations').value = '';
+            // *** CORRECCIÓN 2: Permitir selección de fecha y hora manual ***
             document.getElementById('visitDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('visitTime').value = '';
             document.getElementById('registerCallModal').classList.remove('hidden');
         }
         
@@ -1299,16 +1385,21 @@
             if (!resultado) { alert('Seleccione un resultado'); return; }
             
             let visitaData = null;
-            if (resultado === 'visita_tecnica') {
+            if (resultado === 'visita_tecnica' || resultado === 'dado_baja') {
                 const fecha = document.getElementById('visitDate').value;
+                const hora = document.getElementById('visitTime').value;
+                // *** CORRECCIÓN 2: Validar fecha y hora seleccionadas ***
                 if (!fecha) { alert('Seleccione fecha de visita'); return; }
+                if (!hora) { alert('Seleccione hora de visita'); return; }
+                
                 const tecnicoId = document.getElementById('visitTechnician').value;
-                if (!tecnicoId) { alert('Seleccione un tecnico para la visita'); return; }
+                if (resultado === 'visita_tecnica' && !tecnicoId) { alert('Seleccione un técnico para la visita'); return; }
+                
                 const tecnico = technicians.find(t => t.id === tecnicoId);
                 visitaData = {
                     motivo: document.getElementById('visitReason').value,
                     fecha: fecha,
-                    hora: document.getElementById('visitTime').value,
+                    hora: hora,
                     tecnicoId: tecnicoId,
                     tecnicoNombre: tecnico ? tecnico.nombre : 'No asignado',
                     instrucciones: document.getElementById('visitInstructions').value
@@ -1331,7 +1422,7 @@
             let order, info;
             if (type === 'visita') {
                 order = visitasTecnicas.find(v => v.id === orderId);
-                info = `Cliente: ${order?.clienteNombre}\nDireccion: ${order?.direccion}\nMotivo: ${order?.motivoTexto || order?.motivo || 'Retiro de equipo'}`;
+                info = `Cliente: ${order?.clienteNombre}\nTeléfono: ${order?.clienteTelefono}\nDirección: ${order?.direccion}\nZona: ${order?.zona || order?.centroOp || 'No especificada'}\nFecha: ${order?.fechaVisita} ${order?.horaVisita}\nMotivo: ${order?.motivoTexto || order?.motivo || 'Retiro de equipo'}`;
             } else {
                 return;
             }
@@ -1359,8 +1450,8 @@
         };
         
         window.openAssignTechnicianModal = async function(orderId, type) {
-            if (technicians.length === 0) { showToast('No hay tecnicos registrados', 'error'); return; }
-            const newTech = prompt(`Seleccione un tecnico:\n${technicians.map((t,i) => `${i+1}. ${t.nombre} - ${t.co}`).join('\n')}\n\nIngrese el numero:`);
+            if (technicians.length === 0) { showToast('No hay técnicos registrados', 'error'); return; }
+            const newTech = prompt(`Seleccione un técnico:\n${technicians.map((t,i) => `${i+1}. ${t.nombre} - ${t.co}`).join('\n')}\n\nIngrese el número:`);
             if (newTech) {
                 const idx = parseInt(newTech) - 1;
                 if (idx >= 0 && idx < technicians.length) {
@@ -1370,7 +1461,7 @@
                             tecnicoId: tech.id,
                             tecnicoNombre: tech.nombre
                         }, orderId);
-                        showToast(`Tecnico ${tech.nombre} asignado a la visita`);
+                        showToast(`Técnico ${tech.nombre} asignado a la visita`);
                     }
                 }
             }
@@ -1386,17 +1477,17 @@
                 id: nuevoId,
                 nombre: nombre,
                 co: co,
-                telefono: telefono || 'Sin telefono'
+                telefono: telefono || 'Sin teléfono'
             }, nuevoId);
             document.getElementById('techName').value = '';
             document.getElementById('techPhone').value = '';
-            showToast(`Tecnico ${nombre} agregado`);
+            showToast(`Técnico ${nombre} agregado`);
         }
         
         window.deleteTechnician = async function(techId) {
-            if (confirm('Eliminar este tecnico?')) {
+            if (confirm('Eliminar este técnico?')) {
                 await eliminarDeFirestore(colecciones.technicians, techId);
-                showToast('Tecnico eliminado');
+                showToast('Técnico eliminado');
             }
         }
 
@@ -1436,7 +1527,7 @@
         function getStatusText(estado) {
             switch(estado) {
                 case 'pendiente': return 'PENDIENTE';
-                case 'en_gestion': return 'EN GESTION';
+                case 'en_gestion': return 'EN GESTIÓN';
                 case 'recuperado': return 'RECUPERADO';
                 case 'dado_baja': return 'DADO DE BAJA';
                 default: return 'PENDIENTE';
@@ -1454,7 +1545,7 @@
             const tbodyDesktop = document.getElementById('rezagadosTableBodyDesktop');
             if (tbodyDesktop) {
                 if (items.length === 0) {
-                    tbodyDesktop.innerHTML = '<tr><td colspan="11" class="text-center py-4 text-gray-500 text-xs">No hay clientes rezagados pendientes</td></tr>';
+                    tbodyDesktop.innerHTML = '<tr><td colspan="11" class="text-center py-4 text-gray-500 text-xs">No hay clientes rezagados pendientes</div></td></tr>';
                 } else {
                     tbodyDesktop.innerHTML = pageItems.map(c => {
                         const lockInfo = getCustomerLockInfo(c.id, 'rezagado');
@@ -1464,21 +1555,21 @@
                         const statusClass = getStatusClass(c.estado);
                         const statusText = getStatusText(c.estado);
                         return `<tr>
-                            <td><input type="checkbox" onchange="toggleSelectRezagado('${c.id}', this.checked)"></td>
-                            <td class="truncate-text">${escapeHtml(c.identificador || c.id)}</td>
-                            <td><span class="font-medium">${escapeHtml(c.nombre)}</span></td>
-                            <td class="truncate-text">${escapeHtml(c.documento)}</td>
-                            <td>${hasPhone ? escapeHtml(c.telefono1) : '-'}</td>
-                            <td class="truncate-text">${escapeHtml(c.plan)}</td>
-                            <td>${escapeHtml(c.centroOp)}</td>
-                            <td>${c.fechaCorte || '-'}</td>
-                            <td><span class="status-badge ${statusClass}">${statusText}</span></td>
-                            <td>${isLocked ? `<span class="blocked-badge"><i class="fas fa-lock"></i> ${lockInfo.agente}</span>` : '-'}</td>
+                            <td><input type="checkbox" onchange="toggleSelectRezagado('${c.id}', this.checked)"></div></table>
+                            <td class="truncate-text">${escapeHtml(c.identificador || c.id)}</div></td>
+                            <td><span class="font-medium">${escapeHtml(c.nombre)}</span></div></td>
+                            <td class="truncate-text">${escapeHtml(c.documento)}</div></td>
+                            <td>${hasPhone ? escapeHtml(c.telefono1) : '-'}</div></td>
+                            <td class="truncate-text">${escapeHtml(c.plan)}</div></td>
+                            <td>${escapeHtml(c.centroOp)}</div></td>
+                            <td>${c.fechaCorte || '-'}</div></td>
+                            <td><span class="status-badge ${statusClass}">${statusText}</span></div></td>
+                            <td>${isLocked ? `<span class="blocked-badge"><i class="fas fa-lock"></i> ${lockInfo.agente}</span>` : '-'}</div></td>
                             <td class="action-cell">
-                                ${(!isLocked || lockedByMe) && hasPhone ? `<button onclick="openRegisterCallModal('${c.id}', 'rezagado')" class="call-btn"><i class="fas fa-phone-alt"></i> Gestionar</button>` : `<button class="call-btn opacity-50" disabled>${!hasPhone ? 'Sin telefono' : 'Bloqueado'}</button>`}
+                                ${(!isLocked || lockedByMe) && hasPhone ? `<button onclick="openRegisterCallModal('${c.id}', 'rezagado')" class="call-btn"><i class="fas fa-phone-alt"></i> Gestionar</button>` : `<button class="call-btn opacity-50" disabled>${!hasPhone ? 'Sin teléfono' : 'Bloqueado'}</button>`}
                                 ${hasPhone ? `<a href="tel:${c.telefono1}" class="call-link"><i class="fas fa-phone"></i></a><a href="https://wa.me/${c.telefono1.replace(/[^0-9]/g,'')}" target="_blank" class="whatsapp-link"><i class="fab fa-whatsapp"></i></a>` : ''}
                                 <button onclick="deleteSingleCustomer('${c.id}', 'rezagado')" class="delete-single-btn"><i class="fas fa-trash-alt"></i></button>
-                            </td>
+                             </div>
                         </tr>`;
                     }).join('');
                 }
@@ -1502,13 +1593,14 @@
                                 <span class="status-badge ${statusClass}">${statusText}</span>
                             </div>
                             <div class="info-row-mobile"><span class="info-label">Documento:</span><span class="info-value">${escapeHtml(c.documento)}</span></div>
-                            <div class="info-row-mobile"><span class="info-label">Telefono:</span><span class="info-value">${hasPhone ? escapeHtml(c.telefono1) : '-'}</span></div>
+                            <div class="info-row-mobile"><span class="info-label">Teléfono:</span><span class="info-value">${hasPhone ? escapeHtml(c.telefono1) : '-'}</span></div>
                             <div class="info-row-mobile"><span class="info-label">Plan:</span><span class="info-value">${escapeHtml(c.plan)}</span></div>
                             <div class="info-row-mobile"><span class="info-label">Centro Op.:</span><span class="info-value">${escapeHtml(c.centroOp)}</span></div>
+                            <div class="info-row-mobile"><span class="info-label">Dirección:</span><span class="info-value text-xs">${escapeHtml(c.direccion || 'No registrada')}</span></div>
                             <div class="info-row-mobile"><span class="info-label">Fecha Corte:</span><span class="info-value">${c.fechaCorte || '-'}</span></div>
                             ${isLocked ? `<div class="info-row-mobile"><span class="info-label">Bloqueado por:</span><span class="info-value text-red-600">${lockInfo.agente}</span></div>` : ''}
                             <div class="action-buttons-mobile">
-                                ${(!isLocked || lockedByMe) && hasPhone ? `<button onclick="openRegisterCallModal('${c.id}', 'rezagado')" class="call-btn"><i class="fas fa-phone-alt"></i> Gestionar</button>` : `<button class="call-btn opacity-50" disabled>${!hasPhone ? 'Sin telefono' : 'Bloqueado'}</button>`}
+                                ${(!isLocked || lockedByMe) && hasPhone ? `<button onclick="openRegisterCallModal('${c.id}', 'rezagado')" class="call-btn"><i class="fas fa-phone-alt"></i> Gestionar</button>` : `<button class="call-btn opacity-50" disabled>${!hasPhone ? 'Sin teléfono' : 'Bloqueado'}</button>`}
                                 ${hasPhone ? `<a href="tel:${c.telefono1}" class="call-link"><i class="fas fa-phone"></i> Llamar</a><a href="https://wa.me/${c.telefono1.replace(/[^0-9]/g,'')}" target="_blank" class="whatsapp-link"><i class="fab fa-whatsapp"></i> WhatsApp</a>` : ''}
                                 <button onclick="deleteSingleCustomer('${c.id}', 'rezagado')" class="delete-single-btn"><i class="fas fa-trash-alt"></i> Eliminar</button>
                             </div>
@@ -1519,7 +1611,7 @@
             
             const pagination = document.getElementById('rezagadosPagination');
             if (pagination) {
-                pagination.innerHTML = totalPages > 1 ? `<button onclick="changeRezagadosPage(-1)" class="pagination-btn">◀</button><span class="text-xs">Pag ${rezagadosPage} de ${totalPages}</span><button onclick="changeRezagadosPage(1)" class="pagination-btn">▶</button>` : '';
+                pagination.innerHTML = totalPages > 1 ? `<button onclick="changeRezagadosPage(-1)" class="pagination-btn">◀</button><span class="text-xs">Pág ${rezagadosPage} de ${totalPages}</span><button onclick="changeRezagadosPage(1)" class="pagination-btn">▶</button>` : '';
             }
         }
         
@@ -1544,7 +1636,7 @@
                         const statusClass = getStatusClass(c.estado);
                         const statusText = getStatusText(c.estado);
                         return `<tr>
-                            <td><input type="checkbox" onchange="toggleSelectPerdido('${c.id}', this.checked)"></td>
+                            <td><input type="checkbox" onchange="toggleSelectPerdido('${c.id}', this.checked)"></div></td>
                             <td class="truncate-text">${escapeHtml(c.identificador || c.id)}</div></td>
                             <td><span class="font-medium">${escapeHtml(c.nombre)}</span></div></td>
                             <td class="truncate-text">${escapeHtml(c.documento)}</div></td>
@@ -1555,7 +1647,7 @@
                             <td><span class="status-badge ${statusClass}">${statusText}</span></div></td>
                             <td>${isLocked ? `<span class="blocked-badge"><i class="fas fa-lock"></i> ${lockInfo.agente}</span>` : '-'}</div></td>
                             <td class="action-cell">
-                                ${(!isLocked || lockedByMe) && hasPhone ? `<button onclick="openRegisterCallModal('${c.id}', 'perdido')" class="call-btn"><i class="fas fa-phone-alt"></i> Gestionar</button>` : `<button class="call-btn opacity-50" disabled>${!hasPhone ? 'Sin telefono' : 'Bloqueado'}</button>`}
+                                ${(!isLocked || lockedByMe) && hasPhone ? `<button onclick="openRegisterCallModal('${c.id}', 'perdido')" class="call-btn"><i class="fas fa-phone-alt"></i> Gestionar</button>` : `<button class="call-btn opacity-50" disabled>${!hasPhone ? 'Sin teléfono' : 'Bloqueado'}</button>`}
                                 ${hasPhone ? `<a href="tel:${c.telefono1}" class="call-link"><i class="fas fa-phone"></i></a><a href="https://wa.me/${c.telefono1.replace(/[^0-9]/g,'')}" target="_blank" class="whatsapp-link"><i class="fab fa-whatsapp"></i></a>` : ''}
                                 <button onclick="deleteSingleCustomer('${c.id}', 'perdido')" class="delete-single-btn"><i class="fas fa-trash-alt"></i></button>
                               </div>
@@ -1582,13 +1674,14 @@
                                 <span class="status-badge ${statusClass}">${statusText}</span>
                             </div>
                             <div class="info-row-mobile"><span class="info-label">Documento:</span><span class="info-value">${escapeHtml(c.documento)}</span></div>
-                            <div class="info-row-mobile"><span class="info-label">Telefono:</span><span class="info-value">${hasPhone ? escapeHtml(c.telefono1) : '-'}</span></div>
+                            <div class="info-row-mobile"><span class="info-label">Teléfono:</span><span class="info-value">${hasPhone ? escapeHtml(c.telefono1) : '-'}</span></div>
                             <div class="info-row-mobile"><span class="info-label">Plan:</span><span class="info-value">${escapeHtml(c.plan)}</span></div>
                             <div class="info-row-mobile"><span class="info-label">Centro Op.:</span><span class="info-value">${escapeHtml(c.centroOp)}</span></div>
+                            <div class="info-row-mobile"><span class="info-label">Dirección:</span><span class="info-value text-xs">${escapeHtml(c.direccion || 'No registrada')}</span></div>
                             <div class="info-row-mobile"><span class="info-label">Fecha Corte:</span><span class="info-value">${c.fechaCorte || '-'}</span></div>
                             ${isLocked ? `<div class="info-row-mobile"><span class="info-label">Bloqueado por:</span><span class="info-value text-red-600">${lockInfo.agente}</span></div>` : ''}
                             <div class="action-buttons-mobile">
-                                ${(!isLocked || lockedByMe) && hasPhone ? `<button onclick="openRegisterCallModal('${c.id}', 'perdido')" class="call-btn"><i class="fas fa-phone-alt"></i> Gestionar</button>` : `<button class="call-btn opacity-50" disabled>${!hasPhone ? 'Sin telefono' : 'Bloqueado'}</button>`}
+                                ${(!isLocked || lockedByMe) && hasPhone ? `<button onclick="openRegisterCallModal('${c.id}', 'perdido')" class="call-btn"><i class="fas fa-phone-alt"></i> Gestionar</button>` : `<button class="call-btn opacity-50" disabled>${!hasPhone ? 'Sin teléfono' : 'Bloqueado'}</button>`}
                                 ${hasPhone ? `<a href="tel:${c.telefono1}" class="call-link"><i class="fas fa-phone"></i> Llamar</a><a href="https://wa.me/${c.telefono1.replace(/[^0-9]/g,'')}" target="_blank" class="whatsapp-link"><i class="fab fa-whatsapp"></i> WhatsApp</a>` : ''}
                                 <button onclick="deleteSingleCustomer('${c.id}', 'perdido')" class="delete-single-btn"><i class="fas fa-trash-alt"></i> Eliminar</button>
                             </div>
@@ -1599,7 +1692,7 @@
             
             const pagination = document.getElementById('perdidosPagination');
             if (pagination) {
-                pagination.innerHTML = totalPages > 1 ? `<button onclick="changePerdidosPage(-1)" class="pagination-btn">◀</button><span class="text-xs">Pag ${perdidosPage} de ${totalPages}</span><button onclick="changePerdidosPage(1)" class="pagination-btn">▶</button>` : '';
+                pagination.innerHTML = totalPages > 1 ? `<button onclick="changePerdidosPage(-1)" class="pagination-btn">◀</button><span class="text-xs">Pág ${perdidosPage} de ${totalPages}</span><button onclick="changePerdidosPage(1)" class="pagination-btn">▶</button>` : '';
             }
         }
         
@@ -1612,7 +1705,7 @@
             const tbody = document.getElementById('recuperadosTableBody');
             if (tbody) {
                 if (items.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-gray-500 text-xs">No hay clientes reconectados</div></td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="9" class="text-center py-4 text-gray-500 text-xs">No hay clientes reconectados</div></tr></tr>';
                 } else {
                     tbody.innerHTML = items.slice(0, ITEMS_PER_PAGE).map(c => `<tr>
                         <td class="truncate-text">${escapeHtml(c.clienteId)}</div></td>
@@ -1620,6 +1713,8 @@
                         <td class="truncate-text">${escapeHtml(c.documento)}</div></td>
                         <td>${escapeHtml(c.telefono)}</div></td>
                         <td class="truncate-text">${escapeHtml(c.plan)}</div></td>
+                        <td class="truncate-text">${escapeHtml(c.direccion || 'No registrada')}</div></td>
+                        <td>${escapeHtml(c.centroOp || '-')}</div></td>
                         <td>${new Date(c.fechaGestion).toLocaleDateString()}</div></td>
                         <td>${escapeHtml(c.agente)}</div></td>
                     </tr>`).join('');
@@ -1636,7 +1731,7 @@
             const tbody = document.getElementById('perdidosFinalTableBody');
             if (tbody) {
                 if (items.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="8" class="text-center py-4 text-gray-500 text-xs">No hay clientes dados de baja</div></td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="10" class="text-center py-4 text-gray-500 text-xs">No hay clientes dados de baja</div></td></tr>';
                 } else {
                     tbody.innerHTML = items.slice(0, ITEMS_PER_PAGE).map(c => `<tr>
                         <td class="truncate-text">${escapeHtml(c.clienteId)}</div></td>
@@ -1644,6 +1739,8 @@
                         <td class="truncate-text">${escapeHtml(c.documento)}</div></td>
                         <td>${escapeHtml(c.telefono)}</div></td>
                         <td class="truncate-text">${escapeHtml(c.plan)}</div></td>
+                        <td class="truncate-text">${escapeHtml(c.direccion || 'No registrada')}</div></td>
+                        <td>${escapeHtml(c.centroOp || '-')}</div></td>
                         <td class="truncate-text">${c.motivoBaja === 'price' ? 'Precio' : c.motivoBaja === 'service_issues' ? 'Problemas servicio' : c.motivoBaja === 'relocation' ? 'Mudanza' : c.motivoBaja === 'deceased' ? 'Fallecimiento' : (c.motivoBaja || '-')}</div></td>
                         <td>${new Date(c.fechaGestion).toLocaleDateString()}</div></td>
                         <td>${escapeHtml(c.agente)}</div></td>
@@ -1664,7 +1761,7 @@
                     permisoMsg.innerHTML = '<i class="fas fa-check-circle text-green-500 mr-1"></i> Tienes permisos para completar visitas (Marina M o Administrador)';
                     permisoMsg.className = 'text-xs text-green-600 mt-1';
                 } else {
-                    permisoMsg.innerHTML = '<i class="fas fa-lock text-red-500 mr-1"></i> Solo Marina M y el Administrador pueden completar visitas de retiro de equipo. Tu puedes gestionar llamadas y asignar tecnicos, pero no completar el retiro.';
+                    permisoMsg.innerHTML = '<i class="fas fa-lock text-red-500 mr-1"></i> Solo Marina M y el Administrador pueden completar visitas de retiro de equipo. Tú puedes gestionar llamadas y asignar técnicos, pero no completar el retiro.';
                     permisoMsg.className = 'text-xs text-red-600 mt-1';
                 }
             }
@@ -1672,15 +1769,17 @@
             const tbody = document.getElementById('equiposTableBody');
             if (tbody) {
                 if (items.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="8" class="text-center py-4 text-gray-500 text-xs">No hay visitas tecnicas pendientes de retiro de equipos.</div></td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="10" class="text-center py-4 text-gray-500 text-xs">No hay visitas técnicas pendientes de retiro de equipos.</div></td></tr>';
                 } else {
                     const puedeCompletar = puedeCompletarVisitas();
                     tbody.innerHTML = items.map(v => `<tr>
                         <td><span class="font-medium">${escapeHtml(v.clienteNombre)}</span></div></td>
                         <td>${escapeHtml(v.clienteTelefono)}</div></td>
                         <td class="truncate-text">${escapeHtml(v.direccion)}</div></td>
+                        <td>${escapeHtml(v.zona || v.centroOp || '-')}</div></td>
                         <td>${v.tecnicoNombre || 'Por asignar'}</div></td>
                         <td>${v.fechaVisita || '-'}</div></td>
+                        <td>${v.horaVisita || '-'}</div></td>
                         <td class="text-xs">${v.motivoTexto || (v.motivo === 'retiro_equipo_por_baja' ? 'Retiro de equipo por baja' : (v.motivo || '-'))}</div></td>
                         <td><span class="status-badge bg-pendiente">PENDIENTE</span></div></td>
                         <td class="action-cell">
@@ -1697,15 +1796,16 @@
             const mobileContainer = document.getElementById('equiposMobileList');
             if (mobileContainer) {
                 if (items.length === 0) {
-                    mobileContainer.innerHTML = '<div class="text-center py-4 text-gray-500 text-xs">No hay visitas tecnicas pendientes de retiro de equipos.</div>';
+                    mobileContainer.innerHTML = '<div class="text-center py-4 text-gray-500 text-xs">No hay visitas técnicas pendientes de retiro de equipos.</div>';
                 } else {
                     const puedeCompletar = puedeCompletarVisitas();
                     mobileContainer.innerHTML = items.map(v => `<div class="customer-card-mobile">
                         <div class="font-bold text-sm">${escapeHtml(v.clienteNombre)}</div>
-                        <div class="info-row-mobile"><span class="info-label">Telefono:</span><span class="info-value">${escapeHtml(v.clienteTelefono)}</span></div>
-                        <div class="info-row-mobile"><span class="info-label">Direccion:</span><span class="info-value">${escapeHtml(v.direccion)}</span></div>
-                        <div class="info-row-mobile"><span class="info-label">Tecnico:</span><span class="info-value">${v.tecnicoNombre || 'Por asignar'}</span></div>
-                        <div class="info-row-mobile"><span class="info-label">Fecha:</span><span class="info-value">${v.fechaVisita || '-'}</span></div>
+                        <div class="info-row-mobile"><span class="info-label">Teléfono:</span><span class="info-value">${escapeHtml(v.clienteTelefono)}</span></div>
+                        <div class="info-row-mobile"><span class="info-label">Dirección:</span><span class="info-value">${escapeHtml(v.direccion)}</span></div>
+                        <div class="info-row-mobile"><span class="info-label">Zona:</span><span class="info-value">${escapeHtml(v.zona || v.centroOp || '-')}</span></div>
+                        <div class="info-row-mobile"><span class="info-label">Técnico:</span><span class="info-value">${v.tecnicoNombre || 'Por asignar'}</span></div>
+                        <div class="info-row-mobile"><span class="info-label">Fecha/Hora:</span><span class="info-value">${v.fechaVisita || '-'} ${v.horaVisita || ''}</span></div>
                         <div class="info-row-mobile"><span class="info-label">Motivo:</span><span class="info-value text-xs">${v.motivoTexto || (v.motivo === 'retiro_equipo_por_baja' ? 'Retiro de equipo por baja' : (v.motivo || '-'))}</span></div>
                         <div class="info-row-mobile"><span class="info-label">Estado:</span><span class="info-value"><span class="status-badge bg-pendiente">PENDIENTE</span></span></div>
                         <div class="action-buttons-mobile">
@@ -1729,12 +1829,13 @@
             const tbody = document.getElementById('visitasTableBody');
             if (tbody) {
                 if (items.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="8" class="text-center py-4 text-gray-500 text-xs">No hay visitas tecnicas finalizadas.</div></td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="9" class="text-center py-4 text-gray-500 text-xs">No hay visitas técnicas finalizadas.</div></td></tr>';
                 } else {
                     tbody.innerHTML = items.slice(0, ITEMS_PER_PAGE).map(v => `<tr>
                         <td><span class="font-medium">${escapeHtml(v.clienteNombre)}</span></div></td>
                         <td>${escapeHtml(v.clienteTelefono)}</div></td>
                         <td class="truncate-text">${escapeHtml(v.direccion)}</div></td>
+                        </table>${escapeHtml(v.zona || v.centroOp || '-')}</div></td>
                         <td>${v.tecnicoNombre || 'No asignado'}</div></td>
                         <td>${v.fechaVisita || '-'} ${v.horaVisita || ''}</div></td>
                         <td>${v.fechaCompletado ? new Date(v.fechaCompletado).toLocaleDateString() : '-'}</div></td>
@@ -1747,13 +1848,14 @@
             const mobileContainer = document.getElementById('visitasMobileList');
             if (mobileContainer) {
                 if (items.length === 0) {
-                    mobileContainer.innerHTML = '<div class="text-center py-4 text-gray-500 text-xs">No hay visitas tecnicas finalizadas.</div>';
+                    mobileContainer.innerHTML = '<div class="text-center py-4 text-gray-500 text-xs">No hay visitas técnicas finalizadas.</div>';
                 } else {
                     mobileContainer.innerHTML = items.slice(0, ITEMS_PER_PAGE).map(v => `<div class="customer-card-mobile">
                         <div class="font-bold text-sm">${escapeHtml(v.clienteNombre)}</div>
-                        <div class="info-row-mobile"><span class="info-label">Telefono:</span><span class="info-value">${escapeHtml(v.clienteTelefono)}</span></div>
-                        <div class="info-row-mobile"><span class="info-label">Direccion:</span><span class="info-value">${escapeHtml(v.direccion)}</span></div>
-                        <div class="info-row-mobile"><span class="info-label">Tecnico:</span><span class="info-value">${v.tecnicoNombre || 'No asignado'}</span></div>
+                        <div class="info-row-mobile"><span class="info-label">Teléfono:</span><span class="info-value">${escapeHtml(v.clienteTelefono)}</span></div>
+                        <div class="info-row-mobile"><span class="info-label">Dirección:</span><span class="info-value">${escapeHtml(v.direccion)}</span></div>
+                        <div class="info-row-mobile"><span class="info-label">Zona:</span><span class="info-value">${escapeHtml(v.zona || v.centroOp || '-')}</span></div>
+                        <div class="info-row-mobile"><span class="info-label">Técnico:</span><span class="info-value">${v.tecnicoNombre || 'No asignado'}</span></div>
                         <div class="info-row-mobile"><span class="info-label">Fecha/Hora:</span><span class="info-value">${v.fechaVisita || '-'} ${v.horaVisita || ''}</span></div>
                         <div class="info-row-mobile"><span class="info-label">Completado por:</span><span class="info-value">${v.completadoPor || v.agente || '-'}</span></div>
                         <div class="info-row-mobile"><span class="info-label">Estado:</span><span class="info-value"><span class="status-badge bg-recuperado">EQUIPO RETIRADO</span></span></div>
@@ -1765,7 +1867,7 @@
         function renderTechniciansList() {
             const container = document.getElementById('techniciansList');
             if (!container) return;
-            if (technicians.length === 0) { container.innerHTML = '<div class="text-center py-2 text-gray-500 text-xs">Sin tecnicos registrados</div>'; return; }
+            if (technicians.length === 0) { container.innerHTML = '<div class="text-center py-2 text-gray-500 text-xs">Sin técnicos registrados</div>'; return; }
             container.innerHTML = technicians.map(t => `<div class="flex justify-between items-center p-2 border rounded text-xs">
                 <div><div class="font-medium">${escapeHtml(t.nombre)}</div><div class="text-gray-500">${escapeHtml(t.co)} | ${escapeHtml(t.telefono)}</div></div>
                 <button onclick="deleteTechnician('${t.id}')" class="text-red-500 hover:text-red-700"><i class="fas fa-trash-alt"></i></button>
@@ -1817,7 +1919,16 @@
                               log.resultado === 'dado_baja' ? 'DADO DE BAJA' :
                               log.resultado === 'no_contacto' ? 'SIN CONTACTO' :
                               log.resultado === 'promesa_pago' ? 'PROMESA DE PAGO' :
-                              log.resultado === 'visita_tecnica' ? 'VISITA PROGRAMADA' : log.resultado,
+                              log.resultado === 'visita_tecnica' ? 'VISITA PROGRAMADA' :
+                              log.resultado === 'no_aplica' ? 'NO APLICA' :
+                              log.resultado === 'abonado_hfc' ? 'ABONADO HFC' :
+                              log.resultado === 'extravio_equipos' ? 'EXTRAVÍO DE EQUIPOS' :
+                              log.resultado === 'ab_ocupado' ? 'AB OCUPADO' :
+                              log.resultado === 'ab_conectado_solvente' ? 'AB CONECTADO / SOLVENTE' :
+                              log.resultado === 'baja_procesada_oficina' ? 'BAJA PROCESADA - ENTREGÓ EQUIPOS EN OFC' :
+                              log.resultado === 'venta_inmueble' ? 'VENTA DE INMUEBLE - SIN ACCESO A EQUIPOS' :
+                              log.resultado === 'numero_desconocido' ? 'NÚMERO DESCONOCIDO - NO ES EL TITULAR' :
+                              (log.resultado || '').toUpperCase(),
                     telefono: log.telefono,
                     plan: log.plan,
                     co: log.centroOp
@@ -1830,7 +1941,7 @@
                     agente: r.agente,
                     agenteId: r.agenteId,
                     cliente: r.nombre,
-                    tipo: 'Reconexion',
+                    tipo: 'Reconexión',
                     resultado: 'RECUPERADO',
                     telefono: r.telefono,
                     plan: r.plan,
@@ -1862,7 +1973,7 @@
                     agenteId: v.agenteId,
                     cliente: v.clienteNombre,
                     tipo: 'Visita Programada',
-                    resultado: v.tipoVisita === 'retiro_equipo' ? 'RETIRO EQUIPO - PENDIENTE' : 'PENDIENTE',
+                    resultado: `${v.fechaVisita || 'Sin fecha'} ${v.horaVisita || ''} - ${v.tecnicoNombre || 'Sin técnico'}`,
                     telefono: v.clienteTelefono,
                     plan: v.plan || '-',
                     co: v.centroOp || '-'
@@ -1934,7 +2045,7 @@
                 return;
             }
             const registros = getHistorialRegistros();
-            const data = [['Fecha', 'Agente', 'Cliente', 'Tipo Gestion', 'Resultado', 'Telefono', 'Plan', 'CO']];
+            const data = [['Fecha', 'Agente', 'Cliente', 'Tipo Gestión', 'Resultado', 'Teléfono', 'Plan', 'CO']];
             registros.forEach(r => {
                 data.push([
                     new Date(r.fecha).toLocaleString(),
@@ -1949,7 +2060,7 @@
             });
             const ws = XLSX.utils.aoa_to_sheet(data);
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'Historial_Gestion');
+            XLSX.utils.book_append_sheet(wb, ws, 'Historial_Gestión');
             XLSX.writeFile(wb, `historial_gestion_${new Date().toISOString().split('T')[0]}.xlsx`);
             showToast('Exportado a Excel');
         }
@@ -1966,7 +2077,7 @@
             
             doc.setFontSize(16);
             doc.setFont(undefined, 'bold');
-            doc.text('Historial de Gestion por Agente - OCAD Inter', 14, 20);
+            doc.text('Historial de Gestión por Agente - OCAD Inter', 14, 20);
             
             doc.setFontSize(10);
             doc.setFont(undefined, 'normal');
@@ -2002,7 +2113,7 @@
             
             doc.autoTable({
                 startY: 62,
-                head: [['Fecha', 'Agente', 'Cliente', 'Tipo', 'Resultado', 'Telefono', 'Plan', 'CO']],
+                head: [['Fecha', 'Agente', 'Cliente', 'Tipo', 'Resultado', 'Teléfono', 'Plan', 'CO']],
                 body: tableData,
                 theme: 'striped',
                 headStyles: { fillColor: [79, 70, 229], textColor: [255, 255, 255], fontStyle: 'bold' },
@@ -2023,7 +2134,7 @@
             const finalY = doc.lastAutoTable.finalY + 10;
             doc.setFontSize(8);
             doc.setTextColor(150, 150, 150);
-            doc.text('Reporte generado por sistema OCAD Inter - Gestion de Recupero', 14, finalY);
+            doc.text('Reporte generado por sistema OCAD Inter - Gestión de Recupero', 14, finalY);
             
             doc.save(`historial_gestion_${new Date().toISOString().split('T')[0]}.pdf`);
             showToast('Exportado a PDF');
@@ -2032,8 +2143,8 @@
         // ==================== EXPORTACIONES ====================
         function exportRezagadosToExcel() {
             const items = getFilteredRezagados();
-            const data = [['ID', 'Nombre', 'Documento', 'Telefono', 'Plan', 'CO', 'Fecha Corte', 'Estado', 'Direccion']];
-            items.forEach(c => data.push([c.identificador || c.id, c.nombre, c.documento, c.telefono1, c.plan, c.centroOp, c.fechaCorte, c.estado, c.direccion]));
+            const data = [['ID', 'Nombre', 'Documento', 'Teléfono', 'Plan', 'CO', 'Fecha Corte', 'Estado', 'Dirección', 'Zona']];
+            items.forEach(c => data.push([c.identificador || c.id, c.nombre, c.documento, c.telefono1, c.plan, c.centroOp, c.fechaCorte, c.estado, c.direccion || 'No registrada', c.centroOp]));
             const ws = XLSX.utils.aoa_to_sheet(data);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'Rezagados');
@@ -2043,8 +2154,8 @@
         
         function exportPerdidosToExcel() {
             const items = getFilteredPerdidos();
-            const data = [['ID', 'Nombre', 'Documento', 'Telefono', 'Plan', 'CO', 'Fecha Corte', 'Estado', 'Direccion']];
-            items.forEach(c => data.push([c.identificador || c.id, c.nombre, c.documento, c.telefono1, c.plan, c.centroOp, c.fechaCorte, c.estado, c.direccion]));
+            const data = [['ID', 'Nombre', 'Documento', 'Teléfono', 'Plan', 'CO', 'Fecha Corte', 'Estado', 'Dirección', 'Zona']];
+            items.forEach(c => data.push([c.identificador || c.id, c.nombre, c.documento, c.telefono1, c.plan, c.centroOp, c.fechaCorte, c.estado, c.direccion || 'No registrada', c.centroOp]));
             const ws = XLSX.utils.aoa_to_sheet(data);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'Perdidos');
@@ -2053,8 +2164,8 @@
         }
         
         function exportEquiposToExcel() {
-            const data = [['Cliente', 'Telefono', 'Direccion', 'Tecnico', 'Fecha Programada', 'Motivo', 'Estado']];
-            visitasTecnicas.filter(v => v.estado !== 'completada').forEach(v => data.push([v.clienteNombre, v.clienteTelefono, v.direccion, v.tecnicoNombre || 'No asignado', v.fechaVisita || '-', v.motivoTexto || 'Retiro de equipo', 'PENDIENTE']));
+            const data = [['Cliente', 'Teléfono', 'Dirección', 'Zona/CO', 'Técnico', 'Fecha Programada', 'Hora', 'Motivo', 'Estado']];
+            visitasTecnicas.filter(v => v.estado !== 'completada').forEach(v => data.push([v.clienteNombre, v.clienteTelefono, v.direccion, v.zona || v.centroOp || '-', v.tecnicoNombre || 'No asignado', v.fechaVisita || '-', v.horaVisita || '-', v.motivoTexto || 'Retiro de equipo', 'PENDIENTE']));
             const ws = XLSX.utils.aoa_to_sheet(data);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'VisitasPendientes');
@@ -2063,8 +2174,8 @@
         }
         
         function exportVisitasToExcel() {
-            const data = [['Cliente', 'Telefono', 'Direccion', 'Tecnico', 'Fecha Programada', 'Fecha Completado', 'Completado por', 'Estado']];
-            visitasFinalizadas.forEach(v => data.push([v.clienteNombre, v.clienteTelefono, v.direccion, v.tecnicoNombre || 'No asignado', v.fechaVisita || '-', v.fechaCompletado ? new Date(v.fechaCompletado).toLocaleDateString() : '-', v.completadoPor || v.agente || '-', 'EQUIPO RETIRADO']));
+            const data = [['Cliente', 'Teléfono', 'Dirección', 'Zona/CO', 'Técnico', 'Fecha Programada', 'Hora', 'Fecha Completado', 'Completado por', 'Estado']];
+            visitasFinalizadas.forEach(v => data.push([v.clienteNombre, v.clienteTelefono, v.direccion, v.zona || v.centroOp || '-', v.tecnicoNombre || 'No asignado', v.fechaVisita || '-', v.horaVisita || '-', v.fechaCompletado ? new Date(v.fechaCompletado).toLocaleDateString() : '-', v.completadoPor || v.agente || '-', 'EQUIPO RETIRADO']));
             const ws = XLSX.utils.aoa_to_sheet(data);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'VisitasFinalizadas');
@@ -2072,7 +2183,7 @@
             showToast('Exportado');
         }
 
-        // ==================== REPORTE PDF DIARIO CORREGIDO (SIN EMOJIS) ====================
+        // ==================== REPORTE PDF DIARIO ====================
         async function generateDailyReport() {
             if (!puedeGenerarReportes()) {
                 showToast('No tiene permisos para generar reportes. Solo Administrador y Marina M pueden.', 'error');
@@ -2088,7 +2199,6 @@
             const fechaFin = new Date(fechaObj);
             fechaFin.setHours(23,59,59,999);
             
-            // OBTENER DATOS REALES DEL SISTEMA
             const llamadasHoy = callLogs.filter(c => {
                 if (!c.fechaGestion) return false;
                 const fechaLog = new Date(c.fechaGestion);
@@ -2119,22 +2229,30 @@
                 dado_baja: llamadasHoy.filter(l => l.resultado === 'dado_baja').length,
                 no_contacto: llamadasHoy.filter(l => l.resultado === 'no_contacto').length,
                 promesa_pago: llamadasHoy.filter(l => l.resultado === 'promesa_pago').length,
-                visita_tecnica: llamadasHoy.filter(l => l.resultado === 'visita_tecnica').length
+                visita_tecnica: llamadasHoy.filter(l => l.resultado === 'visita_tecnica').length,
+                no_aplica: llamadasHoy.filter(l => l.resultado === 'no_aplica').length,
+                abonado_hfc: llamadasHoy.filter(l => l.resultado === 'abonado_hfc').length,
+                extravio_equipos: llamadasHoy.filter(l => l.resultado === 'extravio_equipos').length,
+                ab_ocupado: llamadasHoy.filter(l => l.resultado === 'ab_ocupado').length,
+                ab_conectado_solvente: llamadasHoy.filter(l => l.resultado === 'ab_conectado_solvente').length,
+                baja_procesada_oficina: llamadasHoy.filter(l => l.resultado === 'baja_procesada_oficina').length,
+                venta_inmueble: llamadasHoy.filter(l => l.resultado === 'venta_inmueble').length,
+                numero_desconocido: llamadasHoy.filter(l => l.resultado === 'numero_desconocido').length
             };
             
-            // Estadisticas por agente
             const agentStats = new Map();
             llamadasHoy.forEach(l => {
-                if (!agentStats.has(l.agente)) agentStats.set(l.agente, { llamadas: 0, recuperados: 0, bajas: 0 });
+                if (!agentStats.has(l.agente)) agentStats.set(l.agente, { llamadas: 0, recuperados: 0, bajas: 0, sinContacto: 0 });
                 const stats = agentStats.get(l.agente);
                 stats.llamadas++;
                 if (l.resultado === 'recuperado') stats.recuperados++;
                 if (l.resultado === 'dado_baja') stats.bajas++;
+                if (l.resultado === 'no_contacto') stats.sinContacto++;
             });
             
             recuperadosHoy.forEach(r => {
                 if (r.agente && !agentStats.has(r.agente)) {
-                    agentStats.set(r.agente, { llamadas: 0, recuperados: 0, bajas: 0 });
+                    agentStats.set(r.agente, { llamadas: 0, recuperados: 0, bajas: 0, sinContacto: 0 });
                 }
                 if (r.agente) {
                     const stats = agentStats.get(r.agente);
@@ -2144,7 +2262,7 @@
             
             perdidosHoy.forEach(p => {
                 if (p.agente && !agentStats.has(p.agente)) {
-                    agentStats.set(p.agente, { llamadas: 0, recuperados: 0, bajas: 0 });
+                    agentStats.set(p.agente, { llamadas: 0, recuperados: 0, bajas: 0, sinContacto: 0 });
                 }
                 if (p.agente) {
                     const stats = agentStats.get(p.agente);
@@ -2152,18 +2270,15 @@
                 }
             });
             
-            // Generar PDF
             doc.setFontSize(16);
             doc.setFont(undefined, 'bold');
-            doc.text('Reporte de Gestion Diario - OCAD Inter', 14, 20);
+            doc.text('Reporte de Gestión Diario - OCAD Inter', 14, 20);
             doc.setFontSize(10);
             doc.setFont(undefined, 'normal');
             doc.text('Fecha: ' + fecha, 14, 32);
-            doc.text('Hora generacion: ' + new Date().toLocaleTimeString(), 14, 38);
+            doc.text('Hora generación: ' + new Date().toLocaleTimeString(), 14, 38);
             
             let generadoPor = appCurrentUser?.fullName || 'Sistema';
-            if (generadoPor === 'Marina M') generadoPor = 'Marina M';
-            if (generadoPor === 'Administrador') generadoPor = 'Administrador';
             doc.text('Generado por: ' + generadoPor, 14, 44);
             
             doc.setDrawColor(200, 200, 200);
@@ -2171,41 +2286,45 @@
             
             doc.setFontSize(12);
             doc.setFont(undefined, 'bold');
-            doc.text('RESUMEN GENERAL DE GESTION', 14, 60);
+            doc.text('RESUMEN GENERAL DE GESTIÓN', 14, 60);
             doc.setFontSize(10);
             doc.setFont(undefined, 'normal');
             doc.text('* Total de llamadas realizadas: ' + llamadasHoy.length, 20, 70);
             doc.text('* Clientes reconectados: ' + recuperadosHoy.length, 20, 78);
             doc.text('* Clientes dados de baja: ' + perdidosHoy.length, 20, 86);
-            doc.text('* Visitas tecnicas programadas para hoy: ' + visitasProgramadasHoy.length, 20, 94);
+            doc.text('* Visitas técnicas programadas para hoy: ' + visitasProgramadasHoy.length, 20, 94);
             doc.text('* Visitas completadas (equipos retirados): ' + visitasCompletadasHoy.length, 20, 102);
             doc.text('* Visitas pendientes totales: ' + visitasPendientesTotal, 20, 110);
             
             doc.line(14, 116, 196, 116);
             
-            if (llamadasHoy.length > 0 || recuperadosHoy.length > 0 || perdidosHoy.length > 0) {
-                doc.setFontSize(12);
-                doc.setFont(undefined, 'bold');
-                doc.text('DETALLE DE GESTION POR RESULTADO', 14, 128);
-                
-                const totalLlamadas = llamadasHoy.length;
-                doc.autoTable({
-                    startY: 134,
-                    head: [['Resultado', 'Cantidad', 'Porcentaje']],
-                    body: [
-                        ['Reconectados', llamadasPorResultado.recuperado.toString(), (totalLlamadas > 0 ? Math.round((llamadasPorResultado.recuperado / totalLlamadas) * 100) : 0) + '%'],
-                        ['Dados de baja', llamadasPorResultado.dado_baja.toString(), (totalLlamadas > 0 ? Math.round((llamadasPorResultado.dado_baja / totalLlamadas) * 100) : 0) + '%'],
-                        ['Sin contacto', llamadasPorResultado.no_contacto.toString(), (totalLlamadas > 0 ? Math.round((llamadasPorResultado.no_contacto / totalLlamadas) * 100) : 0) + '%'],
-                        ['Promesas de pago', llamadasPorResultado.promesa_pago.toString(), (totalLlamadas > 0 ? Math.round((llamadasPorResultado.promesa_pago / totalLlamadas) * 100) : 0) + '%'],
-                        ['Visitas programadas', llamadasPorResultado.visita_tecnica.toString(), (totalLlamadas > 0 ? Math.round((llamadasPorResultado.visita_tecnica / totalLlamadas) * 100) : 0) + '%']
-                    ],
-                    theme: 'striped',
-                    headStyles: { fillColor: [79, 70, 229], textColor: [255, 255, 255], fontStyle: 'bold' },
-                    bodyStyles: { fontSize: 9 },
-                    columnStyles: { 0: { cellWidth: 60 }, 1: { cellWidth: 30, halign: 'center' }, 2: { cellWidth: 30, halign: 'center' } },
-                    margin: { left: 14 }
-                });
-            }
+            const totalLlamadas = llamadasHoy.length;
+            const resultadosData = [
+                ['Reconectados', llamadasPorResultado.recuperado.toString(), (totalLlamadas > 0 ? Math.round((llamadasPorResultado.recuperado / totalLlamadas) * 100) : 0) + '%'],
+                ['Dados de baja', llamadasPorResultado.dado_baja.toString(), (totalLlamadas > 0 ? Math.round((llamadasPorResultado.dado_baja / totalLlamadas) * 100) : 0) + '%'],
+                ['Sin contacto', llamadasPorResultado.no_contacto.toString(), (totalLlamadas > 0 ? Math.round((llamadasPorResultado.no_contacto / totalLlamadas) * 100) : 0) + '%'],
+                ['Promesas de pago', llamadasPorResultado.promesa_pago.toString(), (totalLlamadas > 0 ? Math.round((llamadasPorResultado.promesa_pago / totalLlamadas) * 100) : 0) + '%'],
+                ['Visitas programadas', llamadasPorResultado.visita_tecnica.toString(), (totalLlamadas > 0 ? Math.round((llamadasPorResultado.visita_tecnica / totalLlamadas) * 100) : 0) + '%'],
+                ['No aplica', llamadasPorResultado.no_aplica.toString(), (totalLlamadas > 0 ? Math.round((llamadasPorResultado.no_aplica / totalLlamadas) * 100) : 0) + '%'],
+                ['Abonado HFC', llamadasPorResultado.abonado_hfc.toString(), (totalLlamadas > 0 ? Math.round((llamadasPorResultado.abonado_hfc / totalLlamadas) * 100) : 0) + '%'],
+                ['Extravío de equipos', llamadasPorResultado.extravio_equipos.toString(), (totalLlamadas > 0 ? Math.round((llamadasPorResultado.extravio_equipos / totalLlamadas) * 100) : 0) + '%'],
+                ['AB ocupado', llamadasPorResultado.ab_ocupado.toString(), (totalLlamadas > 0 ? Math.round((llamadasPorResultado.ab_ocupado / totalLlamadas) * 100) : 0) + '%'],
+                ['AB solvente', llamadasPorResultado.ab_conectado_solvente.toString(), (totalLlamadas > 0 ? Math.round((llamadasPorResultado.ab_conectado_solvente / totalLlamadas) * 100) : 0) + '%'],
+                ['Baja procesada oficina', llamadasPorResultado.baja_procesada_oficina.toString(), (totalLlamadas > 0 ? Math.round((llamadasPorResultado.baja_procesada_oficina / totalLlamadas) * 100) : 0) + '%'],
+                ['Venta de inmueble', llamadasPorResultado.venta_inmueble.toString(), (totalLlamadas > 0 ? Math.round((llamadasPorResultado.venta_inmueble / totalLlamadas) * 100) : 0) + '%'],
+                ['Número desconocido', llamadasPorResultado.numero_desconocido.toString(), (totalLlamadas > 0 ? Math.round((llamadasPorResultado.numero_desconocido / totalLlamadas) * 100) : 0) + '%']
+            ];
+            
+            doc.autoTable({
+                startY: 122,
+                head: [['Resultado', 'Cantidad', 'Porcentaje']],
+                body: resultadosData,
+                theme: 'striped',
+                headStyles: { fillColor: [79, 70, 229], textColor: [255, 255, 255], fontStyle: 'bold' },
+                bodyStyles: { fontSize: 9 },
+                columnStyles: { 0: { cellWidth: 70 }, 1: { cellWidth: 30, halign: 'center' }, 2: { cellWidth: 30, halign: 'center' } },
+                margin: { left: 14 }
+            });
             
             let yPos = doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : 140;
             
@@ -2213,17 +2332,16 @@
                 if (yPos > 250) { doc.addPage(); yPos = 20; }
                 doc.setFontSize(11);
                 doc.setFont(undefined, 'bold');
-                doc.text('ESTADISTICAS POR AGENTE', 14, yPos);
+                doc.text('ESTADÍSTICAS POR AGENTE', 14, yPos);
                 
                 const agentData = Array.from(agentStats.entries()).map(([agente, stats]) => {
                     let nombreAgente = agente;
-                    if (nombreAgente === 'Marina M') nombreAgente = 'Marina M';
-                    return [nombreAgente.substring(0, 25), stats.llamadas.toString(), stats.recuperados.toString(), stats.bajas.toString(), (stats.llamadas > 0 ? Math.round((stats.recuperados / stats.llamadas) * 100) : stats.recuperados > 0 ? 100 : 0) + '%'];
+                    return [nombreAgente.substring(0, 25), stats.llamadas.toString(), stats.recuperados.toString(), stats.bajas.toString(), stats.sinContacto.toString(), (stats.llamadas > 0 ? Math.round((stats.recuperados / stats.llamadas) * 100) : stats.recuperados > 0 ? 100 : 0) + '%'];
                 });
                 
                 doc.autoTable({
                     startY: yPos + 4,
-                    head: [['Agente', 'Llamadas', 'Reconectados', 'Bajas', 'Efectividad']],
+                    head: [['Agente', 'Llamadas', 'Reconectados', 'Bajas', 'Sin Contacto', 'Efectividad']],
                     body: agentData,
                     theme: 'striped',
                     headStyles: { fillColor: [100, 100, 100], textColor: [255, 255, 255], fontStyle: 'bold' },
@@ -2244,12 +2362,14 @@
                     (r.nombre || '').substring(0, 30),
                     r.telefono || '-',
                     r.plan || '-',
+                    r.direccion ? r.direccion.substring(0, 40) : '-',
+                    r.centroOp || '-',
                     r.agente || '-'
                 ]);
                 
                 doc.autoTable({
                     startY: yPos + 4,
-                    head: [['ID', 'Cliente', 'Telefono', 'Plan', 'Agente']],
+                    head: [['ID', 'Cliente', 'Teléfono', 'Plan', 'Dirección', 'Zona', 'Agente']],
                     body: reconectadosData,
                     theme: 'striped',
                     headStyles: { fillColor: [16, 185, 129], textColor: [255, 255, 255], fontStyle: 'bold' },
@@ -2270,13 +2390,15 @@
                     (p.nombre || '').substring(0, 30),
                     p.telefono || '-',
                     p.plan || '-',
+                    p.direccion ? p.direccion.substring(0, 40) : '-',
+                    p.centroOp || '-',
                     p.motivoBaja === 'price' ? 'Precio' : p.motivoBaja === 'service_issues' ? 'Problemas servicio' : p.motivoBaja === 'relocation' ? 'Mudanza' : p.motivoBaja === 'deceased' ? 'Fallecimiento' : (p.motivoBaja || '-'),
                     p.agente || '-'
                 ]);
                 
                 doc.autoTable({
                     startY: yPos + 4,
-                    head: [['ID', 'Cliente', 'Telefono', 'Plan', 'Motivo', 'Agente']],
+                    head: [['ID', 'Cliente', 'Teléfono', 'Plan', 'Dirección', 'Zona', 'Motivo', 'Agente']],
                     body: bajasData,
                     theme: 'striped',
                     headStyles: { fillColor: [239, 68, 68], textColor: [255, 255, 255], fontStyle: 'bold' },
@@ -2296,13 +2418,14 @@
                     (v.clienteNombre || '').substring(0, 30),
                     v.clienteTelefono || '-',
                     (v.direccion || '').substring(0, 35),
+                    v.zona || v.centroOp || '-',
                     v.tecnicoNombre || '-',
                     v.completadoPor || v.agente || '-'
                 ]);
                 
                 doc.autoTable({
                     startY: yPos + 4,
-                    head: [['Cliente', 'Telefono', 'Direccion', 'Tecnico', 'Completado por']],
+                    head: [['Cliente', 'Teléfono', 'Dirección', 'Zona', 'Técnico', 'Completado por']],
                     body: equiposData,
                     theme: 'striped',
                     headStyles: { fillColor: [79, 70, 229], textColor: [255, 255, 255], fontStyle: 'bold' },
@@ -2322,7 +2445,7 @@
             doc.text('RESUMEN FINAL:', 14, yPos);
             doc.setFont(undefined, 'normal');
             doc.text('* Total clientes gestionados: ' + llamadasHoy.length, 14, yPos + 8);
-            doc.text('* Tasa de reconexion: ' + (llamadasHoy.length > 0 ? Math.round((recuperadosHoy.length / llamadasHoy.length) * 100) : (recuperadosHoy.length > 0 ? 100 : 0)) + '%', 14, yPos + 14);
+            doc.text('* Tasa de reconexión: ' + (llamadasHoy.length > 0 ? Math.round((recuperadosHoy.length / llamadasHoy.length) * 100) : (recuperadosHoy.length > 0 ? 100 : 0)) + '%', 14, yPos + 14);
             doc.text('* Tasa de bajas: ' + (llamadasHoy.length > 0 ? Math.round((perdidosHoy.length / llamadasHoy.length) * 100) : 0) + '%', 14, yPos + 20);
             doc.text('* Visitas de retiro pendientes: ' + visitasPendientesTotal, 14, yPos + 26);
             doc.text('* Total equipos retirados hasta la fecha: ' + visitasFinalizadas.length, 14, yPos + 32);
@@ -2336,7 +2459,7 @@
             
             doc.setFontSize(8);
             doc.setTextColor(150, 150, 150);
-            doc.text('Reporte generado por sistema OCAD Inter - Gestion de Recupero - ' + new Date().toLocaleString(), 14, yPos + 72);
+            doc.text('Reporte generado por sistema OCAD Inter - Gestión de Recupero - ' + new Date().toLocaleString(), 14, yPos + 72);
             
             const nombreArchivo = `reporte_gestion_${fecha}_${new Date().toLocaleTimeString().replace(/:/g, '-')}.pdf`;
             doc.save(nombreArchivo);
@@ -2401,7 +2524,7 @@
         }
 
         // ==================== ELIMINACIONES ====================
-        async function deleteAllTechnicians() { if (!puedeEliminarDatos()) { showToast('No tiene permisos para eliminar datos', 'error'); return; } if (confirm('Eliminar todos los tecnicos?')) { const snap = await colecciones.technicians.get(); const batch = db.batch(); snap.forEach(doc => batch.delete(doc.ref)); await batch.commit(); showToast('Tecnicos eliminados'); } }
+        async function deleteAllTechnicians() { if (!puedeEliminarDatos()) { showToast('No tiene permisos para eliminar datos', 'error'); return; } if (confirm('Eliminar todos los técnicos?')) { const snap = await colecciones.technicians.get(); const batch = db.batch(); snap.forEach(doc => batch.delete(doc.ref)); await batch.commit(); showToast('Técnicos eliminados'); } }
         async function deleteAllRezagados() { if (!puedeEliminarDatos()) { showToast('No tiene permisos para eliminar datos', 'error'); return; } if (confirm('Eliminar todos los rezagados?')) { const snap = await colecciones.rezagados.get(); const batch = db.batch(); snap.forEach(doc => batch.delete(doc.ref)); await batch.commit(); showToast('Rezagados eliminados'); } }
         async function deleteAllPerdidos() { if (!puedeEliminarDatos()) { showToast('No tiene permisos para eliminar datos', 'error'); return; } if (confirm('Eliminar todos los perdidos?')) { const snap = await colecciones.perdidos.get(); const batch = db.batch(); snap.forEach(doc => batch.delete(doc.ref)); await batch.commit(); showToast('Perdidos eliminados'); } }
         async function deleteAllRecuperados() { if (!puedeEliminarDatos()) { showToast('No tiene permisos para eliminar datos', 'error'); return; } if (confirm('Eliminar todos los reconectados?')) { const snap = await colecciones.recuperados.get(); const batch = db.batch(); snap.forEach(doc => batch.delete(doc.ref)); await batch.commit(); showToast('Reconectados eliminados'); } }
@@ -2414,7 +2537,7 @@
             const container = document.getElementById('configButtonsContainer');
             if (container) {
                 if (!puedeEliminarDatos()) {
-                    container.innerHTML = `<div class="p-3 text-center text-red-600 bg-red-50 rounded-lg"><i class="fas fa-lock mr-1"></i>No tiene permisos para acceder a esta seccion. Solo Administrador y Marina M pueden realizar limpieza de datos.</div>`;
+                    container.innerHTML = `<div class="p-3 text-center text-red-600 bg-red-50 rounded-lg"><i class="fas fa-lock mr-1"></i>No tiene permisos para acceder a esta sección. Solo Administrador y Marina M pueden realizar limpieza de datos.</div>`;
                 } else {
                     container.innerHTML = `
                         <button onclick="deleteAllRezagados()" class="delete-all-btn bg-amber-600"><i class="fas fa-trash mr-1"></i>Eliminar Rezagados (${clientesRezagados.length})</button>
@@ -2423,7 +2546,7 @@
                         <button onclick="deleteAllPerdidosFinal()" class="delete-all-btn bg-red-600"><i class="fas fa-trash mr-1"></i>Eliminar Dados de Baja (${clientesPerdidosFinal.length})</button>
                         <button onclick="deleteAllEquiposVisitas()" class="delete-all-btn bg-purple-600"><i class="fas fa-trash mr-1"></i>Eliminar Visitas Pendientes (${visitasTecnicas.length})</button>
                         <button onclick="deleteAllVisitasFinalizadas()" class="delete-all-btn bg-blue-600"><i class="fas fa-trash mr-1"></i>Eliminar Visitas Finalizadas (${visitasFinalizadas.length})</button>
-                        <button onclick="deleteAllTechnicians()" class="delete-all-btn bg-gray-600"><i class="fas fa-trash mr-1"></i>Eliminar Tecnicos (${technicians.length})</button>
+                        <button onclick="deleteAllTechnicians()" class="delete-all-btn bg-gray-600"><i class="fas fa-trash mr-1"></i>Eliminar Técnicos (${technicians.length})</button>
                         <div class="border-t my-1"></div>
                         <button onclick="deleteAllData()" class="delete-all-btn bg-red-900"><i class="fas fa-database mr-1"></i>ELIMINAR TODOS LOS DATOS</button>
                     `;
@@ -2498,7 +2621,7 @@
                 return;
             }
             if (tabName === 'config' && !puedeEliminarDatos()) {
-                showToast('No tiene permisos para acceder a configuracion', 'error');
+                showToast('No tiene permisos para acceder a configuración', 'error');
                 return;
             }
             
@@ -2535,7 +2658,7 @@
             const password = document.getElementById('loginPassword').value;
             const user = appUsers.find(u => u.id === userId);
             if (!userId || !user) { 
-                document.getElementById('loginError').textContent = 'Perfil invalido'; 
+                document.getElementById('loginError').textContent = 'Perfil inválido'; 
                 document.getElementById('loginError').classList.remove('hidden');
                 return; 
             }
@@ -2581,7 +2704,7 @@
         document.getElementById('completeOrderBtn')?.addEventListener('click', completeOrder);
         document.getElementById('callResult')?.addEventListener('change', (e) => {
             document.getElementById('bajaReasonDiv').classList.toggle('hidden', e.target.value !== 'dado_baja');
-            document.getElementById('visitaFields').classList.toggle('hidden', e.target.value !== 'visita_tecnica');
+            document.getElementById('visitaFields').classList.toggle('hidden', e.target.value !== 'visita_tecnica' && e.target.value !== 'dado_baja');
         });
         
         document.getElementById('loginPassword')?.addEventListener('keypress', (e) => { if (e.key === 'Enter') doLogin(); });

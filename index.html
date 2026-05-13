@@ -92,8 +92,10 @@
         .completar-btn { background: #10b981; color: white; padding: 4px 8px; border-radius: 6px; font-size: 10px; cursor: pointer; border: none; }
         .completar-btn:hover { background: #059669; }
         .completar-btn-disabled { background: #9ca3af; color: white; padding: 4px 8px; border-radius: 6px; font-size: 10px; border: none; cursor: not-allowed; }
-        .datetime-picker { display: flex; gap: 8px; flex-wrap: wrap; }
-        .datetime-picker input, .datetime-picker select { flex: 1; min-width: 120px; }
+        .historial-search-bar { background: #f9fafb; border-radius: 12px; padding: 12px; margin-bottom: 12px; border: 1px solid #e5e7eb; }
+        .historial-stats { background: #f0fdf4; border-radius: 8px; padding: 8px; margin-bottom: 12px; border-left: 3px solid #10b981; }
+        .fa-spin { animation: spin 1s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="bg-gray-100 font-sans">
@@ -118,17 +120,17 @@
                 <label class="block text-sm font-medium text-gray-700 mb-1">Seleccione su perfil</label>
                 <select id="loginUserSelect" class="w-full border rounded-lg px-3 py-2 mb-3 text-sm" required>
                     <option value="">-- Seleccionar perfil --</option>
-                    <option value="marina"> Marina M</option>
-                    <option value="yuraza"> Yuraza R</option>
-                    <option value="samira"> Samira M</option>
-                    <option value="ivette"> Ivette A</option>
-                    <option value="genesis"> Genesis U</option>
-                    <option value="alexa"> Alexa B</option>
-                    <option value="edgar"> Edgar R</option>
-                    <option value="karla"> Karla E</option>
-                    <option value="agente1"> Agente 1</option>
-                    <option value="agente2"> Agente 2</option>
-                    <option value="admin"> Administrador</option>
+                    <option value="marina">Marina M</option>
+                    <option value="yuraza">Yuraza R</option>
+                    <option value="samira">Samira M</option>
+                    <option value="ivette">Ivette A</option>
+                    <option value="genesis">Genesis U</option>
+                    <option value="alexa">Alexa B</option>
+                    <option value="edgar">Edgar R</option>
+                    <option value="karla">Karla E</option>
+                    <option value="agente1">Agente 1</option>
+                    <option value="agente2">Agente 2</option>
+                    <option value="admin">Administrador</option>
                 </select>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
                 <input type="password" id="loginPassword" placeholder="Ingrese su contraseña" class="w-full border rounded-lg px-3 py-2 mb-3 text-sm" required>
@@ -175,7 +177,7 @@
                     <li class="mr-1"><button onclick="showTab('equipos')" id="tab-equipos-btn" class="tab-btn inline-block px-3 py-2 border-b-2 rounded-t-lg tab-inactive"><i class="fas fa-wrench mr-1"></i>Visita técnica Pendiente</button></li>
                     <li class="mr-1"><button onclick="showTab('visitas')" id="tab-visitas-btn" class="tab-btn inline-block px-3 py-2 border-b-2 rounded-t-lg tab-inactive"><i class="fas fa-calendar-check mr-1"></i>Visita técnica Finalizada</button></li>
                     <li class="mr-1"><button onclick="showTab('tecnicos')" id="tab-tecnicos-btn" class="tab-btn inline-block px-3 py-2 border-b-2 rounded-t-lg tab-inactive"><i class="fas fa-users mr-1"></i>Técnicos</button></li>
-                    <li class="mr-1" id="historialTabItem"><button onclick="showTab('historial')" id="tab-historial-btn" class="tab-btn inline-block px-3 py-2 border-b-2 rounded-t-lg tab-inactive"><i class="fas fa-history mr-1"></i>Historial por Agente</button></li>
+                    <li class="mr-1" id="historialTabItem"><button onclick="showTab('historial')" id="tab-historial-btn" class="tab-btn inline-block px-3 py-2 border-b-2 rounded-t-lg tab-inactive"><i class="fas fa-history mr-1"></i>Historial General</button></li>
                     <li class="mr-1"><button onclick="showTab('importar')" id="tab-importar-btn" class="tab-btn inline-block px-3 py-2 border-b-2 rounded-t-lg tab-inactive"><i class="fas fa-file-import mr-1"></i>Importar</button></li>
                     <li class="mr-1" id="reportesTabItem"><button onclick="showTab('reportes')" id="tab-reportes-btn" class="tab-btn inline-block px-3 py-2 border-b-2 rounded-t-lg tab-inactive"><i class="fas fa-file-pdf mr-1"></i>Reportes</button></li>
                     <li class="mr-1" id="configTabItem"><button onclick="showTab('config')" id="tab-config-btn" class="tab-btn inline-block px-3 py-2 border-b-2 rounded-t-lg tab-inactive"><i class="fas fa-cog mr-1"></i>Config</button></li>
@@ -339,24 +341,53 @@
                 </div>
             </div>
 
-            <!-- Historial por Agente Tab -->
+            <!-- Historial General Tab -->
             <div id="historialTab" class="tab-content hidden">
                 <div class="bg-white rounded-xl shadow-md p-3 mb-3">
-                    <h3 class="font-bold text-sm mb-2"><i class="fas fa-chart-line text-indigo-500 mr-1"></i>Historial de Gestión por Agente</h3>
-                    <div class="filters-grid mb-3">
-                        <select id="filterAgenteHistorial" class="border rounded-lg px-2 py-1 text-xs">
-                            <option value="">Todos los agentes</option>
-                        </select>
-                        <input type="date" id="filterFechaInicio" class="border rounded-lg px-2 py-1 text-xs" placeholder="Fecha inicio">
-                        <input type="date" id="filterFechaFin" class="border rounded-lg px-2 py-1 text-xs" placeholder="Fecha fin">
-                        <button onclick="filtrarHistorial()" class="bg-indigo-600 text-white px-2 py-1 rounded text-xs"><i class="fas fa-search mr-1"></i>Filtrar</button>
-                        <button onclick="exportHistorialToExcel()" class="bg-green-600 text-white px-2 py-1 rounded text-xs"><i class="fas fa-file-excel mr-1"></i>Exportar Excel</button>
-                        <button onclick="exportHistorialToPDF()" class="btn-pdf"><i class="fas fa-file-pdf mr-1"></i>Exportar PDF</button>
+                    <h3 class="font-bold text-sm mb-2"><i class="fas fa-history text-indigo-500 mr-1"></i>Historial General de Gestión</h3>
+                    <p class="text-xs text-gray-500 mb-3">Todos los clientes gestionados (reconectados, dados de baja, con visitas programadas, etc.)</p>
+                    
+                    <div class="historial-search-bar">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-2 mb-2">
+                            <input type="text" id="historialSearchNombre" placeholder="Buscar por nombre..." class="border rounded-lg px-2 py-1 text-xs">
+                            <input type="text" id="historialSearchDocumento" placeholder="Buscar por documento..." class="border rounded-lg px-2 py-1 text-xs">
+                            <input type="text" id="historialSearchTelefono" placeholder="Buscar por teléfono..." class="border rounded-lg px-2 py-1 text-xs">
+                            <input type="text" id="historialSearchId" placeholder="Buscar por ID de cliente..." class="border rounded-lg px-2 py-1 text-xs">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-5 gap-2">
+                            <select id="filterAgenteHistorial" class="border rounded-lg px-2 py-1 text-xs">
+                                <option value="">Todos los agentes</option>
+                            </select>
+                            <select id="filterTipoGestion" class="border rounded-lg px-2 py-1 text-xs">
+                                <option value="">Todos los tipos</option>
+                                <option value="Llamada">Llamada</option>
+                                <option value="Reconexion">Reconexión</option>
+                                <option value="Baja">Baja</option>
+                                <option value="Visita Programada">Visita Programada</option>
+                                <option value="Visita Finalizada">Visita Finalizada</option>
+                            </select>
+                            <input type="date" id="filterFechaInicio" class="border rounded-lg px-2 py-1 text-xs" placeholder="Fecha inicio">
+                            <input type="date" id="filterFechaFin" class="border rounded-lg px-2 py-1 text-xs" placeholder="Fecha fin">
+                            <div class="flex gap-1">
+                                <button onclick="filtrarHistorial()" class="bg-indigo-600 text-white px-2 py-1 rounded text-xs flex-1"><i class="fas fa-search mr-1"></i>Filtrar</button>
+                                <button onclick="limpiarFiltrosHistorial()" class="bg-gray-400 text-white px-2 py-1 rounded text-xs"><i class="fas fa-eraser mr-1"></i>Limpiar</button>
+                            </div>
+                        </div>
                     </div>
+                    
+                    <div class="historial-stats text-xs" id="historialStats">
+                        <span class="font-bold">Estadísticas:</span> Cargando...
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-2 mb-3">
+                        <button onclick="exportHistorialToExcel()" class="bg-green-600 text-white px-2 py-1 rounded text-xs"><i class="fas fa-file-excel mr-1"></i>Exportar Excel</button>
+                        <button onclick="exportHistorialToPDF()" class="btn-pdf text-xs py-1"><i class="fas fa-file-pdf mr-1"></i>Exportar PDF</button>
+                    </div>
+                    
                     <div class="overflow-x-auto">
                         <table class="historial-table" id="historialTable">
                             <thead>
-                                <tr><th>Fecha</th><th>Agente</th><th>Cliente</th><th>Tipo Gestión</th><th>Resultado</th><th>Teléfono</th><th>Plan</th><th>CO</th></tr>
+                                <tr><th>Fecha</th><th>Agente</th><th>Cliente</th><th>ID Cliente</th><th>Documento</th><th>Tipo Gestión</th><th>Resultado</th><th>Teléfono</th><th>Plan</th><th>CO</th></tr>
                             </thead>
                             <tbody id="historialTableBody"></tbody>
                         </table>
@@ -870,6 +901,7 @@
             const registro = {
                 id: Date.now().toString(),
                 clienteId: customer.id,
+                clienteIdOriginal: customer.identificador || customer.id,
                 nombre: customer.nombre,
                 documento: customer.documento,
                 telefono: customer.telefono1,
@@ -887,32 +919,25 @@
             
             await guardarEnFirestore(colecciones.callLogs, registro);
             
-            const resultadoMap = {
-                'recuperado': 'RECUPERADO - Cliente continúa',
-                'dado_baja': 'DADO DE BAJA',
-                'no_contacto': 'Sin contacto',
-                'promesa_pago': 'Promesa de pago',
-                'visita_tecnica': 'Visita programada',
-                'no_aplica': 'No aplica',
-                'abonado_hfc': 'Abonado HFC',
-                'extravio_equipos': 'Extravío de equipos',
-                'ab_ocupado': 'AB ocupado',
-                'ab_conectado_solvente': 'AB conectado / solvente',
-                'baja_procesada_oficina': 'Baja Procesada - entrego equipos en ofc',
-                'venta_inmueble': 'Venta de inmueble - no tiene acceso a los equipos',
-                'numero_desconocido': 'Número desconocido - No es el titular'
-            };
-            
-            const resultadoTexto = resultadoMap[resultado] || resultado;
-            
-            // *** CORRECCIÓN 1: ABONADO SOLVENTE Y NÚMERO DESCONOCIDO - ELIMINAN DE LA LISTA ***
-            const resultadosQueNoEliminan = ['no_contacto', 'promesa_pago', 'visita_tecnica', 'no_aplica', 'abonado_hfc', 'extravio_equipos', 'ab_ocupado', 'baja_procesada_oficina', 'venta_inmueble'];
-            
             if (resultado === 'recuperado') {
-                registro.fechaRecuperacion = fechaGestion;
-                await guardarEnFirestore(colecciones.recuperados, registro);
+                const recuperadoData = {
+                    id: Date.now().toString(),
+                    clienteId: customer.id,
+                    clienteIdOriginal: customer.identificador || customer.id,
+                    nombre: customer.nombre,
+                    documento: customer.documento,
+                    telefono: customer.telefono1,
+                    plan: customer.plan,
+                    direccion: customer.direccion,
+                    centroOp: customer.centroOp,
+                    fechaGestion: fechaGestion,
+                    fechaRecuperacion: fechaGestion,
+                    agente: agente,
+                    agenteId: appCurrentUser.id
+                };
+                await guardarEnFirestore(colecciones.recuperados, recuperadoData);
                 showToast(`Cliente ${customer.nombre} reconectado exitosamente`);
-                // ELIMINAR DE LA LISTA ORIGINAL
+                
                 if (customerType === 'rezagado') {
                     await eliminarDeFirestore(colecciones.rezagados, customer.id);
                 } else if (customerType === 'perdido') {
@@ -920,19 +945,32 @@
                 }
                 
             } else if (resultado === 'dado_baja') {
-                registro.fechaBaja = fechaGestion;
-                registro.motivoBaja = motivoBaja;
-                registro.tipo = 'baja_servicio';
-                await guardarEnFirestore(colecciones.perdidosFinal, registro);
+                const bajaData = {
+                    id: Date.now().toString(),
+                    clienteId: customer.id,
+                    clienteIdOriginal: customer.identificador || customer.id,
+                    nombre: customer.nombre,
+                    documento: customer.documento,
+                    telefono: customer.telefono1,
+                    plan: customer.plan,
+                    direccion: customer.direccion,
+                    centroOp: customer.centroOp,
+                    fechaGestion: fechaGestion,
+                    fechaBaja: fechaGestion,
+                    motivoBaja: motivoBaja,
+                    agente: agente,
+                    agenteId: appCurrentUser.id
+                };
+                await guardarEnFirestore(colecciones.perdidosFinal, bajaData);
                 
-                // Crear visita con fecha y hora seleccionadas por el usuario
                 if (visitaData && visitaData.fecha) {
                     const visitaRetiro = {
                         id: Date.now().toString(),
                         clienteId: customer.id,
+                        clienteIdOriginal: customer.identificador || customer.id,
                         clienteNombre: customer.nombre,
-                        clienteTelefono: customer.telefono1,
                         clienteDocumento: customer.documento,
+                        clienteTelefono: customer.telefono1,
                         direccion: customer.direccion || 'Dirección no registrada',
                         zona: customer.centroOp || 'No especificada',
                         plan: customer.plan,
@@ -943,7 +981,7 @@
                         tecnicoNombre: visitaData.tecnicoNombre || 'Por asignar',
                         fechaVisita: visitaData.fecha,
                         horaVisita: visitaData.hora,
-                        instrucciones: visitaData.instrucciones || `Cliente dado de baja. Motivo: ${motivoBaja === 'price' ? 'Precio' : motivoBaja === 'service_issues' ? 'Problemas servicio' : motivoBaja === 'relocation' ? 'Mudanza' : motivoBaja === 'deceased' ? 'Fallecimiento' : 'Otro'}. Realizar retiro de equipos (ONT, router, cable modem, etc.)`,
+                        instrucciones: visitaData.instrucciones || 'Cliente dado de baja - Realizar retiro de equipos',
                         estado: 'pendiente',
                         tipoVisita: 'retiro_equipo',
                         fechaCreacion: fechaGestion,
@@ -951,11 +989,10 @@
                         agenteId: appCurrentUser.id,
                         observacionesGestion: observaciones
                     };
-                    
                     await guardarEnFirestore(colecciones.visitasTecnicas, visitaRetiro);
-                    showToast(`Cliente ${customer.nombre} dado de baja - Visita para retiro de equipo creada para el ${visitaData.fecha} a las ${visitaData.hora}`);
+                    showToast(`Visita para retiro de equipo creada para ${customer.nombre}`);
                 }
-                // ELIMINAR DE LA LISTA ORIGINAL
+                
                 if (customerType === 'rezagado') {
                     await eliminarDeFirestore(colecciones.rezagados, customer.id);
                 } else if (customerType === 'perdido') {
@@ -963,13 +1000,13 @@
                 }
                 
             } else if (resultado === 'visita_tecnica' && visitaData) {
-                // Crear visita con fecha y hora seleccionadas
                 const visita = {
                     id: Date.now().toString(),
                     clienteId: customer.id,
+                    clienteIdOriginal: customer.identificador || customer.id,
                     clienteNombre: customer.nombre,
-                    clienteTelefono: customer.telefono1,
                     clienteDocumento: customer.documento,
+                    clienteTelefono: customer.telefono1,
                     direccion: customer.direccion || 'Dirección no registrada',
                     zona: customer.centroOp || 'No especificada',
                     motivo: visitaData.motivo,
@@ -987,12 +1024,10 @@
                     centroOp: customer.centroOp
                 };
                 await guardarEnFirestore(colecciones.visitasTecnicas, visita);
-                showToast(`Visita técnica programada para ${customer.nombre} el ${visitaData.fecha} a las ${visitaData.hora}`);
-                // NO ELIMINAMOS AL CLIENTE DE LA LISTA EN VISITA TÉCNICA
+                showToast(`Visita técnica programada para ${customer.nombre}`);
                 
             } else if (resultado === 'ab_conectado_solvente') {
-                // *** CORRECCIÓN 1: Cliente solvente - ELIMINAR DE LA LISTA ***
-                showToast(`Cliente ${customer.nombre} registrado como solvente - eliminado de la lista de gestión`);
+                showToast(`Cliente ${customer.nombre} registrado como solvente - eliminado de la lista`);
                 if (customerType === 'rezagado') {
                     await eliminarDeFirestore(colecciones.rezagados, customer.id);
                 } else if (customerType === 'perdido') {
@@ -1000,20 +1035,27 @@
                 }
                 
             } else if (resultado === 'numero_desconocido') {
-                // *** CORRECCIÓN 4: Número desconocido - ELIMINAR DE LA LISTA ***
-                showToast(`Se ha reportado que el número ${customer.telefono1} no pertenece al titular ${customer.nombre} - eliminado de la lista de gestión`);
+                showToast(`El número no pertenece al titular - cliente eliminado de la lista`);
                 if (customerType === 'rezagado') {
                     await eliminarDeFirestore(colecciones.rezagados, customer.id);
                 } else if (customerType === 'perdido') {
                     await eliminarDeFirestore(colecciones.perdidos, customer.id);
                 }
                 
-            } else if (resultadosQueNoEliminan.includes(resultado)) {
-                // Para otros resultados: solo registramos en el historial
-                showToast(`${resultadoTexto} registrado para ${customer.nombre}`);
-                // NO ELIMINAMOS AL CLIENTE DE LA LISTA
             } else {
-                showToast(`${resultadoTexto} registrado para ${customer.nombre}`);
+                let msg = '';
+                switch(resultado) {
+                    case 'no_contacto': msg = 'Sin contacto'; break;
+                    case 'promesa_pago': msg = 'Promesa de pago'; break;
+                    case 'no_aplica': msg = 'No aplica'; break;
+                    case 'abonado_hfc': msg = 'Abonado HFC'; break;
+                    case 'extravio_equipos': msg = 'Extravío de equipos'; break;
+                    case 'ab_ocupado': msg = 'AB ocupado'; break;
+                    case 'baja_procesada_oficina': msg = 'Baja procesada oficina'; break;
+                    case 'venta_inmueble': msg = 'Venta de inmueble'; break;
+                    default: msg = resultado;
+                }
+                showToast(`${msg} registrado para ${customer.nombre}`);
             }
             
             await unlockCustomer(customer.id, customerType);
@@ -1046,7 +1088,7 @@
                     if (rows.length < 2) { alert('El archivo no contiene datos'); return; }
                     rezagadosHeaders = rows[0].map(h => String(h || '').trim());
                     rezagadosRawData = rows.slice(1).filter(row => row && row.length > 0 && row.some(cell => cell && String(cell).trim() !== ''));
-                    let previewHtml = '<thead><tr>';
+                    let previewHtml = '<thead></tr>';
                     for(let i = 0; i < Math.min(rezagadosHeaders.length, 8); i++) {
                         previewHtml += `<th class="text-xs">${escapeHtml(rezagadosHeaders[i]).substring(0, 20)}</th>`;
                     }
@@ -1180,7 +1222,7 @@
                     if (rows.length < 2) { alert('El archivo no contiene datos'); return; }
                     perdidosHeaders = rows[0].map(h => String(h || '').trim());
                     perdidosRawData = rows.slice(1).filter(row => row && row.length > 0 && row.some(cell => cell && String(cell).trim() !== ''));
-                    let previewHtml = '<thead><tr>' + perdidosHeaders.slice(0, 6).map(h => `<th class="text-xs">${escapeHtml(h).substring(0, 15)}</th>`).join('') + '</td></thead><tbody>';
+                    let previewHtml = '<thead><tr>' + perdidosHeaders.slice(0, 6).map(h => `<th class="text-xs">${escapeHtml(h).substring(0, 15)}</th>`).join('') + '</thead><tbody>';
                     previewHtml += perdidosRawData.slice(0, 3).map(row => '<tr>' + row.slice(0, 6).map(cell => `<td class="text-xs">${escapeHtml(String(cell || '').substring(0, 20))}</td>`).join('') + '</tr>').join('');
                     previewHtml += '</tbody>';
                     document.getElementById('previewPerdidosTable').innerHTML = previewHtml;
@@ -1351,7 +1393,6 @@
             document.getElementById('bajaReasonDiv').classList.add('hidden');
             document.getElementById('visitaFields').classList.add('hidden');
             document.getElementById('callObservations').value = '';
-            // *** CORRECCIÓN 2: Permitir selección de fecha y hora manual ***
             document.getElementById('visitDate').value = new Date().toISOString().split('T')[0];
             document.getElementById('visitTime').value = '';
             document.getElementById('registerCallModal').classList.remove('hidden');
@@ -1388,7 +1429,6 @@
             if (resultado === 'visita_tecnica' || resultado === 'dado_baja') {
                 const fecha = document.getElementById('visitDate').value;
                 const hora = document.getElementById('visitTime').value;
-                // *** CORRECCIÓN 2: Validar fecha y hora seleccionadas ***
                 if (!fecha) { alert('Seleccione fecha de visita'); return; }
                 if (!hora) { alert('Seleccione hora de visita'); return; }
                 
@@ -1545,7 +1585,7 @@
             const tbodyDesktop = document.getElementById('rezagadosTableBodyDesktop');
             if (tbodyDesktop) {
                 if (items.length === 0) {
-                    tbodyDesktop.innerHTML = '<tr><td colspan="11" class="text-center py-4 text-gray-500 text-xs">No hay clientes rezagados pendientes</div></td></tr>';
+                    tbodyDesktop.innerHTML = '<tr><td colspan="11" class="text-center py-4 text-gray-500 text-xs">No hay clientes rezagados pendientes</div></tr>';
                 } else {
                     tbodyDesktop.innerHTML = pageItems.map(c => {
                         const lockInfo = getCustomerLockInfo(c.id, 'rezagado');
@@ -1555,7 +1595,7 @@
                         const statusClass = getStatusClass(c.estado);
                         const statusText = getStatusText(c.estado);
                         return `<tr>
-                            <td><input type="checkbox" onchange="toggleSelectRezagado('${c.id}', this.checked)"></div></table>
+                            <td><input type="checkbox" onchange="toggleSelectRezagado('${c.id}', this.checked)"></div></td>
                             <td class="truncate-text">${escapeHtml(c.identificador || c.id)}</div></td>
                             <td><span class="font-medium">${escapeHtml(c.nombre)}</span></div></td>
                             <td class="truncate-text">${escapeHtml(c.documento)}</div></td>
@@ -1569,7 +1609,7 @@
                                 ${(!isLocked || lockedByMe) && hasPhone ? `<button onclick="openRegisterCallModal('${c.id}', 'rezagado')" class="call-btn"><i class="fas fa-phone-alt"></i> Gestionar</button>` : `<button class="call-btn opacity-50" disabled>${!hasPhone ? 'Sin teléfono' : 'Bloqueado'}</button>`}
                                 ${hasPhone ? `<a href="tel:${c.telefono1}" class="call-link"><i class="fas fa-phone"></i></a><a href="https://wa.me/${c.telefono1.replace(/[^0-9]/g,'')}" target="_blank" class="whatsapp-link"><i class="fab fa-whatsapp"></i></a>` : ''}
                                 <button onclick="deleteSingleCustomer('${c.id}', 'rezagado')" class="delete-single-btn"><i class="fas fa-trash-alt"></i></button>
-                             </div>
+                              </div>
                         </tr>`;
                     }).join('');
                 }
@@ -1626,7 +1666,7 @@
             const tbodyDesktop = document.getElementById('perdidosTableBodyDesktop');
             if (tbodyDesktop) {
                 if (items.length === 0) {
-                    tbodyDesktop.innerHTML = '<tr><td colspan="11" class="text-center py-4 text-gray-500 text-xs">No hay clientes perdidos pendientes</div></td></tr>';
+                    tbodyDesktop.innerHTML = '<tr><td colspan="11" class="text-center py-4 text-gray-500 text-xs">No hay clientes perdidos pendientes</div></tr>';
                 } else {
                     tbodyDesktop.innerHTML = pageItems.map(c => {
                         const lockInfo = getCustomerLockInfo(c.id, 'perdido');
@@ -1705,10 +1745,10 @@
             const tbody = document.getElementById('recuperadosTableBody');
             if (tbody) {
                 if (items.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="9" class="text-center py-4 text-gray-500 text-xs">No hay clientes reconectados</div></tr></tr>';
+                    tbody.innerHTML = '<tr><td colspan="9" class="text-center py-4 text-gray-500 text-xs">No hay clientes reconectados</div></tr>';
                 } else {
                     tbody.innerHTML = items.slice(0, ITEMS_PER_PAGE).map(c => `<tr>
-                        <td class="truncate-text">${escapeHtml(c.clienteId)}</div></td>
+                        <td class="truncate-text">${escapeHtml(c.clienteIdOriginal || c.clienteId)}</div></td>
                         <td><span class="font-medium">${escapeHtml(c.nombre)}</span></div></td>
                         <td class="truncate-text">${escapeHtml(c.documento)}</div></td>
                         <td>${escapeHtml(c.telefono)}</div></td>
@@ -1731,10 +1771,10 @@
             const tbody = document.getElementById('perdidosFinalTableBody');
             if (tbody) {
                 if (items.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="10" class="text-center py-4 text-gray-500 text-xs">No hay clientes dados de baja</div></td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="10" class="text-center py-4 text-gray-500 text-xs">No hay clientes dados de baja</div></table>';
                 } else {
                     tbody.innerHTML = items.slice(0, ITEMS_PER_PAGE).map(c => `<tr>
-                        <td class="truncate-text">${escapeHtml(c.clienteId)}</div></td>
+                        <td class="truncate-text">${escapeHtml(c.clienteIdOriginal || c.clienteId)}</div></td>
                         <td><span class="font-medium">${escapeHtml(c.nombre)}</span></div></td>
                         <td class="truncate-text">${escapeHtml(c.documento)}</div></td>
                         <td>${escapeHtml(c.telefono)}</div></td>
@@ -1769,7 +1809,7 @@
             const tbody = document.getElementById('equiposTableBody');
             if (tbody) {
                 if (items.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="10" class="text-center py-4 text-gray-500 text-xs">No hay visitas técnicas pendientes de retiro de equipos.</div></td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="10" class="text-center py-4 text-gray-500 text-xs">No hay visitas técnicas pendientes de retiro de equipos.</div></tr>';
                 } else {
                     const puedeCompletar = puedeCompletarVisitas();
                     tbody.innerHTML = items.map(v => `<tr>
@@ -1829,13 +1869,13 @@
             const tbody = document.getElementById('visitasTableBody');
             if (tbody) {
                 if (items.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="9" class="text-center py-4 text-gray-500 text-xs">No hay visitas técnicas finalizadas.</div></td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="9" class="text-center py-4 text-gray-500 text-xs">No hay visitas técnicas finalizadas.</div></tr>';
                 } else {
                     tbody.innerHTML = items.slice(0, ITEMS_PER_PAGE).map(v => `<tr>
                         <td><span class="font-medium">${escapeHtml(v.clienteNombre)}</span></div></td>
                         <td>${escapeHtml(v.clienteTelefono)}</div></td>
                         <td class="truncate-text">${escapeHtml(v.direccion)}</div></td>
-                        </table>${escapeHtml(v.zona || v.centroOp || '-')}</div></td>
+                        <td>${escapeHtml(v.zona || v.centroOp || '-')}</div></td>
                         <td>${v.tecnicoNombre || 'No asignado'}</div></td>
                         <td>${v.fechaVisita || '-'} ${v.horaVisita || ''}</div></td>
                         <td>${v.fechaCompletado ? new Date(v.fechaCompletado).toLocaleDateString() : '-'}</div></td>
@@ -1874,7 +1914,7 @@
             </div>`).join('');
         }
 
-        // ==================== HISTORIAL POR AGENTE ====================
+        // ==================== HISTORIAL GENERAL ====================
         function cargarSelectAgentes() {
             const select = document.getElementById('filterAgenteHistorial');
             if (!select) return;
@@ -1905,43 +1945,58 @@
             const agenteId = document.getElementById('filterAgenteHistorial')?.value || '';
             const fechaInicio = document.getElementById('filterFechaInicio')?.value;
             const fechaFin = document.getElementById('filterFechaFin')?.value;
+            const tipoGestion = document.getElementById('filterTipoGestion')?.value || '';
+            const searchNombre = document.getElementById('historialSearchNombre')?.value.toLowerCase() || '';
+            const searchDocumento = document.getElementById('historialSearchDocumento')?.value.toLowerCase() || '';
+            const searchTelefono = document.getElementById('historialSearchTelefono')?.value || '';
+            const searchId = document.getElementById('historialSearchId')?.value.toLowerCase() || '';
             
             let registros = [];
             
+            // Llamadas
             callLogs.forEach(log => {
+                let resultadoTexto = '';
+                switch(log.resultado) {
+                    case 'recuperado': resultadoTexto = 'RECUPERADO'; break;
+                    case 'dado_baja': resultadoTexto = 'DADO DE BAJA'; break;
+                    case 'no_contacto': resultadoTexto = 'SIN CONTACTO'; break;
+                    case 'promesa_pago': resultadoTexto = 'PROMESA DE PAGO'; break;
+                    case 'visita_tecnica': resultadoTexto = 'VISITA PROGRAMADA'; break;
+                    case 'no_aplica': resultadoTexto = 'NO APLICA'; break;
+                    case 'abonado_hfc': resultadoTexto = 'ABONADO HFC'; break;
+                    case 'extravio_equipos': resultadoTexto = 'EXTRAVIO DE EQUIPOS'; break;
+                    case 'ab_ocupado': resultadoTexto = 'AB OCUPADO'; break;
+                    case 'ab_conectado_solvente': resultadoTexto = 'AB CONECTADO/SOLVENTE'; break;
+                    case 'baja_procesada_oficina': resultadoTexto = 'BAJA PROCESADA OFICINA'; break;
+                    case 'venta_inmueble': resultadoTexto = 'VENTA DE INMUEBLE'; break;
+                    case 'numero_desconocido': resultadoTexto = 'NUMERO DESCONOCIDO'; break;
+                    default: resultadoTexto = log.resultado || '';
+                }
                 registros.push({
                     fecha: log.fechaGestion,
                     agente: log.agente,
                     agenteId: log.agenteId,
                     cliente: log.nombre,
+                    clienteId: log.clienteIdOriginal || log.clienteId,
+                    documento: log.documento,
                     tipo: 'Llamada',
-                    resultado: log.resultado === 'recuperado' ? 'RECUPERADO' : 
-                              log.resultado === 'dado_baja' ? 'DADO DE BAJA' :
-                              log.resultado === 'no_contacto' ? 'SIN CONTACTO' :
-                              log.resultado === 'promesa_pago' ? 'PROMESA DE PAGO' :
-                              log.resultado === 'visita_tecnica' ? 'VISITA PROGRAMADA' :
-                              log.resultado === 'no_aplica' ? 'NO APLICA' :
-                              log.resultado === 'abonado_hfc' ? 'ABONADO HFC' :
-                              log.resultado === 'extravio_equipos' ? 'EXTRAVÍO DE EQUIPOS' :
-                              log.resultado === 'ab_ocupado' ? 'AB OCUPADO' :
-                              log.resultado === 'ab_conectado_solvente' ? 'AB CONECTADO / SOLVENTE' :
-                              log.resultado === 'baja_procesada_oficina' ? 'BAJA PROCESADA - ENTREGÓ EQUIPOS EN OFC' :
-                              log.resultado === 'venta_inmueble' ? 'VENTA DE INMUEBLE - SIN ACCESO A EQUIPOS' :
-                              log.resultado === 'numero_desconocido' ? 'NÚMERO DESCONOCIDO - NO ES EL TITULAR' :
-                              (log.resultado || '').toUpperCase(),
+                    resultado: resultadoTexto,
                     telefono: log.telefono,
                     plan: log.plan,
                     co: log.centroOp
                 });
             });
             
+            // Reconexiones
             clientesRecuperados.forEach(r => {
                 registros.push({
                     fecha: r.fechaGestion,
                     agente: r.agente,
                     agenteId: r.agenteId,
                     cliente: r.nombre,
-                    tipo: 'Reconexión',
+                    clienteId: r.clienteIdOriginal || r.clienteId,
+                    documento: r.documento,
+                    tipo: 'Reconexion',
                     resultado: 'RECUPERADO',
                     telefono: r.telefono,
                     plan: r.plan,
@@ -1949,43 +2004,59 @@
                 });
             });
             
+            // Bajas
             clientesPerdidosFinal.forEach(p => {
+                let motivoTexto = '';
+                switch(p.motivoBaja) {
+                    case 'price': motivoTexto = 'Precio'; break;
+                    case 'service_issues': motivoTexto = 'Problemas servicio'; break;
+                    case 'relocation': motivoTexto = 'Mudanza'; break;
+                    case 'deceased': motivoTexto = 'Fallecimiento'; break;
+                    default: motivoTexto = p.motivoBaja || 'Otro';
+                }
                 registros.push({
                     fecha: p.fechaGestion,
                     agente: p.agente,
                     agenteId: p.agenteId,
                     cliente: p.nombre,
+                    clienteId: p.clienteIdOriginal || p.clienteId,
+                    documento: p.documento,
                     tipo: 'Baja',
-                    resultado: p.motivoBaja === 'price' ? 'Precio' : 
-                              p.motivoBaja === 'service_issues' ? 'Problemas servicio' :
-                              p.motivoBaja === 'relocation' ? 'Mudanza' :
-                              p.motivoBaja === 'deceased' ? 'Fallecimiento' : 'Otro',
+                    resultado: motivoTexto,
                     telefono: p.telefono,
                     plan: p.plan,
                     co: p.centroOp
                 });
             });
             
+            // Visitas programadas
             visitasTecnicas.forEach(v => {
-                registros.push({
-                    fecha: v.fechaCreacion,
-                    agente: v.agente,
-                    agenteId: v.agenteId,
-                    cliente: v.clienteNombre,
-                    tipo: 'Visita Programada',
-                    resultado: `${v.fechaVisita || 'Sin fecha'} ${v.horaVisita || ''} - ${v.tecnicoNombre || 'Sin técnico'}`,
-                    telefono: v.clienteTelefono,
-                    plan: v.plan || '-',
-                    co: v.centroOp || '-'
-                });
+                if (v.estado !== 'completada') {
+                    registros.push({
+                        fecha: v.fechaCreacion,
+                        agente: v.agente,
+                        agenteId: v.agenteId,
+                        cliente: v.clienteNombre,
+                        clienteId: v.clienteIdOriginal || v.clienteId,
+                        documento: v.clienteDocumento,
+                        tipo: 'Visita Programada',
+                        resultado: `${v.fechaVisita || 'Sin fecha'} ${v.horaVisita || ''} - ${v.tecnicoNombre || 'Sin técnico'}`,
+                        telefono: v.clienteTelefono,
+                        plan: v.plan || '-',
+                        co: v.centroOp || '-'
+                    });
+                }
             });
             
+            // Visitas finalizadas
             visitasFinalizadas.forEach(v => {
                 registros.push({
                     fecha: v.fechaCompletado || v.fechaCreacion,
                     agente: v.completadoPor || v.agente,
                     agenteId: v.completadoPorId || v.agenteId,
                     cliente: v.clienteNombre,
+                    clienteId: v.clienteIdOriginal || v.clienteId,
+                    documento: v.clienteDocumento,
                     tipo: 'Visita Finalizada',
                     resultado: 'EQUIPO RETIRADO',
                     telefono: v.clienteTelefono,
@@ -1994,8 +2065,13 @@
                 });
             });
             
+            // Aplicar filtros
             if (agenteId) {
                 registros = registros.filter(r => r.agenteId === agenteId);
+            }
+            
+            if (tipoGestion) {
+                registros = registros.filter(r => r.tipo === tipoGestion);
             }
             
             if (fechaInicio) {
@@ -2005,9 +2081,34 @@
                 registros = registros.filter(r => r.fecha && r.fecha.split('T')[0] <= fechaFin);
             }
             
+            if (searchNombre) {
+                registros = registros.filter(r => (r.cliente || '').toLowerCase().includes(searchNombre));
+            }
+            if (searchDocumento) {
+                registros = registros.filter(r => (r.documento || '').toLowerCase().includes(searchDocumento));
+            }
+            if (searchTelefono) {
+                registros = registros.filter(r => (r.telefono || '').includes(searchTelefono));
+            }
+            if (searchId) {
+                registros = registros.filter(r => (r.clienteId || '').toLowerCase().includes(searchId));
+            }
+            
             registros.sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
             
             return registros;
+        }
+        
+        function limpiarFiltrosHistorial() {
+            document.getElementById('filterAgenteHistorial').value = '';
+            document.getElementById('filterFechaInicio').value = '';
+            document.getElementById('filterFechaFin').value = '';
+            document.getElementById('filterTipoGestion').value = '';
+            document.getElementById('historialSearchNombre').value = '';
+            document.getElementById('historialSearchDocumento').value = '';
+            document.getElementById('historialSearchTelefono').value = '';
+            document.getElementById('historialSearchId').value = '';
+            filtrarHistorial();
         }
         
         function filtrarHistorial() {
@@ -2018,18 +2119,30 @@
             const registros = getHistorialRegistros();
             const tbody = document.getElementById('historialTableBody');
             const totalSpan = document.getElementById('historialTotalCount');
+            const statsSpan = document.getElementById('historialStats');
+            
+            const totalLlamadas = registros.filter(r => r.tipo === 'Llamada').length;
+            const totalReconexiones = registros.filter(r => r.tipo === 'Reconexion').length;
+            const totalBajas = registros.filter(r => r.tipo === 'Baja').length;
+            const totalVisitas = registros.filter(r => r.tipo === 'Visita Finalizada').length;
+            
+            if (statsSpan) {
+                statsSpan.innerHTML = `<span class="font-bold">Estadísticas:</span> Llamadas: ${totalLlamadas} | Reconexiones: ${totalReconexiones} | Bajas: ${totalBajas} | Equipos retirados: ${totalVisitas}`;
+            }
             
             if (totalSpan) totalSpan.innerText = registros.length;
             
             if (tbody) {
                 if (registros.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="8" class="text-center py-4 text-gray-500">No hay registros</div></tr>';
+                    tbody.innerHTML = '<td><td colspan="10" class="text-center py-4 text-gray-500">No hay registros que coincidan con los filtros</div></tr>';
                 } else {
-                    tbody.innerHTML = registros.slice(0, 100).map(r => `<tr>
+                    tbody.innerHTML = registros.slice(0, 200).map(r => `<tr>
                         <td class="text-xs">${new Date(r.fecha).toLocaleDateString()} ${new Date(r.fecha).toLocaleTimeString()}</div></td>
                         <td class="text-xs">${escapeHtml(r.agente)}</div></td>
                         <td class="text-xs">${escapeHtml(r.cliente)}</div></td>
-                        <td class="text-xs">${escapeHtml(r.tipo)}</div></td>
+                        <td class="text-xs">${escapeHtml(r.clienteId || '-')}</div></td>
+                        <td class="text-xs">${escapeHtml(r.documento || '-')}</div></td>
+                        <td class="text-xs"><span class="px-1 py-0.5 rounded ${r.tipo === 'Reconexion' ? 'bg-green-100 text-green-700' : r.tipo === 'Baja' ? 'bg-red-100 text-red-700' : r.tipo === 'Visita Finalizada' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100'}">${escapeHtml(r.tipo)}</span></div></td>
                         <td class="text-xs">${escapeHtml(r.resultado)}</div></td>
                         <td class="text-xs">${escapeHtml(r.telefono)}</div></td>
                         <td class="text-xs">${escapeHtml(r.plan)}</div></td>
@@ -2045,12 +2158,14 @@
                 return;
             }
             const registros = getHistorialRegistros();
-            const data = [['Fecha', 'Agente', 'Cliente', 'Tipo Gestión', 'Resultado', 'Teléfono', 'Plan', 'CO']];
+            const data = [['Fecha', 'Agente', 'Cliente', 'ID Cliente', 'Documento', 'Tipo Gestión', 'Resultado', 'Teléfono', 'Plan', 'CO']];
             registros.forEach(r => {
                 data.push([
                     new Date(r.fecha).toLocaleString(),
                     r.agente,
                     r.cliente,
+                    r.clienteId || '-',
+                    r.documento || '-',
                     r.tipo,
                     r.resultado,
                     r.telefono,
@@ -2060,7 +2175,7 @@
             });
             const ws = XLSX.utils.aoa_to_sheet(data);
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'Historial_Gestión');
+            XLSX.utils.book_append_sheet(wb, ws, 'Historial_Gestion');
             XLSX.writeFile(wb, `historial_gestion_${new Date().toISOString().split('T')[0]}.xlsx`);
             showToast('Exportado a Excel');
         }
@@ -2077,20 +2192,23 @@
             
             doc.setFontSize(16);
             doc.setFont(undefined, 'bold');
-            doc.text('Historial de Gestión por Agente - OCAD Inter', 14, 20);
+            doc.text('Historial de Gestión - OCAD Inter', 14, 20);
             
             doc.setFontSize(10);
             doc.setFont(undefined, 'normal');
-            let filtrosStr = '';
+            
             const agenteId = document.getElementById('filterAgenteHistorial')?.value || '';
             const fechaInicio = document.getElementById('filterFechaInicio')?.value;
             const fechaFin = document.getElementById('filterFechaFin')?.value;
+            const tipoGestion = document.getElementById('filterTipoGestion')?.value || '';
             
+            let filtrosStr = '';
             if (agenteId) {
                 const agenteSelect = document.getElementById('filterAgenteHistorial');
                 const agenteNombre = agenteSelect.options[agenteSelect.selectedIndex]?.text || '';
                 filtrosStr += `Agente: ${agenteNombre} | `;
             }
+            if (tipoGestion) filtrosStr += `Tipo: ${tipoGestion} | `;
             if (fechaInicio) filtrosStr += `Desde: ${fechaInicio} | `;
             if (fechaFin) filtrosStr += `Hasta: ${fechaFin} | `;
             if (filtrosStr === '') filtrosStr = 'Todos los registros';
@@ -2104,6 +2222,8 @@
                 new Date(r.fecha).toLocaleDateString() + ' ' + new Date(r.fecha).toLocaleTimeString(),
                 r.agente,
                 r.cliente,
+                r.clienteId || '-',
+                r.documento || '-',
                 r.tipo,
                 r.resultado,
                 r.telefono,
@@ -2113,20 +2233,22 @@
             
             doc.autoTable({
                 startY: 62,
-                head: [['Fecha', 'Agente', 'Cliente', 'Tipo', 'Resultado', 'Teléfono', 'Plan', 'CO']],
+                head: [['Fecha', 'Agente', 'Cliente', 'ID', 'Documento', 'Tipo', 'Resultado', 'Teléfono', 'Plan', 'CO']],
                 body: tableData,
                 theme: 'striped',
                 headStyles: { fillColor: [79, 70, 229], textColor: [255, 255, 255], fontStyle: 'bold' },
-                bodyStyles: { fontSize: 8 },
+                bodyStyles: { fontSize: 7 },
                 columnStyles: {
-                    0: { cellWidth: 35 },
+                    0: { cellWidth: 30 },
                     1: { cellWidth: 25 },
                     2: { cellWidth: 35 },
                     3: { cellWidth: 20 },
-                    4: { cellWidth: 22 },
-                    5: { cellWidth: 22 },
-                    6: { cellWidth: 20 },
-                    7: { cellWidth: 20 }
+                    4: { cellWidth: 20 },
+                    5: { cellWidth: 20 },
+                    6: { cellWidth: 25 },
+                    7: { cellWidth: 22 },
+                    8: { cellWidth: 20 },
+                    9: { cellWidth: 20 }
                 },
                 margin: { left: 10, right: 10 }
             });
@@ -2183,7 +2305,7 @@
             showToast('Exportado');
         }
 
-        // ==================== REPORTE PDF DIARIO ====================
+        // ==================== REPORTE PDF DIARIO CORREGIDO ====================
         async function generateDailyReport() {
             if (!puedeGenerarReportes()) {
                 showToast('No tiene permisos para generar reportes. Solo Administrador y Marina M pueden.', 'error');
@@ -2192,13 +2314,24 @@
             
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-            const fecha = document.getElementById('reportDate').value || new Date().toISOString().split('T')[0];
+            
+            const fechaSeleccionada = document.getElementById('reportDate').value;
+            const fecha = fechaSeleccionada || new Date().toISOString().split('T')[0];
+            
             const fechaObj = new Date(fecha);
             const fechaInicio = new Date(fechaObj);
-            fechaInicio.setHours(0,0,0,0);
+            fechaInicio.setHours(0, 0, 0, 0);
             const fechaFin = new Date(fechaObj);
-            fechaFin.setHours(23,59,59,999);
+            fechaFin.setHours(23, 59, 59, 999);
             
+            const diaAnterior = new Date(fechaObj);
+            diaAnterior.setDate(diaAnterior.getDate() - 1);
+            const fechaInicioAyer = new Date(diaAnterior);
+            fechaInicioAyer.setHours(0, 0, 0, 0);
+            const fechaFinAyer = new Date(diaAnterior);
+            fechaFinAyer.setHours(23, 59, 59, 999);
+            
+            // Datos del día
             const llamadasHoy = callLogs.filter(c => {
                 if (!c.fechaGestion) return false;
                 const fechaLog = new Date(c.fechaGestion);
@@ -2217,29 +2350,77 @@
                 return fechaBaja >= fechaInicio && fechaBaja <= fechaFin;
             });
             
-            const visitasProgramadasHoy = visitasTecnicas.filter(v => v.fechaVisita === fecha);
+            const visitasProgramadasHoy = visitasTecnicas.filter(v => v.fechaVisita === fecha && v.estado !== 'completada');
             const visitasCompletadasHoy = visitasFinalizadas.filter(v => {
                 if (!v.fechaCompletado) return false;
                 return v.fechaCompletado.split('T')[0] === fecha;
             });
-            const visitasPendientesTotal = visitasTecnicas.filter(v => v.estado !== 'completada').length;
             
-            const llamadasPorResultado = {
-                recuperado: llamadasHoy.filter(l => l.resultado === 'recuperado').length,
-                dado_baja: llamadasHoy.filter(l => l.resultado === 'dado_baja').length,
-                no_contacto: llamadasHoy.filter(l => l.resultado === 'no_contacto').length,
-                promesa_pago: llamadasHoy.filter(l => l.resultado === 'promesa_pago').length,
-                visita_tecnica: llamadasHoy.filter(l => l.resultado === 'visita_tecnica').length,
-                no_aplica: llamadasHoy.filter(l => l.resultado === 'no_aplica').length,
-                abonado_hfc: llamadasHoy.filter(l => l.resultado === 'abonado_hfc').length,
-                extravio_equipos: llamadasHoy.filter(l => l.resultado === 'extravio_equipos').length,
-                ab_ocupado: llamadasHoy.filter(l => l.resultado === 'ab_ocupado').length,
-                ab_conectado_solvente: llamadasHoy.filter(l => l.resultado === 'ab_conectado_solvente').length,
-                baja_procesada_oficina: llamadasHoy.filter(l => l.resultado === 'baja_procesada_oficina').length,
-                venta_inmueble: llamadasHoy.filter(l => l.resultado === 'venta_inmueble').length,
-                numero_desconocido: llamadasHoy.filter(l => l.resultado === 'numero_desconocido').length
+            // Datos del día anterior
+            const llamadasAyer = callLogs.filter(c => {
+                if (!c.fechaGestion) return false;
+                const fechaLog = new Date(c.fechaGestion);
+                return fechaLog >= fechaInicioAyer && fechaLog <= fechaFinAyer;
+            });
+            
+            const recuperadosAyer = clientesRecuperados.filter(c => {
+                if (!c.fechaGestion) return false;
+                const fechaRec = new Date(c.fechaGestion);
+                return fechaRec >= fechaInicioAyer && fechaRec <= fechaFinAyer;
+            });
+            
+            const perdidosAyer = clientesPerdidosFinal.filter(c => {
+                if (!c.fechaGestion) return false;
+                const fechaBaja = new Date(c.fechaGestion);
+                return fechaBaja >= fechaInicioAyer && fechaBaja <= fechaFinAyer;
+            });
+            
+            // Totales acumulados
+            const totalLlamadasAcumuladas = callLogs.length;
+            const totalRecuperadosAcumulados = clientesRecuperados.length;
+            const totalBajasAcumuladas = clientesPerdidosFinal.length;
+            const totalVisitasPendientes = visitasTecnicas.filter(v => v.estado !== 'completada').length;
+            const totalVisitasCompletadas = visitasFinalizadas.length;
+            
+            // Calcular variaciones (solo mostrar si hay cambio y datos para comparar)
+            let varLlamadasText = '';
+            let varRecuperadosText = '';
+            let varBajasText = '';
+            
+            if (llamadasAyer.length > 0 || llamadasHoy.length > 0) {
+                const varLlamadas = llamadasHoy.length - llamadasAyer.length;
+                if (varLlamadas !== 0) {
+                    varLlamadasText = varLlamadas > 0 ? ` (+${varLlamadas})` : ` (${varLlamadas})`;
+                }
+            }
+            
+            if (recuperadosAyer.length > 0 || recuperadosHoy.length > 0) {
+                const varRecuperados = recuperadosHoy.length - recuperadosAyer.length;
+                if (varRecuperados !== 0) {
+                    varRecuperadosText = varRecuperados > 0 ? ` (+${varRecuperados})` : ` (${varRecuperados})`;
+                }
+            }
+            
+            if (perdidosAyer.length > 0 || perdidosHoy.length > 0) {
+                const varBajas = perdidosHoy.length - perdidosAyer.length;
+                if (varBajas !== 0) {
+                    varBajasText = varBajas > 0 ? ` (+${varBajas})` : ` (${varBajas})`;
+                }
+            }
+            
+            // Contar resultados de llamadas
+            const resultados = {
+                recuperado: 0, dado_baja: 0, no_contacto: 0, promesa_pago: 0,
+                visita_tecnica: 0, no_aplica: 0, abonado_hfc: 0, extravio_equipos: 0,
+                ab_ocupado: 0, ab_conectado_solvente: 0, baja_procesada_oficina: 0,
+                venta_inmueble: 0, numero_desconocido: 0
             };
             
+            llamadasHoy.forEach(l => {
+                if (resultados[l.resultado] !== undefined) resultados[l.resultado]++;
+            });
+            
+            // Estadísticas por agente
             const agentStats = new Map();
             llamadasHoy.forEach(l => {
                 if (!agentStats.has(l.agente)) agentStats.set(l.agente, { llamadas: 0, recuperados: 0, bajas: 0, sinContacto: 0 });
@@ -2254,94 +2435,129 @@
                 if (r.agente && !agentStats.has(r.agente)) {
                     agentStats.set(r.agente, { llamadas: 0, recuperados: 0, bajas: 0, sinContacto: 0 });
                 }
-                if (r.agente) {
-                    const stats = agentStats.get(r.agente);
-                    stats.recuperados++;
-                }
+                if (r.agente) agentStats.get(r.agente).recuperados++;
             });
             
             perdidosHoy.forEach(p => {
                 if (p.agente && !agentStats.has(p.agente)) {
                     agentStats.set(p.agente, { llamadas: 0, recuperados: 0, bajas: 0, sinContacto: 0 });
                 }
-                if (p.agente) {
-                    const stats = agentStats.get(p.agente);
-                    stats.bajas++;
-                }
+                if (p.agente) agentStats.get(p.agente).bajas++;
             });
             
+            let yPos = 20;
+            
+            // Título
             doc.setFontSize(16);
             doc.setFont(undefined, 'bold');
-            doc.text('Reporte de Gestión Diario - OCAD Inter', 14, 20);
+            doc.text('Reporte de Gestión Diario - OCAD Inter', 14, yPos);
+            yPos += 8;
+            
+            // Información del reporte
             doc.setFontSize(10);
             doc.setFont(undefined, 'normal');
-            doc.text('Fecha: ' + fecha, 14, 32);
-            doc.text('Hora generación: ' + new Date().toLocaleTimeString(), 14, 38);
-            
-            let generadoPor = appCurrentUser?.fullName || 'Sistema';
-            doc.text('Generado por: ' + generadoPor, 14, 44);
+            doc.text(`Fecha del reporte: ${fecha}`, 14, yPos);
+            yPos += 6;
+            doc.text(`Hora generación: ${new Date().toLocaleTimeString()}`, 14, yPos);
+            yPos += 6;
+            doc.text(`Generado por: ${appCurrentUser?.fullName || 'Sistema'}`, 14, yPos);
+            yPos += 10;
             
             doc.setDrawColor(200, 200, 200);
-            doc.line(14, 50, 196, 50);
+            doc.line(14, yPos, 196, yPos);
+            yPos += 8;
             
+            // RESUMEN DEL DIA
             doc.setFontSize(12);
             doc.setFont(undefined, 'bold');
-            doc.text('RESUMEN GENERAL DE GESTIÓN', 14, 60);
+            doc.text('RESUMEN DEL DÍA ' + fecha, 14, yPos);
+            yPos += 8;
+            
             doc.setFontSize(10);
             doc.setFont(undefined, 'normal');
-            doc.text('* Total de llamadas realizadas: ' + llamadasHoy.length, 20, 70);
-            doc.text('* Clientes reconectados: ' + recuperadosHoy.length, 20, 78);
-            doc.text('* Clientes dados de baja: ' + perdidosHoy.length, 20, 86);
-            doc.text('* Visitas técnicas programadas para hoy: ' + visitasProgramadasHoy.length, 20, 94);
-            doc.text('* Visitas completadas (equipos retirados): ' + visitasCompletadasHoy.length, 20, 102);
-            doc.text('* Visitas pendientes totales: ' + visitasPendientesTotal, 20, 110);
             
-            doc.line(14, 116, 196, 116);
+            doc.text(`* Total de llamadas realizadas: ${llamadasHoy.length}${varLlamadasText}`, 20, yPos);
+            yPos += 6;
+            doc.text(`* Clientes reconectados: ${recuperadosHoy.length}${varRecuperadosText}`, 20, yPos);
+            yPos += 6;
+            doc.text(`* Clientes dados de baja: ${perdidosHoy.length}${varBajasText}`, 20, yPos);
+            yPos += 6;
+            doc.text(`* Visitas técnicas programadas para hoy: ${visitasProgramadasHoy.length}`, 20, yPos);
+            yPos += 6;
+            doc.text(`* Visitas completadas (equipos retirados): ${visitasCompletadasHoy.length}`, 20, yPos);
+            yPos += 6;
+            doc.text(`* Visitas pendientes totales: ${totalVisitasPendientes}`, 20, yPos);
+            yPos += 10;
             
-            const totalLlamadas = llamadasHoy.length;
-            const resultadosData = [
-                ['Reconectados', llamadasPorResultado.recuperado.toString(), (totalLlamadas > 0 ? Math.round((llamadasPorResultado.recuperado / totalLlamadas) * 100) : 0) + '%'],
-                ['Dados de baja', llamadasPorResultado.dado_baja.toString(), (totalLlamadas > 0 ? Math.round((llamadasPorResultado.dado_baja / totalLlamadas) * 100) : 0) + '%'],
-                ['Sin contacto', llamadasPorResultado.no_contacto.toString(), (totalLlamadas > 0 ? Math.round((llamadasPorResultado.no_contacto / totalLlamadas) * 100) : 0) + '%'],
-                ['Promesas de pago', llamadasPorResultado.promesa_pago.toString(), (totalLlamadas > 0 ? Math.round((llamadasPorResultado.promesa_pago / totalLlamadas) * 100) : 0) + '%'],
-                ['Visitas programadas', llamadasPorResultado.visita_tecnica.toString(), (totalLlamadas > 0 ? Math.round((llamadasPorResultado.visita_tecnica / totalLlamadas) * 100) : 0) + '%'],
-                ['No aplica', llamadasPorResultado.no_aplica.toString(), (totalLlamadas > 0 ? Math.round((llamadasPorResultado.no_aplica / totalLlamadas) * 100) : 0) + '%'],
-                ['Abonado HFC', llamadasPorResultado.abonado_hfc.toString(), (totalLlamadas > 0 ? Math.round((llamadasPorResultado.abonado_hfc / totalLlamadas) * 100) : 0) + '%'],
-                ['Extravío de equipos', llamadasPorResultado.extravio_equipos.toString(), (totalLlamadas > 0 ? Math.round((llamadasPorResultado.extravio_equipos / totalLlamadas) * 100) : 0) + '%'],
-                ['AB ocupado', llamadasPorResultado.ab_ocupado.toString(), (totalLlamadas > 0 ? Math.round((llamadasPorResultado.ab_ocupado / totalLlamadas) * 100) : 0) + '%'],
-                ['AB solvente', llamadasPorResultado.ab_conectado_solvente.toString(), (totalLlamadas > 0 ? Math.round((llamadasPorResultado.ab_conectado_solvente / totalLlamadas) * 100) : 0) + '%'],
-                ['Baja procesada oficina', llamadasPorResultado.baja_procesada_oficina.toString(), (totalLlamadas > 0 ? Math.round((llamadasPorResultado.baja_procesada_oficina / totalLlamadas) * 100) : 0) + '%'],
-                ['Venta de inmueble', llamadasPorResultado.venta_inmueble.toString(), (totalLlamadas > 0 ? Math.round((llamadasPorResultado.venta_inmueble / totalLlamadas) * 100) : 0) + '%'],
-                ['Número desconocido', llamadasPorResultado.numero_desconocido.toString(), (totalLlamadas > 0 ? Math.round((llamadasPorResultado.numero_desconocido / totalLlamadas) * 100) : 0) + '%']
-            ];
+            doc.line(14, yPos, 196, yPos);
+            yPos += 8;
             
-            doc.autoTable({
-                startY: 122,
-                head: [['Resultado', 'Cantidad', 'Porcentaje']],
-                body: resultadosData,
-                theme: 'striped',
-                headStyles: { fillColor: [79, 70, 229], textColor: [255, 255, 255], fontStyle: 'bold' },
-                bodyStyles: { fontSize: 9 },
-                columnStyles: { 0: { cellWidth: 70 }, 1: { cellWidth: 30, halign: 'center' }, 2: { cellWidth: 30, halign: 'center' } },
-                margin: { left: 14 }
-            });
+            // TABLA DE RESULTADOS DE LLAMADAS (solo si hay llamadas)
+            if (llamadasHoy.length > 0) {
+                doc.setFontSize(11);
+                doc.setFont(undefined, 'bold');
+                doc.text('DETALLE DE RESULTADOS DE LLAMADAS', 14, yPos);
+                yPos += 6;
+                
+                const totalLlamadas = llamadasHoy.length;
+                const resultadosData = [
+                    ['Reconectados', resultados.recuperado, totalLlamadas > 0 ? Math.round((resultados.recuperado / totalLlamadas) * 100) : 0],
+                    ['Dados de baja', resultados.dado_baja, totalLlamadas > 0 ? Math.round((resultados.dado_baja / totalLlamadas) * 100) : 0],
+                    ['Sin contacto', resultados.no_contacto, totalLlamadas > 0 ? Math.round((resultados.no_contacto / totalLlamadas) * 100) : 0],
+                    ['Promesas de pago', resultados.promesa_pago, totalLlamadas > 0 ? Math.round((resultados.promesa_pago / totalLlamadas) * 100) : 0],
+                    ['Visitas programadas', resultados.visita_tecnica, totalLlamadas > 0 ? Math.round((resultados.visita_tecnica / totalLlamadas) * 100) : 0],
+                    ['No aplica', resultados.no_aplica, totalLlamadas > 0 ? Math.round((resultados.no_aplica / totalLlamadas) * 100) : 0],
+                    ['Abonado HFC', resultados.abonado_hfc, totalLlamadas > 0 ? Math.round((resultados.abonado_hfc / totalLlamadas) * 100) : 0],
+                    ['Extravío de equipos', resultados.extravio_equipos, totalLlamadas > 0 ? Math.round((resultados.extravio_equipos / totalLlamadas) * 100) : 0],
+                    ['AB ocupado', resultados.ab_ocupado, totalLlamadas > 0 ? Math.round((resultados.ab_ocupado / totalLlamadas) * 100) : 0],
+                    ['AB solvente', resultados.ab_conectado_solvente, totalLlamadas > 0 ? Math.round((resultados.ab_conectado_solvente / totalLlamadas) * 100) : 0],
+                    ['Baja procesada oficina', resultados.baja_procesada_oficina, totalLlamadas > 0 ? Math.round((resultados.baja_procesada_oficina / totalLlamadas) * 100) : 0],
+                    ['Venta de inmueble', resultados.venta_inmueble, totalLlamadas > 0 ? Math.round((resultados.venta_inmueble / totalLlamadas) * 100) : 0],
+                    ['Número desconocido', resultados.numero_desconocido, totalLlamadas > 0 ? Math.round((resultados.numero_desconocido / totalLlamadas) * 100) : 0]
+                ];
+                
+                doc.autoTable({
+                    startY: yPos,
+                    head: [['Resultado', 'Cantidad', 'Porcentaje']],
+                    body: resultadosData,
+                    theme: 'striped',
+                    headStyles: { fillColor: [79, 70, 229], textColor: [255, 255, 255], fontStyle: 'bold' },
+                    bodyStyles: { fontSize: 9 },
+                    columnStyles: { 0: { cellWidth: 70 }, 1: { cellWidth: 30, halign: 'center' }, 2: { cellWidth: 30, halign: 'center' } },
+                    margin: { left: 14 }
+                });
+                
+                yPos = doc.lastAutoTable.finalY + 10;
+            } else {
+                doc.setFontSize(10);
+                doc.setFont(undefined, 'italic');
+                doc.setTextColor(150, 150, 150);
+                doc.text('No hay llamadas registradas en la fecha seleccionada.', 20, yPos);
+                yPos += 10;
+                doc.setTextColor(0, 0, 0);
+                doc.setFont(undefined, 'normal');
+            }
             
-            let yPos = doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : 140;
-            
+            // ESTADISTICAS POR AGENTE (solo si hay agentes con actividad)
             if (agentStats.size > 0) {
-                if (yPos > 250) { doc.addPage(); yPos = 20; }
+                if (yPos > 240) { doc.addPage(); yPos = 20; }
                 doc.setFontSize(11);
                 doc.setFont(undefined, 'bold');
                 doc.text('ESTADÍSTICAS POR AGENTE', 14, yPos);
+                yPos += 6;
                 
-                const agentData = Array.from(agentStats.entries()).map(([agente, stats]) => {
-                    let nombreAgente = agente;
-                    return [nombreAgente.substring(0, 25), stats.llamadas.toString(), stats.recuperados.toString(), stats.bajas.toString(), stats.sinContacto.toString(), (stats.llamadas > 0 ? Math.round((stats.recuperados / stats.llamadas) * 100) : stats.recuperados > 0 ? 100 : 0) + '%'];
-                });
+                const agentData = Array.from(agentStats.entries()).map(([agente, stats]) => [
+                    agente.substring(0, 25),
+                    stats.llamadas,
+                    stats.recuperados,
+                    stats.bajas,
+                    stats.sinContacto,
+                    stats.llamadas > 0 ? Math.round((stats.recuperados / stats.llamadas) * 100) : (stats.recuperados > 0 ? 100 : 0)
+                ]);
                 
                 doc.autoTable({
-                    startY: yPos + 4,
-                    head: [['Agente', 'Llamadas', 'Reconectados', 'Bajas', 'Sin Contacto', 'Efectividad']],
+                    startY: yPos,
+                    head: [['Agente', 'Llamadas', 'Reconectados', 'Bajas', 'Sin Contacto', 'Efectividad %']],
                     body: agentData,
                     theme: 'striped',
                     headStyles: { fillColor: [100, 100, 100], textColor: [255, 255, 255], fontStyle: 'bold' },
@@ -2351,25 +2567,47 @@
                 yPos = doc.lastAutoTable.finalY + 10;
             }
             
+            // TOTALES ACUMULADOS
+            if (yPos > 240) { doc.addPage(); yPos = 20; }
+            doc.setFontSize(11);
+            doc.setFont(undefined, 'bold');
+            doc.text('TOTALES ACUMULADOS (Histórico completo)', 14, yPos);
+            yPos += 8;
+            
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            doc.text(`* Total llamadas registradas: ${totalLlamadasAcumuladas}`, 20, yPos);
+            yPos += 6;
+            doc.text(`* Total clientes reconectados: ${totalRecuperadosAcumulados}`, 20, yPos);
+            yPos += 6;
+            doc.text(`* Total clientes dados de baja: ${totalBajasAcumuladas}`, 20, yPos);
+            yPos += 6;
+            doc.text(`* Total equipos retirados: ${totalVisitasCompletadas}`, 20, yPos);
+            yPos += 6;
+            doc.text(`* Visitas de retiro pendientes: ${totalVisitasPendientes}`, 20, yPos);
+            yPos += 10;
+            
+            doc.line(14, yPos, 196, yPos);
+            yPos += 8;
+            
+            // LISTADO DE RECONECTADOS (solo si hay)
             if (recuperadosHoy.length > 0) {
-                if (yPos > 250) { doc.addPage(); yPos = 20; }
+                if (yPos > 240) { doc.addPage(); yPos = 20; }
                 doc.setFontSize(11);
                 doc.setFont(undefined, 'bold');
                 doc.text('CLIENTES RECONECTADOS', 14, yPos);
+                yPos += 6;
                 
-                const reconectadosData = recuperadosHoy.slice(0, 30).map(r => [
-                    (r.clienteId || r.id || '-').substring(0, 20),
-                    (r.nombre || '').substring(0, 30),
+                const reconectadosData = recuperadosHoy.slice(0, 25).map(r => [
+                    (r.clienteIdOriginal || r.clienteId || '-').substring(0, 18),
+                    (r.nombre || '').substring(0, 25),
                     r.telefono || '-',
-                    r.plan || '-',
-                    r.direccion ? r.direccion.substring(0, 40) : '-',
-                    r.centroOp || '-',
                     r.agente || '-'
                 ]);
                 
                 doc.autoTable({
-                    startY: yPos + 4,
-                    head: [['ID', 'Cliente', 'Teléfono', 'Plan', 'Dirección', 'Zona', 'Agente']],
+                    startY: yPos,
+                    head: [['ID', 'Cliente', 'Teléfono', 'Agente']],
                     body: reconectadosData,
                     theme: 'striped',
                     headStyles: { fillColor: [16, 185, 129], textColor: [255, 255, 255], fontStyle: 'bold' },
@@ -2379,26 +2617,25 @@
                 yPos = doc.lastAutoTable.finalY + 10;
             }
             
+            // LISTADO DE BAJAS (solo si hay)
             if (perdidosHoy.length > 0) {
-                if (yPos > 250) { doc.addPage(); yPos = 20; }
+                if (yPos > 240) { doc.addPage(); yPos = 20; }
                 doc.setFontSize(11);
                 doc.setFont(undefined, 'bold');
                 doc.text('CLIENTES DADOS DE BAJA', 14, yPos);
+                yPos += 6;
                 
-                const bajasData = perdidosHoy.slice(0, 30).map(p => [
-                    (p.clienteId || p.id || '-').substring(0, 20),
-                    (p.nombre || '').substring(0, 30),
+                const bajasData = perdidosHoy.slice(0, 25).map(p => [
+                    (p.clienteIdOriginal || p.clienteId || '-').substring(0, 18),
+                    (p.nombre || '').substring(0, 25),
                     p.telefono || '-',
-                    p.plan || '-',
-                    p.direccion ? p.direccion.substring(0, 40) : '-',
-                    p.centroOp || '-',
                     p.motivoBaja === 'price' ? 'Precio' : p.motivoBaja === 'service_issues' ? 'Problemas servicio' : p.motivoBaja === 'relocation' ? 'Mudanza' : p.motivoBaja === 'deceased' ? 'Fallecimiento' : (p.motivoBaja || '-'),
                     p.agente || '-'
                 ]);
                 
                 doc.autoTable({
-                    startY: yPos + 4,
-                    head: [['ID', 'Cliente', 'Teléfono', 'Plan', 'Dirección', 'Zona', 'Motivo', 'Agente']],
+                    startY: yPos,
+                    head: [['ID', 'Cliente', 'Teléfono', 'Motivo', 'Agente']],
                     body: bajasData,
                     theme: 'striped',
                     headStyles: { fillColor: [239, 68, 68], textColor: [255, 255, 255], fontStyle: 'bold' },
@@ -2408,62 +2645,16 @@
                 yPos = doc.lastAutoTable.finalY + 10;
             }
             
-            if (visitasCompletadasHoy.length > 0) {
-                if (yPos > 250) { doc.addPage(); yPos = 20; }
-                doc.setFontSize(11);
-                doc.setFont(undefined, 'bold');
-                doc.text('EQUIPOS RETIRADOS (Visitas completadas)', 14, yPos);
-                
-                const equiposData = visitasCompletadasHoy.slice(0, 30).map(v => [
-                    (v.clienteNombre || '').substring(0, 30),
-                    v.clienteTelefono || '-',
-                    (v.direccion || '').substring(0, 35),
-                    v.zona || v.centroOp || '-',
-                    v.tecnicoNombre || '-',
-                    v.completadoPor || v.agente || '-'
-                ]);
-                
-                doc.autoTable({
-                    startY: yPos + 4,
-                    head: [['Cliente', 'Teléfono', 'Dirección', 'Zona', 'Técnico', 'Completado por']],
-                    body: equiposData,
-                    theme: 'striped',
-                    headStyles: { fillColor: [79, 70, 229], textColor: [255, 255, 255], fontStyle: 'bold' },
-                    bodyStyles: { fontSize: 7 },
-                    margin: { left: 14 }
-                });
-                yPos = doc.lastAutoTable.finalY + 10;
-            }
-            
-            if (yPos > 250) { doc.addPage(); yPos = 20; }
-            doc.setDrawColor(200, 200, 200);
-            doc.line(14, yPos, 196, yPos);
-            yPos += 6;
-            
-            doc.setFontSize(10);
-            doc.setFont(undefined, 'bold');
-            doc.text('RESUMEN FINAL:', 14, yPos);
-            doc.setFont(undefined, 'normal');
-            doc.text('* Total clientes gestionados: ' + llamadasHoy.length, 14, yPos + 8);
-            doc.text('* Tasa de reconexión: ' + (llamadasHoy.length > 0 ? Math.round((recuperadosHoy.length / llamadasHoy.length) * 100) : (recuperadosHoy.length > 0 ? 100 : 0)) + '%', 14, yPos + 14);
-            doc.text('* Tasa de bajas: ' + (llamadasHoy.length > 0 ? Math.round((perdidosHoy.length / llamadasHoy.length) * 100) : 0) + '%', 14, yPos + 20);
-            doc.text('* Visitas de retiro pendientes: ' + visitasPendientesTotal, 14, yPos + 26);
-            doc.text('* Total equipos retirados hasta la fecha: ' + visitasFinalizadas.length, 14, yPos + 32);
-            
-            doc.setFontSize(9);
-            doc.setTextColor(100, 100, 100);
-            doc.text('TOTALES ACUMULADOS:', 14, yPos + 42);
-            doc.text('   - Clientes reconectados totales: ' + clientesRecuperados.length, 14, yPos + 48);
-            doc.text('   - Clientes dados de baja totales: ' + clientesPerdidosFinal.length, 14, yPos + 54);
-            doc.text('   - Visitas completadas totales: ' + visitasFinalizadas.length, 14, yPos + 60);
-            
+            // Pie de página
+            if (yPos > 270) { doc.addPage(); yPos = 20; }
             doc.setFontSize(8);
             doc.setTextColor(150, 150, 150);
-            doc.text('Reporte generado por sistema OCAD Inter - Gestión de Recupero - ' + new Date().toLocaleString(), 14, yPos + 72);
+            doc.text('Reporte generado por sistema OCAD Inter - Gestión de Recupero', 14, yPos + 10);
+            doc.text('Los totales acumulados representan el histórico completo del sistema sin filtro de fechas.', 14, yPos + 16);
             
             const nombreArchivo = `reporte_gestion_${fecha}_${new Date().toLocaleTimeString().replace(/:/g, '-')}.pdf`;
             doc.save(nombreArchivo);
-            showToast('Reporte generado exitosamente con los datos reales del sistema');
+            showToast('Reporte generado exitosamente');
         }
 
         // ==================== DASHBOARD ====================
@@ -2515,7 +2706,7 @@
             const agentStats = new Map();
             [...clientesRecuperados, ...clientesPerdidosFinal].forEach(r => {
                 if (!agentStats.has(r.agente)) agentStats.set(r.agente, { recuperados: 0, perdidos: 0 });
-                if (r.tipo === 'recuperado' || r.resultado === 'recuperado') agentStats.get(r.agente).recuperados++;
+                if (r.resultado === 'recuperado' || r.tipo === 'recuperado') agentStats.get(r.agente).recuperados++;
                 else if (r.resultado === 'dado_baja' || r.tipo === 'baja_servicio') agentStats.get(r.agente).perdidos++;
             });
             const sorted = Array.from(agentStats.entries()).sort((a,b) => b[1].recuperados - a[1].recuperados).slice(0,5);
@@ -2531,7 +2722,7 @@
         async function deleteAllPerdidosFinal() { if (!puedeEliminarDatos()) { showToast('No tiene permisos para eliminar datos', 'error'); return; } if (confirm('Eliminar todos los dados de baja?')) { const snap = await colecciones.perdidosFinal.get(); const batch = db.batch(); snap.forEach(doc => batch.delete(doc.ref)); await batch.commit(); showToast('Dados de baja eliminados'); } }
         async function deleteAllEquiposVisitas() { if (!puedeEliminarDatos()) { showToast('No tiene permisos para eliminar datos', 'error'); return; } if (confirm('Eliminar todas las visitas pendientes?')) { const snap = await colecciones.visitasTecnicas.get(); const batch = db.batch(); snap.forEach(doc => batch.delete(doc.ref)); await batch.commit(); showToast('Visitas pendientes eliminadas'); } }
         async function deleteAllVisitasFinalizadas() { if (!puedeEliminarDatos()) { showToast('No tiene permisos para eliminar datos', 'error'); return; } if (confirm('Eliminar todas las visitas finalizadas?')) { const snap = await colecciones.visitasFinalizadas.get(); const batch = db.batch(); snap.forEach(doc => batch.delete(doc.ref)); await batch.commit(); showToast('Visitas finalizadas eliminadas'); } }
-        async function deleteAllData() { if (!puedeEliminarDatos()) { showToast('No tiene permisos para eliminar datos', 'error'); return; } if (confirm('ELIMINAR TODOS LOS DATOS?')) { const col = [colecciones.rezagados, colecciones.perdidos, colecciones.recuperados, colecciones.perdidosFinal, colecciones.ordenesEquipos, colecciones.visitasTecnicas, colecciones.visitasFinalizadas, colecciones.technicians, colecciones.callLogs, colecciones.lockedCustomers]; for (const c of col) { const snap = await c.get(); const batch = db.batch(); snap.forEach(doc => batch.delete(doc.ref)); await batch.commit(); } showToast('Todos los datos eliminados'); } }
+        async function deleteAllData() { if (!puedeEliminarDatos()) { showToast('No tiene permisos para eliminar datos', 'error'); return; } if (confirm('ELIMINAR TODOS LOS DATOS? Esta acción es irreversible.')) { const col = [colecciones.rezagados, colecciones.perdidos, colecciones.recuperados, colecciones.perdidosFinal, colecciones.ordenesEquipos, colecciones.visitasTecnicas, colecciones.visitasFinalizadas, colecciones.technicians, colecciones.callLogs, colecciones.lockedCustomers]; for (const c of col) { const snap = await c.get(); const batch = db.batch(); snap.forEach(doc => batch.delete(doc.ref)); await batch.commit(); } showToast('Todos los datos eliminados'); } }
         
         function updateConfigCounters() {
             const container = document.getElementById('configButtonsContainer');
@@ -2700,6 +2891,12 @@
         document.getElementById('searchEquipo')?.addEventListener('input', () => renderEquiposTable());
         document.getElementById('searchVisita')?.addEventListener('input', () => renderVisitasTable());
         
+        const historialSearchFields = ['historialSearchNombre', 'historialSearchDocumento', 'historialSearchTelefono', 'historialSearchId'];
+        historialSearchFields.forEach(fieldId => {
+            document.getElementById(fieldId)?.addEventListener('input', () => filtrarHistorial());
+        });
+        document.getElementById('filterTipoGestion')?.addEventListener('change', () => filtrarHistorial());
+        
         document.getElementById('saveCallBtn')?.addEventListener('click', saveCall);
         document.getElementById('completeOrderBtn')?.addEventListener('click', completeOrder);
         document.getElementById('callResult')?.addEventListener('change', (e) => {
@@ -2733,6 +2930,7 @@
         window.deleteAllTechnicians = deleteAllTechnicians;
         window.deleteAllData = deleteAllData;
         window.filtrarHistorial = filtrarHistorial;
+        window.limpiarFiltrosHistorial = limpiarFiltrosHistorial;
         window.exportHistorialToExcel = exportHistorialToExcel;
         window.exportHistorialToPDF = exportHistorialToPDF;
     </script>

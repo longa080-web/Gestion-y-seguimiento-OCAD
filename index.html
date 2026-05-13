@@ -96,6 +96,7 @@
         .historial-stats { background: #f0fdf4; border-radius: 8px; padding: 8px; margin-bottom: 12px; border-left: 3px solid #10b981; }
         .fa-spin { animation: spin 1s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .availability-warning { background: #e0f2fe; border-left: 3px solid #0284c7; padding: 8px; margin-top: 8px; border-radius: 6px; font-size: 11px; color: #0369a1; }
     </style>
 </head>
 <body class="bg-gray-100 font-sans">
@@ -280,7 +281,7 @@
                 <div id="perdidosFinalMobileList" class="mobile-cards"></div>
             </div>
 
-            <!-- Visita técnica Pendiente Tab -->
+            <!-- Visita técnica Pendiente Tab - MODIFICADA para mostrar N° Abonado -->
             <div id="equiposTab" class="tab-content hidden">
                 <div class="bg-white rounded-xl shadow-md p-3 mb-3">
                     <div class="flex flex-wrap justify-between items-center gap-2">
@@ -289,12 +290,12 @@
                     </div>
                     <div class="text-xs text-gray-500 mt-1" id="permisoCompletarMsg"></div>
                     <div class="filters-grid mt-2">
-                        <input type="text" id="searchEquipo" placeholder="Buscar por cliente..." class="search-input border rounded-lg px-2 py-1 text-xs">
+                        <input type="text" id="searchEquipo" placeholder="Buscar por cliente o N° abonado..." class="search-input border rounded-lg px-2 py-1 text-xs">
                     </div>
                 </div>
                 <div class="table-container desktop-table">
                     <table class="customers-table">
-                        <thead><tr><th>Cliente</th><th>Teléfono</th><th>Dirección</th><th>Zona/CO</th><th>Técnico</th><th>Fecha</th><th>Hora</th><th>Motivo</th><th>Estado</th><th>Acciones</th></tr></thead>
+                        <thead><tr><th>N° Abonado</th><th>Cliente</th><th>Teléfono</th><th>Dirección</th><th>Zona/CO</th><th>Técnico</th><th>Fecha</th><th>Hora</th><th>Motivo</th><th>Estado</th><th>Acciones</th></tr></thead>
                         <tbody id="equiposTableBody"></tbody>
                     </table>
                 </div>
@@ -314,7 +315,7 @@
                 </div>
                 <div class="table-container desktop-table">
                     <table class="customers-table">
-                        <thead><tr><th>Cliente</th><th>Teléfono</th><th>Dirección</th><th>Zona/CO</th><th>Técnico</th><th>Fecha/Hora</th><th>Fecha Completado</th><th>Completado por</th><th>Estado</th></tr></thead>
+                        <thead><tr><th>N° Abonado</th><th>Cliente</th><th>Teléfono</th><th>Dirección</th><th>Zona/CO</th><th>Técnico</th><th>Fecha/Hora</th><th>Fecha Completado</th><th>Completado por</th><th>Estado</th></tr></thead>
                         <tbody id="visitasTableBody"></tbody>
                     </table>
                 </div>
@@ -449,7 +450,7 @@
         </div>
     </div>
 
-    <!-- Modal para registrar llamada -->
+    <!-- Modal para registrar llamada - MODIFICADO con validación de horario -->
     <div id="registerCallModal" class="modal hidden">
         <div class="modal-content">
             <div class="flex justify-between items-center mb-3"><h3 class="text-base font-bold"><i class="fas fa-phone-alt text-green-500 mr-1"></i>Registrar Llamada</h3><button onclick="closeRegisterCallModal()"><i class="fas fa-times text-lg"></i></button></div>
@@ -505,6 +506,7 @@
                     <label class="block text-xs font-medium mb-1">Observaciones</label>
                     <textarea id="visitInstructions" rows="2" class="w-full border rounded-lg px-2 py-1 text-sm"></textarea>
                     <p class="text-xs text-blue-500 mt-1"><i class="fas fa-info-circle"></i> La visita se programará automáticamente en la pestaña "Visita técnica Pendiente"</p>
+                    <div id="availabilityWarning" class="availability-warning hidden"></div>
                 </div>
                 <div class="mb-2"><label class="block text-xs font-medium mb-1">Observaciones</label><textarea id="callObservations" rows="2" class="w-full border rounded-lg px-2 py-1 text-sm"></textarea></div>
                 <div class="flex gap-2"><button type="button" id="saveCallBtn" class="flex-1 bg-green-600 text-white py-1 rounded-lg text-sm">Guardar</button><button type="button" onclick="closeRegisterCallModal()" class="flex-1 bg-gray-500 text-white py-1 rounded-lg text-sm">Cancelar</button></div>
@@ -598,6 +600,26 @@
         let datosCargados = false;
         let contadorCargas = 0;
         const TOTAL_COLECCIONES = 10;
+
+        // ==================== FUNCIÓN PARA VERIFICAR DISPONIBILIDAD DE HORARIO ====================
+        async function verificarHorarioDisponible(tecnicoId, fecha, hora) {
+            // Buscar si ya existe una visita para ese técnico en la misma fecha y hora
+            const visitasExistentes = visitasTecnicas.filter(v => 
+                v.tecnicoId === tecnicoId && 
+                v.fechaVisita === fecha && 
+                v.horaVisita === hora &&
+                v.estado !== 'completada'
+            );
+            
+            // También verificar en visitas finalizadas (historial)
+            const visitasCompletadas = visitasFinalizadas.filter(v => 
+                v.tecnicoId === tecnicoId && 
+                v.fechaVisita === fecha && 
+                v.horaVisita === hora
+            );
+            
+            return visitasExistentes.length === 0 && visitasCompletadas.length === 0;
+        }
 
         // ==================== FUNCIONES DE CARGA Y LISTENERS ====================
         function verificarCargaCompleta() {
@@ -1000,6 +1022,13 @@
                 }
                 
             } else if (resultado === 'visita_tecnica' && visitaData) {
+                // Verificar disponibilidad de horario antes de crear la visita
+                const horarioDisponible = await verificarHorarioDisponible(visitaData.tecnicoId, visitaData.fecha, visitaData.hora);
+                if (!horarioDisponible) {
+                    showToast(`El técnico ${visitaData.tecnicoNombre} ya tiene una visita programada en esa fecha y hora. Por favor seleccione otro horario o técnico.`, 'error');
+                    throw new Error('Horario no disponible');
+                }
+                
                 const visita = {
                     id: Date.now().toString(),
                     clienteId: customer.id,
@@ -1088,13 +1117,13 @@
                     if (rows.length < 2) { alert('El archivo no contiene datos'); return; }
                     rezagadosHeaders = rows[0].map(h => String(h || '').trim());
                     rezagadosRawData = rows.slice(1).filter(row => row && row.length > 0 && row.some(cell => cell && String(cell).trim() !== ''));
-                    let previewHtml = '<thead></tr>';
+                    let previewHtml = '<thead><tr>';
                     for(let i = 0; i < Math.min(rezagadosHeaders.length, 8); i++) {
                         previewHtml += `<th class="text-xs">${escapeHtml(rezagadosHeaders[i]).substring(0, 20)}</th>`;
                     }
                     previewHtml += '</thead><tbody>';
                     for(let r = 0; r < Math.min(rezagadosRawData.length, 5); r++) {
-                        previewHtml += '<tr>';
+                        previewHtml += ' hilab';
                         for(let c = 0; c < Math.min(rezagadosRawData[r].length, 8); c++) {
                             previewHtml += `<td class="text-xs">${escapeHtml(String(rezagadosRawData[r][c] || '').substring(0, 30))}</td>`;
                         }
@@ -1395,6 +1424,7 @@
             document.getElementById('callObservations').value = '';
             document.getElementById('visitDate').value = new Date().toISOString().split('T')[0];
             document.getElementById('visitTime').value = '';
+            document.getElementById('availabilityWarning').classList.add('hidden');
             document.getElementById('registerCallModal').classList.remove('hidden');
         }
         
@@ -1413,6 +1443,27 @@
                 await unlockCustomer(id, type);
             }
             document.getElementById('registerCallModal').classList.add('hidden');
+        }
+        
+        // Función para verificar disponibilidad en tiempo real al cambiar técnico, fecha u hora
+        window.checkAvailability = async function() {
+            const tecnicoId = document.getElementById('visitTechnician').value;
+            const fecha = document.getElementById('visitDate').value;
+            const hora = document.getElementById('visitTime').value;
+            const warningDiv = document.getElementById('availabilityWarning');
+            
+            if (tecnicoId && fecha && hora) {
+                const disponible = await verificarHorarioDisponible(tecnicoId, fecha, hora);
+                if (!disponible) {
+                    const tecnicoNombre = document.getElementById('visitTechnician').options[document.getElementById('visitTechnician').selectedIndex]?.text || 'Técnico';
+                    warningDiv.innerHTML = `<i class="fas fa-exclamation-triangle mr-1"></i> El técnico ${tecnicoNombre} ya tiene una visita programada en esta fecha y hora. Por favor seleccione otro horario o técnico.`;
+                    warningDiv.classList.remove('hidden');
+                } else {
+                    warningDiv.classList.add('hidden');
+                }
+            } else {
+                warningDiv.classList.add('hidden');
+            }
         }
         
         window.saveCall = async function() {
@@ -1435,6 +1486,15 @@
                 const tecnicoId = document.getElementById('visitTechnician').value;
                 if (resultado === 'visita_tecnica' && !tecnicoId) { alert('Seleccione un técnico para la visita'); return; }
                 
+                // Verificar disponibilidad antes de guardar
+                if (tecnicoId) {
+                    const disponible = await verificarHorarioDisponible(tecnicoId, fecha, hora);
+                    if (!disponible) {
+                        alert('El técnico seleccionado ya tiene una visita programada en esta fecha y hora. Por favor seleccione otro horario o técnico.');
+                        return;
+                    }
+                }
+                
                 const tecnico = technicians.find(t => t.id === tecnicoId);
                 visitaData = {
                     motivo: document.getElementById('visitReason').value,
@@ -1451,6 +1511,11 @@
             await processCallResult(customer, customerType, resultado, observaciones, motivoBaja, visitaData);
         }
         
+        // Agregar event listeners para verificar disponibilidad en tiempo real
+        document.getElementById('visitTechnician')?.addEventListener('change', window.checkAvailability);
+        document.getElementById('visitDate')?.addEventListener('change', window.checkAvailability);
+        document.getElementById('visitTime')?.addEventListener('change', window.checkAvailability);
+        
         window.closeCompleteOrderModal = function() { document.getElementById('completeOrderModal').classList.add('hidden'); }
         
         window.openCompleteOrderModal = function(orderId, type) {
@@ -1462,7 +1527,7 @@
             let order, info;
             if (type === 'visita') {
                 order = visitasTecnicas.find(v => v.id === orderId);
-                info = `Cliente: ${order?.clienteNombre}\nTeléfono: ${order?.clienteTelefono}\nDirección: ${order?.direccion}\nZona: ${order?.zona || order?.centroOp || 'No especificada'}\nFecha: ${order?.fechaVisita} ${order?.horaVisita}\nMotivo: ${order?.motivoTexto || order?.motivo || 'Retiro de equipo'}`;
+                info = `Cliente: ${order?.clienteNombre}\nN° Abonado: ${order?.clienteIdOriginal || order?.clienteId}\nTeléfono: ${order?.clienteTelefono}\nDirección: ${order?.direccion}\nZona: ${order?.zona || order?.centroOp || 'No especificada'}\nFecha: ${order?.fechaVisita} ${order?.horaVisita}\nMotivo: ${order?.motivoTexto || order?.motivo || 'Retiro de equipo'}`;
             } else {
                 return;
             }
@@ -1585,7 +1650,7 @@
             const tbodyDesktop = document.getElementById('rezagadosTableBodyDesktop');
             if (tbodyDesktop) {
                 if (items.length === 0) {
-                    tbodyDesktop.innerHTML = '<tr><td colspan="11" class="text-center py-4 text-gray-500 text-xs">No hay clientes rezagados pendientes</div></tr>';
+                    tbodyDesktop.innerHTML = '<tr><td colspan="11" class="text-center py-4 text-gray-500 text-xs">No hay clientes rezagados pendientes</td></tr>';
                 } else {
                     tbodyDesktop.innerHTML = pageItems.map(c => {
                         const lockInfo = getCustomerLockInfo(c.id, 'rezagado');
@@ -1595,21 +1660,21 @@
                         const statusClass = getStatusClass(c.estado);
                         const statusText = getStatusText(c.estado);
                         return `<tr>
-                            <td><input type="checkbox" onchange="toggleSelectRezagado('${c.id}', this.checked)"></div></td>
-                            <td class="truncate-text">${escapeHtml(c.identificador || c.id)}</div></td>
-                            <td><span class="font-medium">${escapeHtml(c.nombre)}</span></div></td>
-                            <td class="truncate-text">${escapeHtml(c.documento)}</div></td>
-                            <td>${hasPhone ? escapeHtml(c.telefono1) : '-'}</div></td>
-                            <td class="truncate-text">${escapeHtml(c.plan)}</div></td>
-                            <td>${escapeHtml(c.centroOp)}</div></td>
-                            <td>${c.fechaCorte || '-'}</div></td>
-                            <td><span class="status-badge ${statusClass}">${statusText}</span></div></td>
-                            <td>${isLocked ? `<span class="blocked-badge"><i class="fas fa-lock"></i> ${lockInfo.agente}</span>` : '-'}</div></td>
+                            <td><input type="checkbox" onchange="toggleSelectRezagado('${c.id}', this.checked)"></td>
+                            <td class="truncate-text">${escapeHtml(c.identificador || c.id)}</td>
+                            <td><span class="font-medium">${escapeHtml(c.nombre)}</span></td>
+                            <td class="truncate-text">${escapeHtml(c.documento)}</td>
+                            <td>${hasPhone ? escapeHtml(c.telefono1) : '-'}</td>
+                            <td class="truncate-text">${escapeHtml(c.plan)}</td>
+                            <td>${escapeHtml(c.centroOp)}</td>
+                            <td>${c.fechaCorte || '-'}</td>
+                            <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                            <td>${isLocked ? `<span class="blocked-badge"><i class="fas fa-lock"></i> ${lockInfo.agente}</span>` : '-'}</td>
                             <td class="action-cell">
                                 ${(!isLocked || lockedByMe) && hasPhone ? `<button onclick="openRegisterCallModal('${c.id}', 'rezagado')" class="call-btn"><i class="fas fa-phone-alt"></i> Gestionar</button>` : `<button class="call-btn opacity-50" disabled>${!hasPhone ? 'Sin teléfono' : 'Bloqueado'}</button>`}
                                 ${hasPhone ? `<a href="tel:${c.telefono1}" class="call-link"><i class="fas fa-phone"></i></a><a href="https://wa.me/${c.telefono1.replace(/[^0-9]/g,'')}" target="_blank" class="whatsapp-link"><i class="fab fa-whatsapp"></i></a>` : ''}
                                 <button onclick="deleteSingleCustomer('${c.id}', 'rezagado')" class="delete-single-btn"><i class="fas fa-trash-alt"></i></button>
-                              </div>
+                              </td>
                         </tr>`;
                     }).join('');
                 }
@@ -1666,7 +1731,7 @@
             const tbodyDesktop = document.getElementById('perdidosTableBodyDesktop');
             if (tbodyDesktop) {
                 if (items.length === 0) {
-                    tbodyDesktop.innerHTML = '<tr><td colspan="11" class="text-center py-4 text-gray-500 text-xs">No hay clientes perdidos pendientes</div></tr>';
+                    tbodyDesktop.innerHTML = '<tr><td colspan="11" class="text-center py-4 text-gray-500 text-xs">No hay clientes perdidos pendientes</td></tr>';
                 } else {
                     tbodyDesktop.innerHTML = pageItems.map(c => {
                         const lockInfo = getCustomerLockInfo(c.id, 'perdido');
@@ -1676,21 +1741,21 @@
                         const statusClass = getStatusClass(c.estado);
                         const statusText = getStatusText(c.estado);
                         return `<tr>
-                            <td><input type="checkbox" onchange="toggleSelectPerdido('${c.id}', this.checked)"></div></td>
-                            <td class="truncate-text">${escapeHtml(c.identificador || c.id)}</div></td>
-                            <td><span class="font-medium">${escapeHtml(c.nombre)}</span></div></td>
-                            <td class="truncate-text">${escapeHtml(c.documento)}</div></td>
-                            <td>${hasPhone ? escapeHtml(c.telefono1) : '-'}</div></td>
-                            <td class="truncate-text">${escapeHtml(c.plan)}</div></td>
-                            <td>${escapeHtml(c.centroOp)}</div></td>
-                            <td>${c.fechaCorte || '-'}</div></td>
-                            <td><span class="status-badge ${statusClass}">${statusText}</span></div></td>
-                            <td>${isLocked ? `<span class="blocked-badge"><i class="fas fa-lock"></i> ${lockInfo.agente}</span>` : '-'}</div></td>
+                            <td><input type="checkbox" onchange="toggleSelectPerdido('${c.id}', this.checked)"></td>
+                            <td class="truncate-text">${escapeHtml(c.identificador || c.id)}</td>
+                            <td><span class="font-medium">${escapeHtml(c.nombre)}</span></td>
+                            <td class="truncate-text">${escapeHtml(c.documento)}</td>
+                            <td>${hasPhone ? escapeHtml(c.telefono1) : '-'}</td>
+                            <td class="truncate-text">${escapeHtml(c.plan)}</td>
+                            <td>${escapeHtml(c.centroOp)}</td>
+                            <td>${c.fechaCorte || '-'}</td>
+                            <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                            <td>${isLocked ? `<span class="blocked-badge"><i class="fas fa-lock"></i> ${lockInfo.agente}</span>` : '-'}</td>
                             <td class="action-cell">
                                 ${(!isLocked || lockedByMe) && hasPhone ? `<button onclick="openRegisterCallModal('${c.id}', 'perdido')" class="call-btn"><i class="fas fa-phone-alt"></i> Gestionar</button>` : `<button class="call-btn opacity-50" disabled>${!hasPhone ? 'Sin teléfono' : 'Bloqueado'}</button>`}
                                 ${hasPhone ? `<a href="tel:${c.telefono1}" class="call-link"><i class="fas fa-phone"></i></a><a href="https://wa.me/${c.telefono1.replace(/[^0-9]/g,'')}" target="_blank" class="whatsapp-link"><i class="fab fa-whatsapp"></i></a>` : ''}
                                 <button onclick="deleteSingleCustomer('${c.id}', 'perdido')" class="delete-single-btn"><i class="fas fa-trash-alt"></i></button>
-                              </div>
+                              </td>
                             `;
                     }).join('');
                 }
@@ -1745,18 +1810,18 @@
             const tbody = document.getElementById('recuperadosTableBody');
             if (tbody) {
                 if (items.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="9" class="text-center py-4 text-gray-500 text-xs">No hay clientes reconectados</div></tr>';
+                    tbody.innerHTML = '<tr><td colspan="9" class="text-center py-4 text-gray-500 text-xs">No hay clientes reconectados</td></tr>';
                 } else {
                     tbody.innerHTML = items.slice(0, ITEMS_PER_PAGE).map(c => `<tr>
-                        <td class="truncate-text">${escapeHtml(c.clienteIdOriginal || c.clienteId)}</div></td>
-                        <td><span class="font-medium">${escapeHtml(c.nombre)}</span></div></td>
-                        <td class="truncate-text">${escapeHtml(c.documento)}</div></td>
-                        <td>${escapeHtml(c.telefono)}</div></td>
-                        <td class="truncate-text">${escapeHtml(c.plan)}</div></td>
-                        <td class="truncate-text">${escapeHtml(c.direccion || 'No registrada')}</div></td>
-                        <td>${escapeHtml(c.centroOp || '-')}</div></td>
-                        <td>${new Date(c.fechaGestion).toLocaleDateString()}</div></td>
-                        <td>${escapeHtml(c.agente)}</div></td>
+                        <td class="truncate-text">${escapeHtml(c.clienteIdOriginal || c.clienteId)}</td>
+                        <td><span class="font-medium">${escapeHtml(c.nombre)}</span></td>
+                        <td class="truncate-text">${escapeHtml(c.documento)}</td>
+                        <td>${escapeHtml(c.telefono)}</td>
+                        <td class="truncate-text">${escapeHtml(c.plan)}</td>
+                        <td class="truncate-text">${escapeHtml(c.direccion || 'No registrada')}</td>
+                        <td>${escapeHtml(c.centroOp || '-')}</td>
+                        <td>${new Date(c.fechaGestion).toLocaleDateString()}</td>
+                        <td>${escapeHtml(c.agente)}</td>
                     </tr>`).join('');
                 }
             }
@@ -1771,29 +1836,30 @@
             const tbody = document.getElementById('perdidosFinalTableBody');
             if (tbody) {
                 if (items.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="10" class="text-center py-4 text-gray-500 text-xs">No hay clientes dados de baja</div></table>';
+                    tbody.innerHTML = '<tr><td colspan="10" class="text-center py-4 text-gray-500 text-xs">No hay clientes dados de baja</td></tr>';
                 } else {
                     tbody.innerHTML = items.slice(0, ITEMS_PER_PAGE).map(c => `<tr>
-                        <td class="truncate-text">${escapeHtml(c.clienteIdOriginal || c.clienteId)}</div></td>
-                        <td><span class="font-medium">${escapeHtml(c.nombre)}</span></div></td>
-                        <td class="truncate-text">${escapeHtml(c.documento)}</div></td>
-                        <td>${escapeHtml(c.telefono)}</div></td>
-                        <td class="truncate-text">${escapeHtml(c.plan)}</div></td>
-                        <td class="truncate-text">${escapeHtml(c.direccion || 'No registrada')}</div></td>
-                        <td>${escapeHtml(c.centroOp || '-')}</div></td>
-                        <td class="truncate-text">${c.motivoBaja === 'price' ? 'Precio' : c.motivoBaja === 'service_issues' ? 'Problemas servicio' : c.motivoBaja === 'relocation' ? 'Mudanza' : c.motivoBaja === 'deceased' ? 'Fallecimiento' : (c.motivoBaja || '-')}</div></td>
-                        <td>${new Date(c.fechaGestion).toLocaleDateString()}</div></td>
-                        <td>${escapeHtml(c.agente)}</div></td>
+                        <td class="truncate-text">${escapeHtml(c.clienteIdOriginal || c.clienteId)}</td>
+                        <td><span class="font-medium">${escapeHtml(c.nombre)}</span></td>
+                        <td class="truncate-text">${escapeHtml(c.documento)}</td>
+                        <td>${escapeHtml(c.telefono)}</td>
+                        <td class="truncate-text">${escapeHtml(c.plan)}</td>
+                        <td class="truncate-text">${escapeHtml(c.direccion || 'No registrada')}</td>
+                        <td>${escapeHtml(c.centroOp || '-')}</td>
+                        <td class="truncate-text">${c.motivoBaja === 'price' ? 'Precio' : c.motivoBaja === 'service_issues' ? 'Problemas servicio' : c.motivoBaja === 'relocation' ? 'Mudanza' : c.motivoBaja === 'deceased' ? 'Fallecimiento' : (c.motivoBaja || '-')}</td>
+                        <td>${new Date(c.fechaGestion).toLocaleDateString()}</td>
+                        <td>${escapeHtml(c.agente)}</td>
                     </tr>`).join('');
                 }
             }
         }
         
+        // Renderizado de visitas pendientes - MODIFICADO para mostrar N° Abonado
         function renderEquiposTable() {
             let items = visitasTecnicas.filter(v => v.estado !== 'completada');
             
             const search = document.getElementById('searchEquipo')?.value.toLowerCase() || '';
-            if (search) items = items.filter(v => (v.clienteNombre || '').toLowerCase().includes(search));
+            if (search) items = items.filter(v => (v.clienteNombre || '').toLowerCase().includes(search) || (v.clienteIdOriginal || '').toLowerCase().includes(search));
             
             const permisoMsg = document.getElementById('permisoCompletarMsg');
             if (permisoMsg) {
@@ -1809,26 +1875,27 @@
             const tbody = document.getElementById('equiposTableBody');
             if (tbody) {
                 if (items.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="10" class="text-center py-4 text-gray-500 text-xs">No hay visitas técnicas pendientes de retiro de equipos.</div></tr>';
+                    tbody.innerHTML = '<tr><td colspan="11" class="text-center py-4 text-gray-500 text-xs">No hay visitas técnicas pendientes de retiro de equipos.</td></tr>';
                 } else {
                     const puedeCompletar = puedeCompletarVisitas();
                     tbody.innerHTML = items.map(v => `<tr>
-                        <td><span class="font-medium">${escapeHtml(v.clienteNombre)}</span></div></td>
-                        <td>${escapeHtml(v.clienteTelefono)}</div></td>
-                        <td class="truncate-text">${escapeHtml(v.direccion)}</div></td>
-                        <td>${escapeHtml(v.zona || v.centroOp || '-')}</div></td>
-                        <td>${v.tecnicoNombre || 'Por asignar'}</div></td>
-                        <td>${v.fechaVisita || '-'}</div></td>
-                        <td>${v.horaVisita || '-'}</div></td>
-                        <td class="text-xs">${v.motivoTexto || (v.motivo === 'retiro_equipo_por_baja' ? 'Retiro de equipo por baja' : (v.motivo || '-'))}</div></td>
-                        <td><span class="status-badge bg-pendiente">PENDIENTE</span></div></td>
+                        <td class="truncate-text">${escapeHtml(v.clienteIdOriginal || v.clienteId || '-')}</td>
+                        <td><span class="font-medium">${escapeHtml(v.clienteNombre)}</span></td>
+                        <td>${escapeHtml(v.clienteTelefono)}</td>
+                        <td class="truncate-text">${escapeHtml(v.direccion)}</td>
+                        <td>${escapeHtml(v.zona || v.centroOp || '-')}</td>
+                        <td>${v.tecnicoNombre || 'Por asignar'}</td>
+                        <td>${v.fechaVisita || '-'}</td>
+                        <td>${v.horaVisita || '-'}</td>
+                        <td class="text-xs">${v.motivoTexto || (v.motivo === 'retiro_equipo_por_baja' ? 'Retiro de equipo por baja' : (v.motivo || '-'))}</td>
+                        <td><span class="status-badge bg-pendiente">PENDIENTE</span></td>
                         <td class="action-cell">
                             <button onclick="openAssignTechnicianModal('${v.id}', 'visita')" class="assign-btn"><i class="fas fa-user-cog"></i> Asignar</button>
                             ${puedeCompletar ? 
                                 `<button onclick="openCompleteOrderModal('${v.id}', 'visita')" class="completar-btn"><i class="fas fa-check-circle"></i> Completar</button>` : 
                                 `<button class="completar-btn-disabled" disabled title="Solo Marina M y Administrador pueden completar"><i class="fas fa-lock"></i> Solo Admin</button>`}
                             <a href="https://wa.me/${v.clienteTelefono?.replace(/[^0-9]/g,'')}" target="_blank" class="whatsapp-link"><i class="fab fa-whatsapp"></i></a>
-                          </div>
+                          </td>
                     </tr>`).join('');
                 }
             }
@@ -1841,6 +1908,7 @@
                     const puedeCompletar = puedeCompletarVisitas();
                     mobileContainer.innerHTML = items.map(v => `<div class="customer-card-mobile">
                         <div class="font-bold text-sm">${escapeHtml(v.clienteNombre)}</div>
+                        <div class="text-xs text-gray-500">N° Abonado: ${escapeHtml(v.clienteIdOriginal || v.clienteId || '-')}</div>
                         <div class="info-row-mobile"><span class="info-label">Teléfono:</span><span class="info-value">${escapeHtml(v.clienteTelefono)}</span></div>
                         <div class="info-row-mobile"><span class="info-label">Dirección:</span><span class="info-value">${escapeHtml(v.direccion)}</span></div>
                         <div class="info-row-mobile"><span class="info-label">Zona:</span><span class="info-value">${escapeHtml(v.zona || v.centroOp || '-')}</span></div>
@@ -1860,6 +1928,7 @@
             }
         }
         
+        // Renderizado de visitas finalizadas - MODIFICADO para mostrar N° Abonado
         function renderVisitasTable() {
             let items = visitasFinalizadas;
             
@@ -1869,18 +1938,19 @@
             const tbody = document.getElementById('visitasTableBody');
             if (tbody) {
                 if (items.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="9" class="text-center py-4 text-gray-500 text-xs">No hay visitas técnicas finalizadas.</div></tr>';
+                    tbody.innerHTML = '<tr><td colspan="10" class="text-center py-4 text-gray-500 text-xs">No hay visitas técnicas finalizadas.</td></tr>';
                 } else {
                     tbody.innerHTML = items.slice(0, ITEMS_PER_PAGE).map(v => `<tr>
-                        <td><span class="font-medium">${escapeHtml(v.clienteNombre)}</span></div></td>
-                        <td>${escapeHtml(v.clienteTelefono)}</div></td>
-                        <td class="truncate-text">${escapeHtml(v.direccion)}</div></td>
-                        <td>${escapeHtml(v.zona || v.centroOp || '-')}</div></td>
-                        <td>${v.tecnicoNombre || 'No asignado'}</div></td>
-                        <td>${v.fechaVisita || '-'} ${v.horaVisita || ''}</div></td>
-                        <td>${v.fechaCompletado ? new Date(v.fechaCompletado).toLocaleDateString() : '-'}</div></td>
-                        <td>${v.completadoPor || v.agente || '-'}</div></td>
-                        <td><span class="status-badge bg-recuperado">EQUIPO RETIRADO</span></div></td>
+                        <td class="truncate-text">${escapeHtml(v.clienteIdOriginal || v.clienteId || '-')}</td>
+                        <td><span class="font-medium">${escapeHtml(v.clienteNombre)}</span></td>
+                        <td>${escapeHtml(v.clienteTelefono)}</td>
+                        <td class="truncate-text">${escapeHtml(v.direccion)}</td>
+                        <td>${escapeHtml(v.zona || v.centroOp || '-')}</td>
+                        <td>${v.tecnicoNombre || 'No asignado'}</td>
+                        <td>${v.fechaVisita || '-'} ${v.horaVisita || ''}</td>
+                        <td>${v.fechaCompletado ? new Date(v.fechaCompletado).toLocaleDateString() : '-'}</td>
+                        <td>${v.completadoPor || v.agente || '-'}</td>
+                        <td><span class="status-badge bg-recuperado">EQUIPO RETIRADO</span></td>
                     </tr>`).join('');
                 }
             }
@@ -1892,6 +1962,7 @@
                 } else {
                     mobileContainer.innerHTML = items.slice(0, ITEMS_PER_PAGE).map(v => `<div class="customer-card-mobile">
                         <div class="font-bold text-sm">${escapeHtml(v.clienteNombre)}</div>
+                        <div class="text-xs text-gray-500">N° Abonado: ${escapeHtml(v.clienteIdOriginal || v.clienteId || '-')}</div>
                         <div class="info-row-mobile"><span class="info-label">Teléfono:</span><span class="info-value">${escapeHtml(v.clienteTelefono)}</span></div>
                         <div class="info-row-mobile"><span class="info-label">Dirección:</span><span class="info-value">${escapeHtml(v.direccion)}</span></div>
                         <div class="info-row-mobile"><span class="info-label">Zona:</span><span class="info-value">${escapeHtml(v.zona || v.centroOp || '-')}</span></div>
@@ -2134,19 +2205,19 @@
             
             if (tbody) {
                 if (registros.length === 0) {
-                    tbody.innerHTML = '<td><td colspan="10" class="text-center py-4 text-gray-500">No hay registros que coincidan con los filtros</div></tr>';
+                    tbody.innerHTML = '<tr><td colspan="10" class="text-center py-4 text-gray-500">No hay registros que coincidan con los filtros</td></tr>';
                 } else {
                     tbody.innerHTML = registros.slice(0, 200).map(r => `<tr>
-                        <td class="text-xs">${new Date(r.fecha).toLocaleDateString()} ${new Date(r.fecha).toLocaleTimeString()}</div></td>
-                        <td class="text-xs">${escapeHtml(r.agente)}</div></td>
-                        <td class="text-xs">${escapeHtml(r.cliente)}</div></td>
-                        <td class="text-xs">${escapeHtml(r.clienteId || '-')}</div></td>
-                        <td class="text-xs">${escapeHtml(r.documento || '-')}</div></td>
-                        <td class="text-xs"><span class="px-1 py-0.5 rounded ${r.tipo === 'Reconexion' ? 'bg-green-100 text-green-700' : r.tipo === 'Baja' ? 'bg-red-100 text-red-700' : r.tipo === 'Visita Finalizada' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100'}">${escapeHtml(r.tipo)}</span></div></td>
-                        <td class="text-xs">${escapeHtml(r.resultado)}</div></td>
-                        <td class="text-xs">${escapeHtml(r.telefono)}</div></td>
-                        <td class="text-xs">${escapeHtml(r.plan)}</div></td>
-                        <td class="text-xs">${escapeHtml(r.co)}</div></td>
+                        <td class="text-xs">${new Date(r.fecha).toLocaleDateString()} ${new Date(r.fecha).toLocaleTimeString()}</td>
+                        <td class="text-xs">${escapeHtml(r.agente)}</td>
+                        <td class="text-xs">${escapeHtml(r.cliente)}</td>
+                        <td class="text-xs">${escapeHtml(r.clienteId || '-')}</td>
+                        <td class="text-xs">${escapeHtml(r.documento || '-')}</td>
+                        <td class="text-xs"><span class="px-1 py-0.5 rounded ${r.tipo === 'Reconexion' ? 'bg-green-100 text-green-700' : r.tipo === 'Baja' ? 'bg-red-100 text-red-700' : r.tipo === 'Visita Finalizada' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100'}">${escapeHtml(r.tipo)}</span></td>
+                        <td class="text-xs">${escapeHtml(r.resultado)}</td>
+                        <td class="text-xs">${escapeHtml(r.telefono)}</td>
+                        <td class="text-xs">${escapeHtml(r.plan)}</td>
+                        <td class="text-xs">${escapeHtml(r.co)}</td>
                     </tr>`).join('');
                 }
             }
@@ -2286,8 +2357,8 @@
         }
         
         function exportEquiposToExcel() {
-            const data = [['Cliente', 'Teléfono', 'Dirección', 'Zona/CO', 'Técnico', 'Fecha Programada', 'Hora', 'Motivo', 'Estado']];
-            visitasTecnicas.filter(v => v.estado !== 'completada').forEach(v => data.push([v.clienteNombre, v.clienteTelefono, v.direccion, v.zona || v.centroOp || '-', v.tecnicoNombre || 'No asignado', v.fechaVisita || '-', v.horaVisita || '-', v.motivoTexto || 'Retiro de equipo', 'PENDIENTE']));
+            const data = [['N° Abonado', 'Cliente', 'Teléfono', 'Dirección', 'Zona/CO', 'Técnico', 'Fecha Programada', 'Hora', 'Motivo', 'Estado']];
+            visitasTecnicas.filter(v => v.estado !== 'completada').forEach(v => data.push([v.clienteIdOriginal || v.clienteId || '-', v.clienteNombre, v.clienteTelefono, v.direccion, v.zona || v.centroOp || '-', v.tecnicoNombre || 'No asignado', v.fechaVisita || '-', v.horaVisita || '-', v.motivoTexto || 'Retiro de equipo', 'PENDIENTE']));
             const ws = XLSX.utils.aoa_to_sheet(data);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'VisitasPendientes');
@@ -2296,8 +2367,8 @@
         }
         
         function exportVisitasToExcel() {
-            const data = [['Cliente', 'Teléfono', 'Dirección', 'Zona/CO', 'Técnico', 'Fecha Programada', 'Hora', 'Fecha Completado', 'Completado por', 'Estado']];
-            visitasFinalizadas.forEach(v => data.push([v.clienteNombre, v.clienteTelefono, v.direccion, v.zona || v.centroOp || '-', v.tecnicoNombre || 'No asignado', v.fechaVisita || '-', v.horaVisita || '-', v.fechaCompletado ? new Date(v.fechaCompletado).toLocaleDateString() : '-', v.completadoPor || v.agente || '-', 'EQUIPO RETIRADO']));
+            const data = [['N° Abonado', 'Cliente', 'Teléfono', 'Dirección', 'Zona/CO', 'Técnico', 'Fecha Programada', 'Hora', 'Fecha Completado', 'Completado por', 'Estado']];
+            visitasFinalizadas.forEach(v => data.push([v.clienteIdOriginal || v.clienteId || '-', v.clienteNombre, v.clienteTelefono, v.direccion, v.zona || v.centroOp || '-', v.tecnicoNombre || 'No asignado', v.fechaVisita || '-', v.horaVisita || '-', v.fechaCompletado ? new Date(v.fechaCompletado).toLocaleDateString() : '-', v.completadoPor || v.agente || '-', 'EQUIPO RETIRADO']));
             const ws = XLSX.utils.aoa_to_sheet(data);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'VisitasFinalizadas');
@@ -2305,7 +2376,7 @@
             showToast('Exportado');
         }
 
-        // ==================== REPORTE PDF DIARIO CORREGIDO ====================
+        // ==================== REPORTE PDF DIARIO ====================
         async function generateDailyReport() {
             if (!puedeGenerarReportes()) {
                 showToast('No tiene permisos para generar reportes. Solo Administrador y Marina M pueden.', 'error');
@@ -2382,7 +2453,7 @@
             const totalVisitasPendientes = visitasTecnicas.filter(v => v.estado !== 'completada').length;
             const totalVisitasCompletadas = visitasFinalizadas.length;
             
-            // Calcular variaciones (solo mostrar si hay cambio y datos para comparar)
+            // Calcular variaciones
             let varLlamadasText = '';
             let varRecuperadosText = '';
             let varBajasText = '';
@@ -2492,7 +2563,7 @@
             doc.line(14, yPos, 196, yPos);
             yPos += 8;
             
-            // TABLA DE RESULTADOS DE LLAMADAS (solo si hay llamadas)
+            // TABLA DE RESULTADOS DE LLAMADAS
             if (llamadasHoy.length > 0) {
                 doc.setFontSize(11);
                 doc.setFont(undefined, 'bold');
@@ -2538,7 +2609,7 @@
                 doc.setFont(undefined, 'normal');
             }
             
-            // ESTADISTICAS POR AGENTE (solo si hay agentes con actividad)
+            // ESTADISTICAS POR AGENTE
             if (agentStats.size > 0) {
                 if (yPos > 240) { doc.addPage(); yPos = 20; }
                 doc.setFontSize(11);
@@ -2590,7 +2661,7 @@
             doc.line(14, yPos, 196, yPos);
             yPos += 8;
             
-            // LISTADO DE RECONECTADOS (solo si hay)
+            // LISTADO DE RECONECTADOS
             if (recuperadosHoy.length > 0) {
                 if (yPos > 240) { doc.addPage(); yPos = 20; }
                 doc.setFontSize(11);
@@ -2617,7 +2688,7 @@
                 yPos = doc.lastAutoTable.finalY + 10;
             }
             
-            // LISTADO DE BAJAS (solo si hay)
+            // LISTADO DE BAJAS
             if (perdidosHoy.length > 0) {
                 if (yPos > 240) { doc.addPage(); yPos = 20; }
                 doc.setFontSize(11);
@@ -2711,7 +2782,7 @@
             });
             const sorted = Array.from(agentStats.entries()).sort((a,b) => b[1].recuperados - a[1].recuperados).slice(0,5);
             if (sorted.length === 0) container.innerHTML = '<div class="text-center py-2 text-gray-500 text-xs">Sin datos</div>';
-            else container.innerHTML = sorted.map(([agente, stats], idx) => `<div class="flex justify-between items-center p-1 border-b text-xs"><div><span class="font-bold">${idx === 0 ? '1' : idx+1}.</span> ${escapeHtml(agente)}</div><div><span class="text-green-600">${stats.recuperados}</span> | <span class="text-red-600">${stats.perdidos}</span></div></div>`).join('');
+            else container.innerHTML = sorted.map(([agente, stats], idx) => `<div class="flex justify-between items-center p-1 border-b text-xs"><div><span class="font-bold">${idx === 0 ? '🏆' : idx+1}.</span> ${escapeHtml(agente)}</div><div><span class="text-green-600">${stats.recuperados}</span> | <span class="text-red-600">${stats.perdidos}</span></div></div>`).join('');
         }
 
         // ==================== ELIMINACIONES ====================
@@ -2933,6 +3004,7 @@
         window.limpiarFiltrosHistorial = limpiarFiltrosHistorial;
         window.exportHistorialToExcel = exportHistorialToExcel;
         window.exportHistorialToPDF = exportHistorialToPDF;
+        window.checkAvailability = checkAvailability;
     </script>
 </body>
 </html>

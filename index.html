@@ -107,6 +107,17 @@
         .truncate-text { max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         @media (min-width: 768px) { .truncate-text { max-width: 200px; } }
         .pagination-info { font-size: 11px; color: #6b7280; margin-top: 8px; text-align: center; }
+        
+        /* Estilos para la tabla de Top Agentes */
+        .top-agents-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .top-agents-table th { text-align: left; padding: 8px 6px; background: #f8fafc; color: #475569; font-weight: 600; font-size: 11px; border-bottom: 1px solid #e2e8f0; }
+        .top-agents-table td { padding: 8px 6px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+        .progress-bar-bg { background-color: #e2e8f0; border-radius: 10px; height: 8px; width: 100%; overflow: hidden; }
+        .progress-bar-fill { background-color: #10b981; height: 100%; border-radius: 10px; transition: width 0.5s ease; }
+        .medal-icon { font-size: 16px; margin-right: 4px; }
+        .rank-1 { background: linear-gradient(90deg, #fef3c7 0%, transparent 100%); border-radius: 8px; }
+        .rank-2 { background: linear-gradient(90deg, #f1f5f9 0%, transparent 100%); border-radius: 8px; }
+        .rank-3 { background: linear-gradient(90deg, #ffedd5 0%, transparent 100%); border-radius: 8px; }
     </style>
 </head>
 <body class="bg-gray-100 font-sans">
@@ -212,7 +223,37 @@
                     <div class="bg-white rounded-xl shadow-md p-3"><h3 class="font-bold text-sm mb-2">Evolución de Recupero</h3><canvas id="recoveryTrendChart" height="150"></canvas></div>
                     <div class="bg-white rounded-xl shadow-md p-3"><h3 class="font-bold text-sm mb-2">Motivos de Baja</h3><canvas id="bajaMotivosChart" height="150"></canvas></div>
                 </div>
-                <div class="bg-white rounded-xl shadow-md p-3"><h3 class="font-bold text-sm mb-2"><i class="fas fa-trophy text-yellow-500 mr-2"></i>Top Agentes del Mes</h3><div id="topAgentsList" class="space-y-1"></div></div>
+                <div class="bg-white rounded-xl shadow-md p-3">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="font-bold text-sm flex items-center gap-2">
+                            <i class="fas fa-trophy text-yellow-500"></i>
+                            Top Agentes del Mes
+                            <span class="text-xs text-gray-400 font-normal ml-2">Efectividad</span>
+                        </h3>
+                        <span class="text-xs text-gray-400" id="topAgentsPeriod">Mes actual</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="top-agents-table" id="topAgentsTable">
+                            <thead>
+                                <tr>
+                                    <th class="w-12">#</th>
+                                    <th>Agente</th>
+                                    <th class="text-center">📞 Llamadas</th>
+                                    <th class="text-center">✅ Recuperados</th>
+                                    <th class="text-center">❌ Bajas</th>
+                                    <th>Efectividad</th>
+                                </tr>
+                            </thead>
+                            <tbody id="topAgentsTableBody">
+                                <tr><td colspan="6" class="text-center py-4 text-gray-500">Cargando datos...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-3 pt-2 border-t flex justify-between items-center text-xs text-gray-500" id="teamAverageContainer">
+                        <span>📊 Promedio del equipo</span>
+                        <span id="teamAverageValue">0%</span>
+                    </div>
+                </div>
             </div>
 
             <!-- Rezagados Tab -->
@@ -283,7 +324,7 @@
                 </div>
                 <div class="table-container desktop-table">
                     <table class="customers-table">
-                        <thead><tr><th>ID</th><th>Nombre</th><th>Documento</th><th>Teléfono</th><th>Plan</th><th>CO</th><th>Última Gestión</th><th>Resultado</th><th>Agente</th><th>Fecha/Hora</th><th>Acciones</th></tr></thead>
+                        <thead><tr><th>ID</th><th>Nombre</th><th>Documento</th><th>Teléfono</th><th>Plan</th><th>CO</th><th>Última Gestión</th><th>Resultado</th><th>Agente</th><th>Fecha/Hora</th><th>Acciones</th></td></thead>
                         <tbody id="contactadosTableBodyDesktop"></tbody>
                     </table>
                 </div>
@@ -930,11 +971,11 @@
         }
         
         function puedeCompletarVisitas() {
-            return appCurrentUser && (appCurrentUser.canCompleteVisits === true);
+            return appCurrentUser && (appCurrentUser.canCompleteVisitas === true);
         }
         
         function puedeEditarVisitas() {
-            return appCurrentUser && (appCurrentUser.canEditVisits === true);
+            return appCurrentUser && (appCurrentUser.canEditVisitas === true);
         }
 
         // ==================== FUNCIONES DE BLOQUEO ====================
@@ -1100,7 +1141,7 @@
                     timestamp: now.getTime()
                 };
                 await guardarEnFirestore(colecciones.incontactables, incontactableData, customer.id);
-                showToast(`Cliente ${customer.nombre} registrado como incontactable - Motivo: ${motivoIncontactabilidad}`);
+                showToast(`⚠️ Cliente ${customer.nombre} registrado como incontactable - Motivo: ${motivoIncontactabilidad}`);
             } else {
                 const contactadoData = {
                     id: customer.id,
@@ -1121,7 +1162,7 @@
                     timestamp: now.getTime()
                 };
                 await guardarEnFirestore(colecciones.contactados, contactadoData, customer.id);
-                showToast(`Cliente ${customer.nombre} gestionado - ${resultadoTexto}`);
+                showToast(`📞 Cliente ${customer.nombre} gestionado - ${resultadoTexto}`);
             }
             
             if (resultado === 'recuperado') {
@@ -1139,7 +1180,7 @@
                     timestamp: now.getTime()
                 };
                 await guardarEnFirestore(colecciones.recuperados, recuperadoData);
-                showToast(`Cliente ${customer.nombre} reconectado exitosamente`);
+                showToast(`✅ Cliente ${customer.nombre} reconectado exitosamente`);
             } else if (resultado === 'dado_baja') {
                 const bajaData = {
                     clienteId: customer.id,
@@ -1180,7 +1221,7 @@
                         timestamp: now.getTime()
                     };
                     await guardarEnFirestore(colecciones.visitasTecnicas, visitaRetiro);
-                    showToast(`Visita para retiro de equipo creada para ${customer.nombre}`);
+                    showToast(`🔧 Visita para retiro de equipo creada para ${customer.nombre}`);
                 }
             } else if (resultado === 'visita_tecnica' && visitaData) {
                 const visita = {
@@ -1203,7 +1244,7 @@
                     timestamp: now.getTime()
                 };
                 await guardarEnFirestore(colecciones.visitasTecnicas, visita);
-                showToast(`Visita técnica programada para ${customer.nombre}`);
+                showToast(`🔧 Visita técnica programada para ${customer.nombre}`);
             }
             
             if (customerType === 'rezagado') {
@@ -1284,7 +1325,6 @@
             if (rezagadosPage < 1) rezagadosPage = 1;
             const pageItems = items.slice((rezagadosPage-1)*ITEMS_PER_PAGE, rezagadosPage*ITEMS_PER_PAGE);
             
-            // Información de paginación
             const paginationInfo = document.getElementById('rezagadosPaginationInfo');
             if (paginationInfo && items.length > 0) {
                 const startItem = (rezagadosPage-1)*ITEMS_PER_PAGE + 1;
@@ -1358,7 +1398,7 @@
                     const isLocked = lockInfo !== undefined;
                     const lockedByMe = isCustomerLockedByMe(c.id, 'perdido');
                     return `<tr>
-                        <td class="truncate-text">${escapeHtml(c.identificador || c.id)}</div></td>
+                        <td class="truncate-text">${escapeHtml(c.identificador || c.id)}</div></tr>
                         <td class="truncate-text">${escapeHtml(c.nombre)}</div></td>
                         <td class="truncate-text">${escapeHtml(c.documento)}</div></td>
                         <td>${hasPhone ? escapeHtml(c.telefono1) : '-'}</div></td>
@@ -1467,7 +1507,7 @@
             
             const tbody = document.getElementById('incontactablesTableBodyDesktop');
             if (tbody) {
-                if (items.length === 0) tbody.innerHTML = '<tr><td colspan="10" class="text-center py-4 text-gray-500">No hay abonados incontactables registrados</div></td>';
+                if (items.length === 0) tbody.innerHTML = '<tr><td colspan="10" class="text-center py-4 text-gray-500">No hay abonados incontactables registrados</div></tr>';
                 else tbody.innerHTML = pageItems.map(c => `<tr>
                     <td class="truncate-text">${escapeHtml(c.clienteIdOriginal || c.id)}</div></td>
                     <td class="truncate-text"><span class="font-medium">${escapeHtml(c.nombre)}</span></div></td>
@@ -1876,6 +1916,134 @@
             </div>`).join('');
         }
         
+        // ==================== TOP AGENTES DEL MES - TABLA CON BARRAS DE PROGRESO ====================
+        function renderTopAgents() {
+            const container = document.getElementById('topAgentsTableBody');
+            if (!container) return;
+            
+            // Obtener datos del mes actual
+            const ahora = new Date();
+            const inicioMes = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
+            const finMes = new Date(ahora.getFullYear(), ahora.getMonth() + 1, 0);
+            
+            // Estadísticas por agente
+            const stats = new Map();
+            
+            // Procesar llamadas (callLogs)
+            callLogs.forEach(log => {
+                const fechaLog = log.fechaGestion ? new Date(log.fechaGestion) : null;
+                if (fechaLog && fechaLog >= inicioMes && fechaLog <= finMes && log.agente) {
+                    if (!stats.has(log.agente)) {
+                        stats.set(log.agente, { llamadas: 0, recuperados: 0, bajas: 0 });
+                    }
+                    const stat = stats.get(log.agente);
+                    stat.llamadas++;
+                    
+                    // Clasificar resultado
+                    if (log.resultado === 'recuperado' || log.resultadoTexto === 'RECUPERADO') {
+                        stat.recuperados++;
+                    } else if (log.resultado === 'dado_baja' || log.resultadoTexto === 'DADO DE BAJA') {
+                        stat.bajas++;
+                    }
+                }
+            });
+            
+            // Procesar reconexiones directas (recuperados)
+            clientesRecuperados.forEach(rec => {
+                const fechaRec = rec.fechaGestion ? new Date(rec.fechaGestion) : null;
+                if (fechaRec && fechaRec >= inicioMes && fechaRec <= finMes && rec.agente) {
+                    if (!stats.has(rec.agente)) {
+                        stats.set(rec.agente, { llamadas: 0, recuperados: 0, bajas: 0 });
+                    }
+                    const stat = stats.get(rec.agente);
+                    stat.recuperados++;
+                }
+            });
+            
+            // Procesar bajas directas (perdidosFinal)
+            clientesPerdidosFinal.forEach(baja => {
+                const fechaBaja = baja.fechaGestion ? new Date(baja.fechaGestion) : null;
+                if (fechaBaja && fechaBaja >= inicioMes && fechaBaja <= finMes && baja.agente) {
+                    if (!stats.has(baja.agente)) {
+                        stats.set(baja.agente, { llamadas: 0, recuperados: 0, bajas: 0 });
+                    }
+                    const stat = stats.get(baja.agente);
+                    stat.bajas++;
+                }
+            });
+            
+            // Convertir a array y ordenar por efectividad (recuperados/llamadas)
+            const agentesArray = Array.from(stats.entries()).map(([nombre, data]) => {
+                const efectividad = data.llamadas > 0 ? (data.recuperados / data.llamadas) * 100 : 0;
+                return { nombre, ...data, efectividad: Math.round(efectividad) };
+            });
+            
+            agentesArray.sort((a, b) => b.efectividad - a.efectividad);
+            
+            // Calcular promedio del equipo
+            const totalLlamadas = agentesArray.reduce((sum, a) => sum + a.llamadas, 0);
+            const totalRecuperados = agentesArray.reduce((sum, a) => sum + a.recuperados, 0);
+            const promedioEquipo = totalLlamadas > 0 ? Math.round((totalRecuperados / totalLlamadas) * 100) : 0;
+            
+            // Actualizar promedio del equipo
+            const teamAvgSpan = document.getElementById('teamAverageValue');
+            if (teamAvgSpan) teamAvgSpan.innerText = `${promedioEquipo}%`;
+            
+            // Mostrar período
+            const periodSpan = document.getElementById('topAgentsPeriod');
+            if (periodSpan) {
+                const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+                periodSpan.innerText = `${meses[ahora.getMonth()]} ${ahora.getFullYear()}`;
+            }
+            
+            // Renderizar tabla
+            if (agentesArray.length === 0) {
+                container.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-gray-500">No hay datos para el mes actual</td></tr>';
+                return;
+            }
+            
+            container.innerHTML = agentesArray.slice(0, 10).map((agente, index) => {
+                const rank = index + 1;
+                let rankClass = '';
+                let medalIcon = '';
+                
+                if (rank === 1) {
+                    rankClass = 'rank-1';
+                    medalIcon = '🥇';
+                } else if (rank === 2) {
+                    rankClass = 'rank-2';
+                    medalIcon = '🥈';
+                } else if (rank === 3) {
+                    rankClass = 'rank-3';
+                    medalIcon = '🥉';
+                } else {
+                    medalIcon = `${rank}.`;
+                }
+                
+                // Barra de progreso de efectividad
+                const barWidth = agente.efectividad;
+                const barColor = barWidth >= 25 ? '#10b981' : (barWidth >= 15 ? '#f59e0b' : '#ef4444');
+                
+                return `
+                    <tr class="${rankClass}">
+                        <td class="text-center font-bold">${medalIcon}</td>
+                        <td class="font-medium">${escapeHtml(agente.nombre)}</td>
+                        <td class="text-center">${agente.llamadas}</td>
+                        <td class="text-center text-green-600 font-medium">✅ ${agente.recuperados}</td>
+                        <td class="text-center text-red-500">❌ ${agente.bajas}</td>
+                        <td>
+                            <div class="flex items-center gap-2">
+                                <div class="progress-bar-bg flex-1">
+                                    <div class="progress-bar-fill" style="width: ${barWidth}%; background-color: ${barColor};"></div>
+                                </div>
+                                <span class="text-xs font-medium min-w-[40px]">${agente.efectividad}%</span>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
         window.openRegisterCallModal = async function(customerId, customerType) {
             await cleanExpiredLocks();
             const lock = await lockCustomer(customerId, customerType);
@@ -2229,7 +2397,7 @@
             if (statsSpan) statsSpan.innerHTML = `<span class="font-bold">Estadísticas:</span> Llamadas: ${llamadas} | Reconexiones: ${reconexiones} | Bajas: ${bajas} | Incontactables: ${incontactables}`;
             
             if (tbody) {
-                if (registros.length === 0) tbody.innerHTML = '<tr><td colspan="11" class="text-center py-4 text-gray-500">No hay registros</div></tr>';
+                if (registros.length === 0) tbody.innerHTML = '<td><td colspan="11" class="text-center py-4 text-gray-500">No hay registros</div></tr>';
                 else tbody.innerHTML = registros.slice(0, 200).map(r => `<tr>
                     <td class="text-xs">${new Date(r.fecha).toLocaleString()}</div></td>
                     <td class="text-xs">${escapeHtml(r.agente)}</div></td>
@@ -2327,19 +2495,6 @@
             clientesPerdidosFinal.forEach(c => { if (motivos[c.motivoBaja] !== undefined) motivos[c.motivoBaja]++; else motivos.other++; });
             const ctxMotivos = document.getElementById('bajaMotivosChart')?.getContext('2d');
             if (ctxMotivos) { if (bajaMotivosChart) bajaMotivosChart.destroy(); bajaMotivosChart = new Chart(ctxMotivos, { type: 'pie', data: { labels: ['Precio', 'Problemas servicio', 'Mudanza', 'Fallecimiento', 'Otros'], datasets: [{ data: [motivos.price, motivos.service_issues, motivos.relocation, motivos.deceased, motivos.other], backgroundColor: ['#f59e0b', '#ef4444', '#3b82f6', '#8b5cf6', '#6b7280'] }] }, options: { responsive: true } }); }
-        }
-        
-        function renderTopAgents() {
-            const container = document.getElementById('topAgentsList');
-            if (!container) return;
-            const stats = new Map();
-            [...clientesRecuperados, ...clientesPerdidosFinal].forEach(r => {
-                if (!stats.has(r.agente)) stats.set(r.agente, { rec: 0, baj: 0 });
-                if (r.tipoReg === 'Reconexion' || r.resultado === 'recuperado') stats.get(r.agente).rec++;
-                else stats.get(r.agente).baj++;
-            });
-            const sorted = Array.from(stats.entries()).sort((a,b) => b[1].rec - a[1].rec).slice(0,5);
-            container.innerHTML = sorted.length ? sorted.map(([a,s],i) => `<div class="flex justify-between"><span>${i===0?'🏆':i+1}. ${escapeHtml(a)}</span><span class="text-green-600">${s.rec}</span> | <span class="text-red-600">${s.baj}</span></div>`).join('') : '<div class="text-center text-gray-500">Sin datos</div>';
         }
         
         // ==================== FUNCIONES DE REPORTE PDF ====================
@@ -2801,7 +2956,7 @@
                     perdidosHeaders = rows[0].map(h => String(h || '').trim());
                     perdidosRawData = rows.slice(1).filter(row => row && row.length > 0 && row.some(cell => cell && String(cell).trim() !== ''));
                     let previewHtml = '<thead><tr>' + perdidosHeaders.slice(0, 6).map(h => `<th class="text-xs">${escapeHtml(h).substring(0, 15)}</th>`).join('') + '</thead><tbody>';
-                    previewHtml += perdidosRawData.slice(0, 3).map(row => '<td>' + row.slice(0, 6).map(cell => `<td class="text-xs">${escapeHtml(String(cell || '').substring(0, 20))}</td>`).join('') + '</tr>').join('');
+                    previewHtml += perdidosRawData.slice(0, 3).map(row => '<tr>' + row.slice(0, 6).map(cell => `<td class="text-xs">${escapeHtml(String(cell || '').substring(0, 20))}</td>`).join('') + '</tr>').join('');
                     previewHtml += '</tbody>';
                     document.getElementById('previewPerdidosTable').innerHTML = previewHtml;
                     document.getElementById('perdidosPreview').classList.remove('hidden');
@@ -2902,6 +3057,7 @@
             renderIncontactablesTable(); renderRecuperadosTable(); renderPerdidosFinalTable(); 
             renderEquiposTable(); renderVisitasTable(); renderTechniciansList(); 
             updateDashboardMetrics(); updateConfigCounters(); cargarSelectAgentes();
+            renderTopAgents(); // Asegurar que se actualice el top de agentes
         }
         
         function changeRezagadosPage(delta) { rezagadosPage += delta; renderRezagadosTable(); }

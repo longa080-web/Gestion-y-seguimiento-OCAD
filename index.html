@@ -324,7 +324,7 @@
                 </div>
                 <div class="table-container desktop-table">
                     <table class="customers-table">
-                        <thead><tr><th>ID</th><th>Nombre</th><th>Documento</th><th>Teléfono</th><th>Plan</th><th>CO</th><th>Última Gestión</th><th>Resultado</th><th>Agente</th><th>Fecha/Hora</th><th>Acciones</th></td></thead>
+                        <thead><tr><th>ID</th><th>Nombre</th><th>Documento</th><th>Teléfono</th><th>Plan</th><th>CO</th><th>Última Gestión</th><th>Resultado</th><th>Agente</th><th>Fecha/Hora</th><th>Acciones</th></tr></thead>
                         <tbody id="contactadosTableBodyDesktop"></tbody>
                     </table>
                 </div>
@@ -735,6 +735,61 @@
         db.enablePersistence({ synchronizeTabs: true })
             .catch(err => console.log('Persistencia offline:', err.code));
 
+        // ==================== FUNCIONES DE FECHA LOCAL (VENEZUELA UTC-4) ====================
+        function getFechaLocalVenezuela() {
+            // Venezuela está en UTC-4 (no tiene horario de verano)
+            const now = new Date();
+            // Ajustar a UTC-4 (Venezuela)
+            const venezuelaOffset = -4;
+            const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+            const venezuelaTime = new Date(utc + (3600000 * venezuelaOffset));
+            return venezuelaTime;
+        }
+
+        function formatearFechaLocal(fecha) {
+            if (!fecha) return '';
+            try {
+                let dateObj = fecha;
+                if (typeof fecha === 'string') {
+                    dateObj = new Date(fecha);
+                }
+                const venezuelaOffset = -4;
+                const utc = dateObj.getTime() + (dateObj.getTimezoneOffset() * 60000);
+                const venezuelaTime = new Date(utc + (3600000 * venezuelaOffset));
+                
+                const year = venezuelaTime.getFullYear();
+                const month = String(venezuelaTime.getMonth() + 1).padStart(2, '0');
+                const day = String(venezuelaTime.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            } catch(e) {
+                return fecha;
+            }
+        }
+
+        function formatearFechaHoraLocal(fecha) {
+            if (!fecha) return '';
+            try {
+                let dateObj = fecha;
+                if (typeof fecha === 'string') {
+                    dateObj = new Date(fecha);
+                }
+                const venezuelaOffset = -4;
+                const utc = dateObj.getTime() + (dateObj.getTimezoneOffset() * 60000);
+                const venezuelaTime = new Date(utc + (3600000 * venezuelaOffset));
+                
+                const year = venezuelaTime.getFullYear();
+                const month = String(venezuelaTime.getMonth() + 1).padStart(2, '0');
+                const day = String(venezuelaTime.getDate()).padStart(2, '0');
+                const hours = String(venezuelaTime.getHours()).padStart(2, '0');
+                const minutes = String(venezuelaTime.getMinutes()).padStart(2, '0');
+                const seconds = String(venezuelaTime.getSeconds()).padStart(2, '0');
+                
+                return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+            } catch(e) {
+                return fecha;
+            }
+        }
+
         // ==================== REFERENCIAS A COLECCIONES ====================
         const colecciones = {
             rezagados: db.collection('rezagados'),
@@ -1062,7 +1117,7 @@
 
         // ==================== PROCESAR RESULTADO DE LLAMADA ====================
         async function processCallResult(customer, customerType, resultado, observaciones, motivoBaja, visitaData, telefonoUsado) {
-            const now = new Date();
+            const now = getFechaLocalVenezuela();
             const fechaGestion = now.toISOString();
             const agente = appCurrentUser.fullName;
             
@@ -1336,7 +1391,7 @@
             
             const tbody = document.getElementById('rezagadosTableBodyDesktop');
             if (tbody) {
-                if (items.length === 0) tbody.innerHTML = '<tr><td colspan="9" class="text-center py-4 text-gray-500">No hay clientes rezagados</div></tr>';
+                if (items.length === 0) tbody.innerHTML = '<td><td colspan="9" class="text-center py-4 text-gray-500">No hay clientes rezagados</div></tr>';
                 else tbody.innerHTML = pageItems.map(c => {
                     const hasPhone = c.telefono1 && c.telefono1 !== '';
                     const lockInfo = getCustomerLockInfo(c.id, 'rezagado');
@@ -1391,27 +1446,30 @@
             
             const tbody = document.getElementById('perdidosTableBodyDesktop');
             if (tbody) {
-                if (items.length === 0) tbody.innerHTML = '<tr><td colspan="9" class="text-center py-4 text-gray-500">No hay clientes perdidos</div></tr>';
-                else tbody.innerHTML = pageItems.map(c => {
-                    const hasPhone = c.telefono1 && c.telefono1 !== '';
-                    const lockInfo = getCustomerLockInfo(c.id, 'perdido');
-                    const isLocked = lockInfo !== undefined;
-                    const lockedByMe = isCustomerLockedByMe(c.id, 'perdido');
-                    return `<tr>
-                        <td class="truncate-text">${escapeHtml(c.identificador || c.id)}</div></tr>
-                        <td class="truncate-text">${escapeHtml(c.nombre)}</div></td>
-                        <td class="truncate-text">${escapeHtml(c.documento)}</div></td>
-                        <td>${hasPhone ? escapeHtml(c.telefono1) : '-'}</div></td>
-                        <td class="truncate-text">${escapeHtml(c.plan)}</div></td>
-                        <td>${escapeHtml(c.centroOp)}</div></td>
-                        <td>${c.fechaCorte || '-'}</div></td>
-                        <td><span class="status-badge bg-pendiente">PENDIENTE</span></div></td>
-                        <td class="table-actions">
-                            ${(!isLocked || lockedByMe) && hasPhone ? `<button onclick="openRegisterCallModal('${c.id}', 'perdido')" class="call-btn"><i class="fas fa-phone-alt"></i> Gestionar</button>` : `<button class="call-btn opacity-50" disabled><i class="fas fa-phone-alt"></i> ${!hasPhone ? 'Sin teléfono' : 'Bloqueado'}</button>`}
-                            ${hasPhone ? `<a href="tel:${c.telefono1}" class="call-link"><i class="fas fa-phone"></i></a><a href="https://wa.me/${c.telefono1.replace(/[^0-9]/g,'')}" target="_blank" class="whatsapp-link"><i class="fab fa-whatsapp"></i></a>` : ''}
-                         </div>
-                    </tr>`;
-                }).join('');
+                if (items.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="9" class="text-center py-4 text-gray-500">No hay clientes perdidos</div></tr>';
+                } else {
+                    tbody.innerHTML = pageItems.map(c => {
+                        const hasPhone = c.telefono1 && c.telefono1 !== '';
+                        const lockInfo = getCustomerLockInfo(c.id, 'perdido');
+                        const isLocked = lockInfo !== undefined;
+                        const lockedByMe = isCustomerLockedByMe(c.id, 'perdido');
+                        return `<tr>
+                            <td class="truncate-text">${escapeHtml(c.identificador || c.id)}</div></td>
+                            <td class="truncate-text">${escapeHtml(c.nombre)}</div></td>
+                            <td class="truncate-text">${escapeHtml(c.documento)}</div></td>
+                            <td class="truncate-text">${hasPhone ? escapeHtml(c.telefono1) : '-'}</div></td>
+                            <td class="truncate-text">${escapeHtml(c.plan || '-')}</div></td>
+                            <td class="truncate-text">${escapeHtml(c.centroOp || '-')}</div></td>
+                            <td class="truncate-text">${c.fechaCorte || '-'}</div></td>
+                            <td class="truncate-text"><span class="status-badge bg-pendiente">PENDIENTE</span></div></td>
+                            <td class="table-actions">
+                                ${(!isLocked || lockedByMe) && hasPhone ? `<button onclick="openRegisterCallModal('${c.id}', 'perdido')" class="call-btn"><i class="fas fa-phone-alt"></i> Gestionar</button>` : `<button class="call-btn opacity-50" disabled><i class="fas fa-phone-alt"></i> ${!hasPhone ? 'Sin teléfono' : 'Bloqueado'}</button>`}
+                                ${hasPhone ? `<a href="tel:${c.telefono1}" class="call-link"><i class="fas fa-phone"></i></a><a href="https://wa.me/${c.telefono1.replace(/[^0-9]/g,'')}" target="_blank" class="whatsapp-link"><i class="fab fa-whatsapp"></i></a>` : ''}
+                            </div>
+                        </tr>`;
+                    }).join('');
+                }
             }
             
             const pagination = document.getElementById('perdidosPagination');
@@ -1617,7 +1675,7 @@
             doc.text('REPORTE DE ABONADOS INCONTACTABLES - PARA ESCALAMIENTO COMERCIAL', 14, 20);
             doc.setFontSize(10);
             doc.setFont(undefined, 'normal');
-            doc.text(`Generado: ${new Date().toLocaleString()}`, 14, 30);
+            doc.text(`Generado: ${formatearFechaHoraLocal(getFechaLocalVenezuela())}`, 14, 30);
             doc.text(`Generado por: ${appCurrentUser?.fullName || 'Sistema'}`, 14, 38);
             doc.text(`Total de registros: ${items.length}`, 14, 46);
             
@@ -1630,7 +1688,7 @@
                 c.centroOp || '-',
                 c.motivoIncontactabilidad || '-',
                 c.agente || '-',
-                new Date(c.fechaGestion).toLocaleString()
+                formatearFechaHoraLocal(c.fechaGestion)
             ]);
             
             doc.autoTable({
@@ -1642,7 +1700,7 @@
                 bodyStyles: { fontSize: 7 }
             });
             
-            doc.save(`incontactables_${new Date().toISOString().split('T')[0]}.pdf`);
+            doc.save(`incontactables_${formatearFechaLocal(getFechaLocalVenezuela())}.pdf`);
             showToast('Exportado a PDF');
         };
         
@@ -1731,7 +1789,7 @@
             const ws = XLSX.utils.aoa_to_sheet(data);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'Rezagados');
-            XLSX.writeFile(wb, `rezagados_${new Date().toISOString().split('T')[0]}.xlsx`);
+            XLSX.writeFile(wb, `rezagados_${formatearFechaLocal(getFechaLocalVenezuela())}.xlsx`);
             showToast('Exportado a Excel');
         };
         
@@ -1742,18 +1800,18 @@
             const ws = XLSX.utils.aoa_to_sheet(data);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'Perdidos');
-            XLSX.writeFile(wb, `perdidos_${new Date().toISOString().split('T')[0]}.xlsx`);
+            XLSX.writeFile(wb, `perdidos_${formatearFechaLocal(getFechaLocalVenezuela())}.xlsx`);
             showToast('Exportado a Excel');
         };
         
         window.exportContactadosToExcel = function() {
             const items = getFilteredContactados();
             const data = [['ID', 'Nombre', 'Documento', 'Teléfono', 'Plan', 'CO', 'Gestión', 'Resultado', 'Agente', 'Fecha']];
-            items.forEach(c => data.push([c.clienteIdOriginal || c.id, c.nombre, c.documento, c.telefono, c.plan, c.centroOp, c.resumenGestion || '-', c.resultadoTexto || '-', c.agente, new Date(c.fechaGestion).toLocaleString()]));
+            items.forEach(c => data.push([c.clienteIdOriginal || c.id, c.nombre, c.documento, c.telefono, c.plan, c.centroOp, c.resumenGestion || '-', c.resultadoTexto || '-', c.agente, formatearFechaHoraLocal(c.fechaGestion)]));
             const ws = XLSX.utils.aoa_to_sheet(data);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'Contactados');
-            XLSX.writeFile(wb, `contactados_${new Date().toISOString().split('T')[0]}.xlsx`);
+            XLSX.writeFile(wb, `contactados_${formatearFechaLocal(getFechaLocalVenezuela())}.xlsx`);
             showToast('Exportado a Excel');
         };
         
@@ -1764,18 +1822,18 @@
             const ws = XLSX.utils.aoa_to_sheet(data);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'VisitasPendientes');
-            XLSX.writeFile(wb, `visitas_pendientes_${new Date().toISOString().split('T')[0]}.xlsx`);
+            XLSX.writeFile(wb, `visitas_pendientes_${formatearFechaLocal(getFechaLocalVenezuela())}.xlsx`);
             showToast('Exportado a Excel');
         };
         
         window.exportVisitasToExcel = function() {
             const items = visitasFinalizadas;
             const data = [['N° Abonado', 'Cliente', 'Teléfono', 'Dirección', 'Zona', 'Técnico', 'Fecha Programada', 'Fecha Completado', 'Completado por']];
-            items.forEach(v => data.push([v.clienteIdOriginal || v.clienteId, v.clienteNombre, v.clienteTelefono, v.direccion, v.zona || v.centroOp, v.tecnicoNombre, v.fechaVisita, v.fechaCompletado ? new Date(v.fechaCompletado).toLocaleString() : '-', v.completadoPor || v.agente]));
+            items.forEach(v => data.push([v.clienteIdOriginal || v.clienteId, v.clienteNombre, v.clienteTelefono, v.direccion, v.zona || v.centroOp, v.tecnicoNombre, v.fechaVisita, v.fechaCompletado ? formatearFechaHoraLocal(v.fechaCompletado) : '-', v.completadoPor || v.agente]));
             const ws = XLSX.utils.aoa_to_sheet(data);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'VisitasFinalizadas');
-            XLSX.writeFile(wb, `visitas_finalizadas_${new Date().toISOString().split('T')[0]}.xlsx`);
+            XLSX.writeFile(wb, `visitas_finalizadas_${formatearFechaLocal(getFechaLocalVenezuela())}.xlsx`);
             showToast('Exportado a Excel');
         };
         
@@ -1800,7 +1858,7 @@
                     <td class="truncate-text">${escapeHtml(c.plan)}</div></td>
                     <td class="truncate-text">${escapeHtml(c.direccion || '-')}</div></td>
                     <td>${escapeHtml(c.centroOp || '-')}</div></td>
-                    <td>${new Date(c.fechaGestion).toLocaleDateString()}</div></td>
+                    <td>${formatearFechaLocal(c.fechaGestion)}</div></td>
                     <td>${escapeHtml(c.agente)}</div></td>
                     <td class="table-actions">
                         <button onclick="editCustomer('${c.id}', 'recuperado', 'recuperados')" class="edit-customer-btn"><i class="fas fa-edit"></i> Editar</button>
@@ -1832,7 +1890,7 @@
                     <td class="truncate-text">${escapeHtml(c.direccion || '-')}</div></td>
                     <td>${escapeHtml(c.centroOp || '-')}</div></td>
                     <td>${c.motivoBaja === 'price' ? 'Precio' : c.motivoBaja === 'service_issues' ? 'Problemas servicio' : c.motivoBaja === 'relocation' ? 'Mudanza' : (c.motivoBaja || '-')}</div></td>
-                    <td>${new Date(c.fechaGestion).toLocaleDateString()}</div></td>
+                    <td>${formatearFechaLocal(c.fechaGestion)}</div></td>
                     <td>${escapeHtml(c.agente)}</div></td>
                     <td class="table-actions">
                         <button onclick="editCustomer('${c.id}', 'perdidoFinal', 'perdidosFinal')" class="edit-customer-btn"><i class="fas fa-edit"></i> Editar</button>
@@ -1899,7 +1957,7 @@
                     <td>${escapeHtml(v.zona || v.centroOp || '-')}</div></td>
                     <td>${v.tecnicoNombre || 'No asignado'}</div></td>
                     <td class="text-xs">${v.fechaVisita || '-'} ${v.horaVisita || ''}</div></td>
-                    <td class="text-xs">${v.fechaCompletado ? new Date(v.fechaCompletado).toLocaleString() : '-'}</div></td>
+                    <td class="text-xs">${v.fechaCompletado ? formatearFechaHoraLocal(v.fechaCompletado) : '-'}</div></td>
                     <td>${v.completadoPor || v.agente || '-'}</div></td>
                     <td><span class="status-badge bg-recuperado">✅ EQUIPO RETIRADO</span></div></td>
                 </tr>`);
@@ -1916,20 +1974,17 @@
             </div>`).join('');
         }
         
-        // ==================== TOP AGENTES DEL MES - TABLA CON BARRAS DE PROGRESO ====================
+        // ==================== TOP AGENTES DEL MES ====================
         function renderTopAgents() {
             const container = document.getElementById('topAgentsTableBody');
             if (!container) return;
             
-            // Obtener datos del mes actual
-            const ahora = new Date();
-            const inicioMes = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
-            const finMes = new Date(ahora.getFullYear(), ahora.getMonth() + 1, 0);
+            const ahora = getFechaLocalVenezuela();
+            const inicioMes = new Date(Date.UTC(ahora.getFullYear(), ahora.getMonth(), 1, 0, 0, 0));
+            const finMes = new Date(Date.UTC(ahora.getFullYear(), ahora.getMonth() + 1, 0, 23, 59, 59, 999));
             
-            // Estadísticas por agente
             const stats = new Map();
             
-            // Procesar llamadas (callLogs)
             callLogs.forEach(log => {
                 const fechaLog = log.fechaGestion ? new Date(log.fechaGestion) : null;
                 if (fechaLog && fechaLog >= inicioMes && fechaLog <= finMes && log.agente) {
@@ -1939,7 +1994,6 @@
                     const stat = stats.get(log.agente);
                     stat.llamadas++;
                     
-                    // Clasificar resultado
                     if (log.resultado === 'recuperado' || log.resultadoTexto === 'RECUPERADO') {
                         stat.recuperados++;
                     } else if (log.resultado === 'dado_baja' || log.resultadoTexto === 'DADO DE BAJA') {
@@ -1948,7 +2002,6 @@
                 }
             });
             
-            // Procesar reconexiones directas (recuperados)
             clientesRecuperados.forEach(rec => {
                 const fechaRec = rec.fechaGestion ? new Date(rec.fechaGestion) : null;
                 if (fechaRec && fechaRec >= inicioMes && fechaRec <= finMes && rec.agente) {
@@ -1960,7 +2013,6 @@
                 }
             });
             
-            // Procesar bajas directas (perdidosFinal)
             clientesPerdidosFinal.forEach(baja => {
                 const fechaBaja = baja.fechaGestion ? new Date(baja.fechaGestion) : null;
                 if (fechaBaja && fechaBaja >= inicioMes && fechaBaja <= finMes && baja.agente) {
@@ -1972,7 +2024,6 @@
                 }
             });
             
-            // Convertir a array y ordenar por efectividad (recuperados/llamadas)
             const agentesArray = Array.from(stats.entries()).map(([nombre, data]) => {
                 const efectividad = data.llamadas > 0 ? (data.recuperados / data.llamadas) * 100 : 0;
                 return { nombre, ...data, efectividad: Math.round(efectividad) };
@@ -1980,25 +2031,21 @@
             
             agentesArray.sort((a, b) => b.efectividad - a.efectividad);
             
-            // Calcular promedio del equipo
             const totalLlamadas = agentesArray.reduce((sum, a) => sum + a.llamadas, 0);
             const totalRecuperados = agentesArray.reduce((sum, a) => sum + a.recuperados, 0);
             const promedioEquipo = totalLlamadas > 0 ? Math.round((totalRecuperados / totalLlamadas) * 100) : 0;
             
-            // Actualizar promedio del equipo
             const teamAvgSpan = document.getElementById('teamAverageValue');
             if (teamAvgSpan) teamAvgSpan.innerText = `${promedioEquipo}%`;
             
-            // Mostrar período
             const periodSpan = document.getElementById('topAgentsPeriod');
             if (periodSpan) {
                 const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
                 periodSpan.innerText = `${meses[ahora.getMonth()]} ${ahora.getFullYear()}`;
             }
             
-            // Renderizar tabla
             if (agentesArray.length === 0) {
-                container.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-gray-500">No hay datos para el mes actual</td></tr>';
+                container.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-gray-500">No hay datos para el mes actual</div></tr>';
                 return;
             }
             
@@ -2020,17 +2067,16 @@
                     medalIcon = `${rank}.`;
                 }
                 
-                // Barra de progreso de efectividad
                 const barWidth = agente.efectividad;
                 const barColor = barWidth >= 25 ? '#10b981' : (barWidth >= 15 ? '#f59e0b' : '#ef4444');
                 
                 return `
                     <tr class="${rankClass}">
-                        <td class="text-center font-bold">${medalIcon}</td>
-                        <td class="font-medium">${escapeHtml(agente.nombre)}</td>
-                        <td class="text-center">${agente.llamadas}</td>
-                        <td class="text-center text-green-600 font-medium">✅ ${agente.recuperados}</td>
-                        <td class="text-center text-red-500">❌ ${agente.bajas}</td>
+                        <td class="text-center font-bold">${medalIcon}</div>
+                        <td class="font-medium">${escapeHtml(agente.nombre)}</div>
+                        <td class="text-center">${agente.llamadas}</div>
+                        <td class="text-center text-green-600 font-medium">✅ ${agente.recuperados}</div>
+                        <td class="text-center text-red-500">❌ ${agente.bajas}</div>
                         <td>
                             <div class="flex items-center gap-2">
                                 <div class="progress-bar-bg flex-1">
@@ -2038,7 +2084,7 @@
                                 </div>
                                 <span class="text-xs font-medium min-w-[40px]">${agente.efectividad}%</span>
                             </div>
-                        </td>
+                        </div>
                     </tr>
                 `;
             }).join('');
@@ -2084,7 +2130,7 @@
             document.getElementById('bajaReasonDiv').classList.add('hidden');
             document.getElementById('visitaFields').classList.add('hidden');
             document.getElementById('callObservations').value = '';
-            document.getElementById('visitDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('visitDate').value = formatearFechaLocal(getFechaLocalVenezuela());
             document.getElementById('visitTime').value = '';
             document.getElementById('visitAbonadoId').value = '';
             document.getElementById('availabilityWarning').classList.add('hidden');
@@ -2269,7 +2315,7 @@
                 }
                 
                 const visita = visitaDoc.data();
-                const ahora = new Date();
+                const ahora = getFechaLocalVenezuela();
                 
                 if (resultado === 'completada') {
                     const visitaFinalizada = {
@@ -2397,9 +2443,9 @@
             if (statsSpan) statsSpan.innerHTML = `<span class="font-bold">Estadísticas:</span> Llamadas: ${llamadas} | Reconexiones: ${reconexiones} | Bajas: ${bajas} | Incontactables: ${incontactables}`;
             
             if (tbody) {
-                if (registros.length === 0) tbody.innerHTML = '<td><td colspan="11" class="text-center py-4 text-gray-500">No hay registros</div></tr>';
+                if (registros.length === 0) tbody.innerHTML = '<tr><td colspan="11" class="text-center py-4 text-gray-500">No hay registros</div></tr>';
                 else tbody.innerHTML = registros.slice(0, 200).map(r => `<tr>
-                    <td class="text-xs">${new Date(r.fecha).toLocaleString()}</div></td>
+                    <td class="text-xs">${formatearFechaHoraLocal(r.fecha)}</div></td>
                     <td class="text-xs">${escapeHtml(r.agente)}</div></td>
                     <td class="text-xs">${escapeHtml(r.nombre)}</div></td>
                     <td class="text-xs">${escapeHtml(r.clienteIdOriginal || r.clienteId || '-')}</div></td>
@@ -2431,11 +2477,11 @@
         function exportHistorialToExcel() {
             const registros = getHistorialRegistros();
             const data = [['Fecha', 'Agente', 'Cliente', 'ID', 'Documento', 'Tipo', 'Resultado', 'Teléfono', 'Plan', 'CO']];
-            registros.forEach(r => data.push([new Date(r.fecha).toLocaleString(), r.agente, r.nombre, r.clienteIdOriginal || r.clienteId || '-', r.documento || '-', r.tipoReg, r.resultadoTexto || r.resultado || '-', r.telefono || '-', r.plan || '-', r.centroOp || '-']));
+            registros.forEach(r => data.push([formatearFechaHoraLocal(r.fecha), r.agente, r.nombre, r.clienteIdOriginal || r.clienteId || '-', r.documento || '-', r.tipoReg, r.resultadoTexto || r.resultado || '-', r.telefono || '-', r.plan || '-', r.centroOp || '-']));
             const ws = XLSX.utils.aoa_to_sheet(data);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'Historial');
-            XLSX.writeFile(wb, `historial_${new Date().toISOString().split('T')[0]}.xlsx`);
+            XLSX.writeFile(wb, `historial_${formatearFechaLocal(getFechaLocalVenezuela())}.xlsx`);
             showToast('Exportado a Excel');
         }
         
@@ -2446,10 +2492,10 @@
             doc.setFontSize(16);
             doc.text('Historial de Gestión', 14, 20);
             doc.setFontSize(10);
-            doc.text(`Generado: ${new Date().toLocaleString()}`, 14, 30);
-            const tableData = registros.slice(0, 200).map(r => [new Date(r.fecha).toLocaleString(), r.agente, r.nombre, r.clienteIdOriginal || r.clienteId || '-', r.documento || '-', r.tipoReg, r.resultadoTexto || r.resultado || '-', r.telefono || '-', r.plan || '-', r.centroOp || '-']);
+            doc.text(`Generado: ${formatearFechaHoraLocal(getFechaLocalVenezuela())}`, 14, 30);
+            const tableData = registros.slice(0, 200).map(r => [formatearFechaHoraLocal(r.fecha), r.agente, r.nombre, r.clienteIdOriginal || r.clienteId || '-', r.documento || '-', r.tipoReg, r.resultadoTexto || r.resultado || '-', r.telefono || '-', r.plan || '-', r.centroOp || '-']);
             doc.autoTable({ startY: 40, head: [['Fecha', 'Agente', 'Cliente', 'ID', 'Documento', 'Tipo', 'Resultado', 'Teléfono', 'Plan', 'CO']], body: tableData, theme: 'striped', headStyles: { fillColor: [79, 70, 229] }, bodyStyles: { fontSize: 7 } });
-            doc.save(`historial_${new Date().toISOString().split('T')[0]}.pdf`);
+            doc.save(`historial_${formatearFechaLocal(getFechaLocalVenezuela())}.pdf`);
             showToast('Exportado a PDF');
         }
         
@@ -2487,7 +2533,13 @@
         
         function updateCharts() {
             const last7Days = [], recoveredData = [];
-            for (let i = 6; i >= 0; i--) { const d = new Date(); d.setDate(d.getDate()-i); const ds = d.toISOString().split('T')[0]; last7Days.push(ds.slice(5)); recoveredData.push(clientesRecuperados.filter(r => r.fechaGestion?.split('T')[0] === ds).length); }
+            for (let i = 6; i >= 0; i--) { 
+                const d = getFechaLocalVenezuela(); 
+                d.setDate(d.getDate()-i); 
+                const ds = formatearFechaLocal(d); 
+                last7Days.push(ds.slice(5)); 
+                recoveredData.push(clientesRecuperados.filter(r => formatearFechaLocal(r.fechaGestion) === ds).length); 
+            }
             const ctxTrend = document.getElementById('recoveryTrendChart')?.getContext('2d');
             if (ctxTrend) { if (recoveryChart) recoveryChart.destroy(); recoveryChart = new Chart(ctxTrend, { type: 'line', data: { labels: last7Days, datasets: [{ label: 'Reconectados', data: recoveredData, borderColor: '#10b981', fill: true }] }, options: { responsive: true } }); }
             
@@ -2573,31 +2625,34 @@
                 let fechaInicio, fechaFin;
                 let periodoTexto = '';
                 
+                const hoyLocal = getFechaLocalVenezuela();
+                
                 if (currentPeriod === 'day') {
-                    const fechaStr = document.getElementById('reportSingleDate').value;
+                    let fechaStr = document.getElementById('reportSingleDate').value;
                     if (!fechaStr) {
-                        showToast('Seleccione una fecha', 'error');
-                        showLoading(false);
-                        return;
+                        fechaStr = formatearFechaLocal(hoyLocal);
+                        document.getElementById('reportSingleDate').value = fechaStr;
                     }
-                    fechaInicio = new Date(fechaStr);
-                    fechaInicio.setHours(0, 0, 0, 0);
-                    fechaFin = new Date(fechaStr);
-                    fechaFin.setHours(23, 59, 59, 999);
-                    periodoTexto = `Fecha: ${fechaInicio.toLocaleDateString()}`;
+                    const [year, month, day] = fechaStr.split('-');
+                    fechaInicio = new Date(Date.UTC(year, month-1, day, 0, 0, 0));
+                    fechaFin = new Date(Date.UTC(year, month-1, day, 23, 59, 59, 999));
+                    periodoTexto = `Fecha: ${day}/${month}/${year}`;
                 } else {
-                    const startStr = document.getElementById('reportDateStart').value;
-                    const endStr = document.getElementById('reportDateEnd').value;
+                    let startStr = document.getElementById('reportDateStart').value;
+                    let endStr = document.getElementById('reportDateEnd').value;
                     if (!startStr || !endStr) {
-                        showToast('Seleccione el rango de fechas', 'error');
-                        showLoading(false);
-                        return;
+                        const hoy = hoyLocal;
+                        startStr = `${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}-01`;
+                        const lastDay = new Date(hoy.getFullYear(), hoy.getMonth()+1, 0).getDate();
+                        endStr = `${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}-${lastDay}`;
+                        document.getElementById('reportDateStart').value = startStr;
+                        document.getElementById('reportDateEnd').value = endStr;
                     }
-                    fechaInicio = new Date(startStr);
-                    fechaInicio.setHours(0, 0, 0, 0);
-                    fechaFin = new Date(endStr);
-                    fechaFin.setHours(23, 59, 59, 999);
-                    periodoTexto = `Desde: ${fechaInicio.toLocaleDateString()} Hasta: ${fechaFin.toLocaleDateString()}`;
+                    const [startYear, startMonth, startDay] = startStr.split('-');
+                    const [endYear, endMonth, endDay] = endStr.split('-');
+                    fechaInicio = new Date(Date.UTC(startYear, startMonth-1, startDay, 0, 0, 0));
+                    fechaFin = new Date(Date.UTC(endYear, endMonth-1, endDay, 23, 59, 59, 999));
+                    periodoTexto = `Desde: ${startDay}/${startMonth}/${startYear} Hasta: ${endDay}/${endMonth}/${endYear}`;
                 }
                 
                 const { gestiones, totalLlamados, totalRecuperados, totalPerdidos } = getReportData(fechaInicio, fechaFin);
@@ -2605,7 +2660,8 @@
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF({ orientation: 'landscape' });
                 
-                // Hoja de resumen
+                const ahoraLocal = formatearFechaHoraLocal(hoyLocal);
+                
                 doc.setFontSize(16);
                 doc.setFont(undefined, 'bold');
                 doc.text('INFORME DE GESTION DE RECUPERO', 14, 20);
@@ -2613,7 +2669,7 @@
                 doc.setFontSize(10);
                 doc.setFont(undefined, 'normal');
                 doc.text(periodoTexto, 14, 30);
-                doc.text(`Fecha de generacion: ${new Date().toLocaleString()}`, 14, 38);
+                doc.text(`Fecha de generacion: ${ahoraLocal}`, 14, 38);
                 doc.text(`Generado por: ${appCurrentUser?.fullName || 'Sistema'}`, 14, 46);
                 
                 doc.line(14, 52, 280, 52);
@@ -2663,14 +2719,13 @@
                     }
                 }
                 
-                // Detalle de clientes
                 doc.addPage();
                 doc.setFontSize(12);
                 doc.setFont(undefined, 'bold');
                 doc.text('DETALLE DE GESTIONES POR CLIENTE', 14, 20);
                 
                 const tableData = gestiones.map(g => [
-                    g.fecha.toLocaleString(),
+                    formatearFechaHoraLocal(g.fecha),
                     g.agente,
                     (g.cliente || '-').substring(0, 35),
                     g.documento,
@@ -2701,8 +2756,8 @@
                     }
                 });
                 
-                const fechaInicioStr = fechaInicio.toISOString().split('T')[0];
-                const fechaFinStr = fechaFin.toISOString().split('T')[0];
+                const fechaInicioStr = formatearFechaLocal(fechaInicio);
+                const fechaFinStr = formatearFechaLocal(fechaFin);
                 const filename = `reporte_gestion_${fechaInicioStr}_a_${fechaFinStr}.pdf`;
                 doc.save(filename);
                 showToast('Reporte PDF generado exitosamente');
@@ -2725,39 +2780,45 @@
             
             try {
                 let fechaInicio, fechaFin;
+                const hoyLocal = getFechaLocalVenezuela();
                 
                 if (currentPeriod === 'day') {
-                    const fechaStr = document.getElementById('reportSingleDate').value;
+                    let fechaStr = document.getElementById('reportSingleDate').value;
                     if (!fechaStr) {
-                        showToast('Seleccione una fecha', 'error');
-                        showLoading(false);
-                        return;
+                        fechaStr = formatearFechaLocal(hoyLocal);
+                        document.getElementById('reportSingleDate').value = fechaStr;
                     }
-                    fechaInicio = new Date(fechaStr);
-                    fechaInicio.setHours(0, 0, 0, 0);
-                    fechaFin = new Date(fechaStr);
-                    fechaFin.setHours(23, 59, 59, 999);
+                    const [year, month, day] = fechaStr.split('-');
+                    fechaInicio = new Date(Date.UTC(year, month-1, day, 0, 0, 0));
+                    fechaFin = new Date(Date.UTC(year, month-1, day, 23, 59, 59, 999));
                 } else {
-                    const startStr = document.getElementById('reportDateStart').value;
-                    const endStr = document.getElementById('reportDateEnd').value;
+                    let startStr = document.getElementById('reportDateStart').value;
+                    let endStr = document.getElementById('reportDateEnd').value;
                     if (!startStr || !endStr) {
-                        showToast('Seleccione el rango de fechas', 'error');
-                        showLoading(false);
-                        return;
+                        const hoy = hoyLocal;
+                        startStr = `${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}-01`;
+                        const lastDay = new Date(hoy.getFullYear(), hoy.getMonth()+1, 0).getDate();
+                        endStr = `${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}-${lastDay}`;
+                        document.getElementById('reportDateStart').value = startStr;
+                        document.getElementById('reportDateEnd').value = endStr;
                     }
-                    fechaInicio = new Date(startStr);
-                    fechaInicio.setHours(0, 0, 0, 0);
-                    fechaFin = new Date(endStr);
-                    fechaFin.setHours(23, 59, 59, 999);
+                    const [startYear, startMonth, startDay] = startStr.split('-');
+                    const [endYear, endMonth, endDay] = endStr.split('-');
+                    fechaInicio = new Date(Date.UTC(startYear, startMonth-1, startDay, 0, 0, 0));
+                    fechaFin = new Date(Date.UTC(endYear, endMonth-1, endDay, 23, 59, 59, 999));
                 }
                 
                 const { gestiones, totalLlamados, totalRecuperados, totalPerdidos } = getReportData(fechaInicio, fechaFin);
                 const tasaExito = totalLlamados > 0 ? ((totalRecuperados / totalLlamados) * 100).toFixed(1) : 0;
                 
+                const ahoraLocal = formatearFechaHoraLocal(hoyLocal);
+                const fechaInicioLocal = formatearFechaLocal(fechaInicio);
+                const fechaFinLocal = formatearFechaLocal(fechaFin);
+                
                 const wsData = [
                     ['RESUMEN DEL PERIODO'],
-                    [`Periodo: ${fechaInicio.toLocaleDateString()} - ${fechaFin.toLocaleDateString()}`],
-                    [`Fecha de exportacion: ${new Date().toLocaleString()}`],
+                    [`Periodo: ${fechaInicioLocal} - ${fechaFinLocal}`],
+                    [`Fecha de exportacion: ${ahoraLocal}`],
                     [`Generado por: ${appCurrentUser?.fullName || 'Sistema'}`],
                     [],
                     ['METRICAS CONSOLIDADAS'],
@@ -2772,7 +2833,7 @@
                 
                 gestiones.forEach(g => {
                     wsData.push([
-                        g.fecha.toLocaleString(),
+                        formatearFechaHoraLocal(g.fecha),
                         g.agente,
                         g.cliente,
                         g.documento,
@@ -2789,7 +2850,7 @@
                 
                 const wb = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(wb, ws, 'Reporte_Gestion');
-                XLSX.writeFile(wb, `reporte_gestion_${fechaInicio.toISOString().split('T')[0]}_a_${fechaFin.toISOString().split('T')[0]}.xlsx`);
+                XLSX.writeFile(wb, `reporte_gestion_${fechaInicioLocal}_a_${fechaFinLocal}.xlsx`);
                 showToast('Reporte exportado a Excel');
             } catch (error) {
                 console.error('Error exportando a Excel:', error);
@@ -2806,26 +2867,30 @@
             let fechaInicio, fechaFin;
             
             if (currentPeriod === 'day') {
-                const fechaStr = document.getElementById('reportSingleDate')?.value;
+                let fechaStr = document.getElementById('reportSingleDate')?.value;
                 if (!fechaStr) {
-                    summaryDiv.innerHTML = '<p class="text-gray-500">Seleccione una fecha para ver el resumen</p>';
-                    return;
+                    const hoyLocal = getFechaLocalVenezuela();
+                    fechaStr = formatearFechaLocal(hoyLocal);
+                    document.getElementById('reportSingleDate').value = fechaStr;
                 }
-                fechaInicio = new Date(fechaStr);
-                fechaInicio.setHours(0, 0, 0, 0);
-                fechaFin = new Date(fechaStr);
-                fechaFin.setHours(23, 59, 59, 999);
+                const [year, month, day] = fechaStr.split('-');
+                fechaInicio = new Date(Date.UTC(year, month-1, day, 0, 0, 0));
+                fechaFin = new Date(Date.UTC(year, month-1, day, 23, 59, 59, 999));
             } else {
-                const startStr = document.getElementById('reportDateStart')?.value;
-                const endStr = document.getElementById('reportDateEnd')?.value;
+                let startStr = document.getElementById('reportDateStart')?.value;
+                let endStr = document.getElementById('reportDateEnd')?.value;
                 if (!startStr || !endStr) {
-                    summaryDiv.innerHTML = '<p class="text-gray-500">Seleccione un rango de fechas para ver el resumen</p>';
-                    return;
+                    const hoyLocal = getFechaLocalVenezuela();
+                    startStr = `${hoyLocal.getFullYear()}-${String(hoyLocal.getMonth()+1).padStart(2,'0')}-01`;
+                    const lastDay = new Date(hoyLocal.getFullYear(), hoyLocal.getMonth()+1, 0).getDate();
+                    endStr = `${hoyLocal.getFullYear()}-${String(hoyLocal.getMonth()+1).padStart(2,'0')}-${lastDay}`;
+                    document.getElementById('reportDateStart').value = startStr;
+                    document.getElementById('reportDateEnd').value = endStr;
                 }
-                fechaInicio = new Date(startStr);
-                fechaInicio.setHours(0, 0, 0, 0);
-                fechaFin = new Date(endStr);
-                fechaFin.setHours(23, 59, 59, 999);
+                const [startYear, startMonth, startDay] = startStr.split('-');
+                const [endYear, endMonth, endDay] = endStr.split('-');
+                fechaInicio = new Date(Date.UTC(startYear, startMonth-1, startDay, 0, 0, 0));
+                fechaFin = new Date(Date.UTC(endYear, endMonth-1, endDay, 23, 59, 59, 999));
             }
             
             const { gestiones, totalLlamados, totalRecuperados, totalPerdidos } = getReportData(fechaInicio, fechaFin);
@@ -2848,28 +2913,37 @@
             const singleDateDiv = document.getElementById('singleDateContainer');
             const rangeDiv = document.getElementById('rangeDateContainer');
             const comparisonDiv = document.getElementById('comparisonContainer');
+            
+            const hoyLocal = getFechaLocalVenezuela();
+            const fechaHoyStr = formatearFechaLocal(hoyLocal);
+            
             if (period === 'day') {
                 singleDateDiv.classList.remove('hidden');
                 rangeDiv.classList.add('hidden');
                 comparisonDiv.classList.add('hidden');
-                document.getElementById('reportSingleDate').value = new Date().toISOString().split('T')[0];
+                document.getElementById('reportSingleDate').value = fechaHoyStr;
             } else {
                 singleDateDiv.classList.add('hidden');
                 rangeDiv.classList.remove('hidden');
                 if (period === 'month') comparisonDiv.classList.remove('hidden');
                 else comparisonDiv.classList.add('hidden');
-                const today = new Date();
+                
                 if (period === 'week') {
-                    const start = new Date(today);
-                    start.setDate(today.getDate() - today.getDay());
-                    const end = new Date(today);
-                    end.setDate(today.getDate() + (6 - today.getDay()));
-                    document.getElementById('reportDateStart').value = start.toISOString().split('T')[0];
-                    document.getElementById('reportDateEnd').value = end.toISOString().split('T')[0];
+                    const start = new Date(hoyLocal);
+                    const day = hoyLocal.getDay();
+                    const diff = day === 0 ? 6 : day - 1;
+                    start.setDate(hoyLocal.getDate() - diff);
+                    const end = new Date(start);
+                    end.setDate(start.getDate() + 6);
+                    
+                    document.getElementById('reportDateStart').value = formatearFechaLocal(start);
+                    document.getElementById('reportDateEnd').value = formatearFechaLocal(end);
                 } else if (period === 'month') {
-                    document.getElementById('reportDateStart').value = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-01`;
-                    const lastDay = new Date(today.getFullYear(), today.getMonth()+1, 0).getDate();
-                    document.getElementById('reportDateEnd').value = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${lastDay}`;
+                    const year = hoyLocal.getFullYear();
+                    const month = hoyLocal.getMonth();
+                    const lastDay = new Date(year, month + 1, 0).getDate();
+                    document.getElementById('reportDateStart').value = `${year}-${String(month + 1).padStart(2, '0')}-01`;
+                    document.getElementById('reportDateEnd').value = `${year}-${String(month + 1).padStart(2, '0')}-${lastDay}`;
                 }
             }
             updatePeriodSummary();
@@ -2893,7 +2967,7 @@
                     previewHtml += '</thead><tbody>';
                     for(let r = 0; r < Math.min(rezagadosRawData.length, 5); r++) {
                         previewHtml += '<tr>';
-                        for(let c = 0; c < Math.min(rezagadosRawData[r].length, 8); c++) previewHtml += `<td class="text-xs">${escapeHtml(String(rezagadosRawData[r][c] || '').substring(0, 30))}</td>`;
+                        for(let c = 0; c < Math.min(rezagadosRawData[r].length, 8); c++) previewHtml += `<td class="text-xs">${escapeHtml(String(rezagadosRawData[r][c] || '').substring(0, 30))}</div>`;
                         previewHtml += '</tr>';
                     }
                     previewHtml += '</tbody>';
@@ -2956,7 +3030,7 @@
                     perdidosHeaders = rows[0].map(h => String(h || '').trim());
                     perdidosRawData = rows.slice(1).filter(row => row && row.length > 0 && row.some(cell => cell && String(cell).trim() !== ''));
                     let previewHtml = '<thead><tr>' + perdidosHeaders.slice(0, 6).map(h => `<th class="text-xs">${escapeHtml(h).substring(0, 15)}</th>`).join('') + '</thead><tbody>';
-                    previewHtml += perdidosRawData.slice(0, 3).map(row => '<tr>' + row.slice(0, 6).map(cell => `<td class="text-xs">${escapeHtml(String(cell || '').substring(0, 20))}</td>`).join('') + '</tr>').join('');
+                    previewHtml += perdidosRawData.slice(0, 3).map(row => '<tr>' + row.slice(0, 6).map(cell => `<td class="text-xs">${escapeHtml(String(cell || '').substring(0, 20))}</div>`).join('') + '</tr>').join('');
                     previewHtml += '</tbody>';
                     document.getElementById('previewPerdidosTable').innerHTML = previewHtml;
                     document.getElementById('perdidosPreview').classList.remove('hidden');
@@ -3057,7 +3131,7 @@
             renderIncontactablesTable(); renderRecuperadosTable(); renderPerdidosFinalTable(); 
             renderEquiposTable(); renderVisitasTable(); renderTechniciansList(); 
             updateDashboardMetrics(); updateConfigCounters(); cargarSelectAgentes();
-            renderTopAgents(); // Asegurar que se actualice el top de agentes
+            renderTopAgents();
         }
         
         function changeRezagadosPage(delta) { rezagadosPage += delta; renderRezagadosTable(); }

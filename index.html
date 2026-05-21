@@ -445,7 +445,7 @@
                     <div class="text-right text-xs text-gray-500 mt-1"><span id="perdidosFinalTotalCount" class="font-bold">0</span> registros</div>
                 </div>
                 <div class="table-container desktop-table">
-                    <table class="customers-table"><thead><tr><th>ID</th><th>Nombre</th><th>Documento</th><th>Teléfono</th><th>Plan</th><th>Dirección</th><th>Zona/CO</th><th>Motivo</th><th>Fecha Baja</th><th>Agente</th><th>Acciones</th><tr></thead>
+                    <table class="customers-table"><thead><tr><th>ID</th><th>Nombre</th><th>Documento</th><th>Teléfono</th><th>Plan</th><th>Dirección</th><th>Zona/CO</th><th>Motivo</th><th>Fecha Baja</th><th>Agente</th><th>Acciones</th></tr></thead>
                     <tbody id="perdidosFinalTableBody"></tbody>
                 </table>
                 </div>
@@ -458,7 +458,7 @@
                     <div class="flex flex-wrap justify-between items-center gap-2"><h3 class="font-bold text-sm"><i class="fas fa-wrench text-purple-500 mr-1"></i>Agendados para Retiro de Equipos</h3><button onclick="window.exportEquiposToExcel()" class="bg-green-600 text-white px-2 py-1 rounded text-xs"><i class="fas fa-file-excel mr-1"></i>Exportar</button></div>
                     <div class="filters-grid mt-2"><input type="text" id="searchEquipo" placeholder="Buscar por cliente..." class="search-input border rounded-lg px-2 py-1 text-xs"><input type="text" id="searchEquipoId" placeholder="Buscar por ID/Cédula..." class="search-input border rounded-lg px-2 py-1 text-xs"><input type="date" id="filterEquipoFecha" placeholder="Filtrar por fecha" class="search-input border rounded-lg px-2 py-1 text-xs"></div>
                 </div>
-                <div class="table-container desktop-table"><table class="customers-table"><thead><tr><th>N° Abonado</th><th>Cliente</th><th>Teléfono</th><th>Dirección</th><th>Zona/CO</th><th>Técnico</th><th>Fecha</th><th>Hora</th><th>Motivo</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="equiposTableBody"></tbody></table></div>
+                <div class="table-container desktop-table"><table class="customers-table"><thead><tr><th>N° Abonado</th><th>Cliente</th><th>Teléfono</th><th>Dirección</th><th>Zona/CO</th><th>Técnico</th><th>Fecha</th><th>Hora</th><th>Motivo</th><th>Estado</th><th>Acciones</th></td></thead><tbody id="equiposTableBody"></tbody></table></div>
                 <div id="equiposMobileList" class="mobile-cards"></div>
             </div>
 
@@ -1447,18 +1447,18 @@
                     const isLocked = lockInfo !== undefined; 
                     const lockedByMe = isCustomerLockedByMe(c.id, 'rezagado'); 
                     return `<tr>
-                        <td class="truncate-text">${escapeHtml(c.identificador || c.id)}</td>
-                        <td class="truncate-text">${escapeHtml(c.nombre)}</td>
-                        <td class="truncate-text">${escapeHtml(c.documento)}</td>
-                        <td class="truncate-text">${hasPhone ? escapeHtml(c.telefono1) : '-'}</td>
-                        <td class="truncate-text">${escapeHtml(c.plan)}</td>
-                        <td class="truncate-text">${escapeHtml(c.centroOp)}</td>
-                        <td class="truncate-text">${c.fechaCorte || '-'}</td>
-                        <td class="truncate-text"><span class="status-badge bg-pendiente">PENDIENTE</span></td>
+                        <td class="truncate-text">${escapeHtml(c.identificador || c.id)}</div>
+                        <td class="truncate-text">${escapeHtml(c.nombre)}</div>
+                        <td class="truncate-text">${escapeHtml(c.documento)}</div>
+                        <td class="truncate-text">${hasPhone ? escapeHtml(c.telefono1) : '-'}</div>
+                        <td class="truncate-text">${escapeHtml(c.plan)}</div>
+                        <td class="truncate-text">${escapeHtml(c.centroOp)}</div>
+                        <td class="truncate-text">${c.fechaCorte || '-'}</div>
+                        <td class="truncate-text"><span class="status-badge bg-pendiente">PENDIENTE</span></div>
                         <td class="table-actions">
                             ${(!isLocked || lockedByMe) && hasPhone ? `<button onclick="window.openRegisterCallModal('${c.id}', 'rezagado')" class="call-btn"><i class="fas fa-phone-alt"></i> Gestionar</button>` : `<button class="call-btn opacity-50" disabled><i class="fas fa-phone-alt"></i> ${!hasPhone ? 'Sin teléfono' : 'Bloqueado'}</button>`}
                             ${hasPhone ? `<a href="tel:${c.telefono1}" class="call-link"><i class="fas fa-phone"></i></a><a href="https://wa.me/${c.telefono1.replace(/[^0-9]/g,'')}" target="_blank" class="whatsapp-link"><i class="fab fa-whatsapp"></i></a>` : ''}
-                        </td>
+                        </div>
                     </tr>`; 
                 }).join(''); 
             } 
@@ -1483,7 +1483,7 @@
             } else if (paginationInfo) paginationInfo.innerHTML = 'No hay clientes para mostrar'; 
             const tbody = document.getElementById('perdidosTableBodyDesktop'); 
             if (tbody) { 
-                if (items.length === 0) tbody.innerHTML = '<table><td colspan="9" class="text-center py-4 text-gray-500">No hay clientes perdidos</div></tr>'; 
+                if (items.length === 0) tbody.innerHTML = '<tr><td colspan="9" class="text-center py-4 text-gray-500">No hay clientes perdidos</div></tr>'; 
                 else tbody.innerHTML = pageItems.map(c => { 
                     const hasPhone = c.telefono1 && c.telefono1 !== ''; 
                     const lockInfo = getCustomerLockInfo(c.id, 'perdido'); 
@@ -1544,7 +1544,7 @@
                         <button onclick="window.reclasificarContactado('${c.id}', 'perdido')" class="assign-btn"><i class="fas fa-arrow-right"></i> a Perdido</button>
                         ${puedeEliminarDatos() ? `<button onclick="window.deleteHistorialRegistro('${c.id}', 'contactado')" class="delete-single-btn"><i class="fas fa-trash"></i></button>` : ''}
                     </div>
-                </table>`).join(''); 
+                </tr>`).join(''); 
             } 
             const pagination = document.getElementById('contactadosPagination'); 
             if (pagination && totalPages > 1) pagination.innerHTML = `<button onclick="changeContactadosPage(-1)" class="pagination-btn" ${contactadosPage === 1 ? 'disabled style="opacity:0.5"' : ''}>◀ Anterior</button><span class="text-xs mx-2">Pág ${contactadosPage} de ${totalPages}</span><button onclick="changeContactadosPage(1)" class="pagination-btn" ${contactadosPage === totalPages ? 'disabled style="opacity:0.5"' : ''}>Siguiente ▶</button>`; 
@@ -1608,7 +1608,7 @@
             if (totalSpan) totalSpan.innerText = items.length; 
             const tbody = document.getElementById('recuperadosTableBody'); 
             if (tbody) { 
-                if (items.length === 0) tbody.innerHTML = '<tr><td colspan="10" class="text-center py-4 text-gray-500">No hay reconectados</div></tr>'; 
+                if (items.length === 0) tbody.innerHTML = '<tr><td colspan="10" class="text-center py-4 text-gray-500">No hay reconectados</div></td>'; 
                 else tbody.innerHTML = items.slice(0, ITEMS_PER_PAGE).map(c => `<tr>
                     <td class="truncate-text">${escapeHtml(c.clienteIdOriginal || c.clienteId)}</div>
                     <td class="truncate-text">${escapeHtml(c.nombre)}</div>
@@ -1623,7 +1623,7 @@
                         <button onclick="window.editCustomer('${c.id}', 'recuperado', 'recuperados')" class="edit-customer-btn"><i class="fas fa-edit"></i> Editar</button>
                         ${puedeEliminarDatos() ? `<button onclick="window.deleteHistorialRegistro('${c.id}', 'recuperado')" class="delete-single-btn"><i class="fas fa-trash"></i></button>` : ''}
                     </div>
-                </table>`); 
+                </tr>`); 
             } 
         }
         
@@ -1716,7 +1716,7 @@
                     <td class="text-xs">${v.fechaCompletado ? formatearFechaHoraLocal(v.fechaCompletado) : '-'}</div>
                     <td class="text-xs">${v.completadoPor || v.agente || '-'}</div>
                     <td class="text-xs"><span class="status-badge bg-recuperado">✅ EQUIPO RETIRADO</span></div>
-                </table>`); 
+                </tr>`); 
             } 
         }
         
@@ -1774,7 +1774,7 @@
                 periodSpan.innerText = `${meses[ahora.getMonth()]} ${ahora.getFullYear()}`; 
             } 
             if (agentesArray.length === 0) { 
-                container.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-gray-500">No hay datos para el mes actual</div></tr>'; 
+                container.innerHTML = '<table><td colspan="6" class="text-center py-4 text-gray-500">No hay datos para el mes actual</div></tr>'; 
                 return; 
             } 
             container.innerHTML = agentesArray.slice(0, 10).map((agente, index) => { 
@@ -1786,7 +1786,7 @@
                 else medalIcon = `${rank}.`; 
                 const barWidth = agente.efectividad; 
                 const barColor = barWidth >= 25 ? '#10b981' : (barWidth >= 15 ? '#f59e0b' : '#ef4444'); 
-                return `<tr class="${rankClass}"><td class="text-center font-bold">${medalIcon}</td><td class="font-medium">${escapeHtml(agente.nombre)}</td><td class="text-center">${agente.llamadas}</td><td class="text-center text-green-600 font-medium">✅ ${agente.recuperados}</td><td class="text-center text-red-500">❌ ${agente.bajas}</td><td class="text-center"><div class="flex items-center gap-2"><div class="progress-bar-bg flex-1"><div class="progress-bar-fill" style="width: ${barWidth}%; background-color: ${barColor};"></div></div><span class="text-xs font-medium min-w-[40px]">${agente.efectividad}%</span></div></td></tr>`; 
+                return `<tr class="${rankClass}"><td class="text-center font-bold">${medalIcon}</div><td class="font-medium">${escapeHtml(agente.nombre)}</div><td class="text-center">${agente.llamadas}</div><td class="text-center text-green-600 font-medium">✅ ${agente.recuperados}</div><td class="text-center text-red-500">❌ ${agente.bajas}</div><td class="text-center"><div class="flex items-center gap-2"><div class="progress-bar-bg flex-1"><div class="progress-bar-fill" style="width: ${barWidth}%; background-color: ${barColor};"></div></div><span class="text-xs font-medium min-w-[40px]">${agente.efectividad}%</span></div></div></td>`; 
             }).join(''); 
         }
         
@@ -2075,25 +2075,104 @@
                 const { jsPDF } = window.jspdf; 
                 const doc = new jsPDF({ orientation: 'portrait' }); 
                 const ahoraLocal = formatearFechaHoraLocal(hoyLocal); 
-                doc.setFontSize(16); doc.setFont('helvetica', 'bold'); doc.text('INFORME GENERAL DE GESTION DE RECUPERO', 14, 20); 
-                doc.setFontSize(10); doc.setFont('helvetica', 'normal'); doc.text(periodoTexto, 14, 30); doc.text(`Fecha de generacion: ${ahoraLocal}`, 14, 38); doc.text(`Generado por: ${appCurrentUser?.fullName || 'Sistema'}`, 14, 46); 
+                
+                // Aumentar tamaño de fuente principal
+                doc.setFontSize(18); doc.setFont('helvetica', 'bold'); doc.text('INFORME GENERAL DE GESTION DE RECUPERO', 14, 20); 
+                doc.setFontSize(12); doc.setFont('helvetica', 'normal'); doc.text(periodoTexto, 14, 30); 
+                doc.text(`Fecha de generacion: ${ahoraLocal}`, 14, 38); 
+                doc.text(`Generado por: ${appCurrentUser?.fullName || 'Sistema'}`, 14, 46); 
                 doc.line(14, 52, 196, 52); 
-                doc.setFontSize(12); doc.setFont('helvetica', 'bold'); doc.text('RESUMEN DE METRICAS', 14, 62); 
-                doc.setFontSize(10); doc.setFont('helvetica', 'normal'); let y = 74; 
-                doc.text(`Total de gestiones realizadas: ${totalGestiones}`, 14, y); y += 7; 
-                doc.text(`Llamadas registradas: ${totalLlamadas}`, 14, y); y += 7; 
-                doc.text(`Clientes recuperados (reconectados): ${totalRecuperados}`, 14, y); y += 7; 
-                doc.text(`Clientes dados de baja: ${totalPerdidos}`, 14, y); y += 7; 
-                doc.text(`Clientes incontactables: ${totalIncontactables}`, 14, y); y += 7; 
-                doc.text(`Tasa de efectividad de recupero: ${tasaExito}%`, 14, y); y += 7; 
-                doc.text(`Tasa de perdida de clientes: ${tasaPerdida}%`, 14, y); y += 12; 
-                doc.line(14, y-4, 196, y-4); 
-                doc.setFont('helvetica', 'bold'); doc.text('ESTADO ACTUAL DEL SISTEMA', 14, y); y += 7; 
-                doc.setFont('helvetica', 'normal'); doc.text(`Clientes pendientes (Rezagados): ${clientesRezagados.length}`, 14, y); y += 6; 
-                doc.text(`Clientes en gestion (Perdidos): ${clientesPerdidos.length}`, 14, y); y += 6; 
-                doc.text(`Clientes recuperados totales: ${clientesRecuperados.length}`, 14, y); y += 6; 
-                doc.text(`Clientes dados de baja totales: ${clientesPerdidosFinal.length}`, 14, y); y += 6; 
-                doc.text(`Visitas pendientes de retiro: ${visitasTecnicas.filter(v => v.estado !== 'completada').length}`, 14, y); 
+                
+                doc.setFontSize(14); doc.setFont('helvetica', 'bold'); doc.text('RESUMEN DE METRICAS', 14, 62); 
+                doc.setFontSize(12); doc.setFont('helvetica', 'normal'); let y = 76; 
+                doc.text(`• Total de gestiones realizadas: ${totalGestiones}`, 14, y); y += 8; 
+                doc.text(`• Llamadas registradas: ${totalLlamadas}`, 14, y); y += 8; 
+                doc.text(`• Clientes recuperados (reconectados): ${totalRecuperados}`, 14, y); y += 6; 
+                if(totalRecuperados > 0){ 
+                    doc.setFontSize(10); 
+                    const recCountByDate = new Map(); 
+                    gestiones.filter(g => g.tipo === 'Reconexion').forEach(g => { 
+                        const fecha = formatearFechaLocal(g.fecha); 
+                        recCountByDate.set(fecha, (recCountByDate.get(fecha) || 0) + 1); 
+                    }); 
+                    const sortedDates = Array.from(recCountByDate.keys()).sort().reverse(); 
+                    doc.text(`   Fechas: ${sortedDates.map(f => `${f} (${recCountByDate.get(f)})`).join(', ')}`, 18, y); 
+                    doc.setFontSize(12); 
+                } 
+                y += 8; 
+                doc.text(`• Clientes dados de baja: ${totalPerdidos}`, 14, y); y += 6; 
+                if(totalPerdidos > 0){ 
+                    doc.setFontSize(10); 
+                    const bajaCountByDate = new Map(); 
+                    gestiones.filter(g => g.tipo === 'Baja').forEach(g => { 
+                        const fecha = formatearFechaLocal(g.fecha); 
+                        bajaCountByDate.set(fecha, (bajaCountByDate.get(fecha) || 0) + 1); 
+                    }); 
+                    const sortedDates = Array.from(bajaCountByDate.keys()).sort().reverse(); 
+                    doc.text(`   Fechas: ${sortedDates.map(f => `${f} (${bajaCountByDate.get(f)})`).join(', ')}`, 18, y); 
+                    doc.setFontSize(12); 
+                } 
+                y += 8; 
+                doc.text(`• Clientes incontactables: ${totalIncontactables}`, 14, y); y += 6; 
+                if(totalIncontactables > 0){ 
+                    doc.setFontSize(10); 
+                    const incCountByDate = new Map(); 
+                    gestiones.filter(g => g.tipo === 'Incontactable').forEach(g => { 
+                        const fecha = formatearFechaLocal(g.fecha); 
+                        incCountByDate.set(fecha, (incCountByDate.get(fecha) || 0) + 1); 
+                    }); 
+                    const sortedDates = Array.from(incCountByDate.keys()).sort().reverse(); 
+                    doc.text(`   Fechas: ${sortedDates.map(f => `${f} (${incCountByDate.get(f)})`).join(', ')}`, 18, y); 
+                    doc.setFontSize(12); 
+                } 
+                y += 8; 
+                doc.text(`• Tasa de efectividad de recupero: ${tasaExito}%`, 14, y); y += 8; 
+                doc.text(`• Tasa de perdida de clientes: ${tasaPerdida}%`, 14, y); y += 14; 
+                doc.line(14, y-6, 196, y-6); 
+                
+                doc.setFont('helvetica', 'bold'); doc.text('ESTADO ACTUAL DEL SISTEMA', 14, y); y += 8; 
+                doc.setFont('helvetica', 'normal'); 
+                doc.text(`• Clientes pendientes (Rezagados): ${clientesRezagados.length}`, 14, y); y += 8; 
+                doc.text(`• Clientes en gestion (Perdidos): ${clientesPerdidos.length}`, 14, y); y += 8; 
+                doc.text(`• Clientes recuperados totales: ${clientesRecuperados.length}`, 14, y); y += 6; 
+                if(clientesRecuperados.length > 0){ 
+                    doc.setFontSize(10); 
+                    const recTotalByDate = new Map(); 
+                    clientesRecuperados.forEach(r => { 
+                        const fecha = r.fechaGestion ? formatearFechaLocal(r.fechaGestion) : 'Sin fecha'; 
+                        recTotalByDate.set(fecha, (recTotalByDate.get(fecha) || 0) + 1); 
+                    }); 
+                    const sortedDates = Array.from(recTotalByDate.keys()).sort().reverse(); 
+                    doc.text(`   Fechas: ${sortedDates.map(f => `${f} (${recTotalByDate.get(f)})`).join(', ')}`, 18, y); 
+                    doc.setFontSize(12); 
+                } 
+                y += 8; 
+                doc.text(`• Clientes dados de baja totales: ${clientesPerdidosFinal.length}`, 14, y); y += 6; 
+                if(clientesPerdidosFinal.length > 0){ 
+                    doc.setFontSize(10); 
+                    const bajaTotalByDate = new Map(); 
+                    clientesPerdidosFinal.forEach(b => { 
+                        const fecha = b.fechaGestion ? formatearFechaLocal(b.fechaGestion) : 'Sin fecha'; 
+                        bajaTotalByDate.set(fecha, (bajaTotalByDate.get(fecha) || 0) + 1); 
+                    }); 
+                    const sortedDates = Array.from(bajaTotalByDate.keys()).sort().reverse(); 
+                    doc.text(`   Fechas: ${sortedDates.map(f => `${f} (${bajaTotalByDate.get(f)})`).join(', ')}`, 18, y); 
+                    doc.setFontSize(12); 
+                } 
+                y += 8; 
+                doc.text(`• Visitas pendientes de retiro: ${visitasTecnicas.filter(v => v.estado !== 'completada').length}`, 14, y); y += 6; 
+                const pendingVisits = visitasTecnicas.filter(v => v.estado !== 'completada'); 
+                if(pendingVisits.length > 0){ 
+                    doc.setFontSize(10); 
+                    const visitasByDate = new Map(); 
+                    pendingVisits.forEach(v => { 
+                        const fecha = v.fechaVisita || 'Sin fecha'; 
+                        visitasByDate.set(fecha, (visitasByDate.get(fecha) || 0) + 1); 
+                    }); 
+                    const sortedDates = Array.from(visitasByDate.keys()).sort(); 
+                    doc.text(`   Fechas programadas: ${sortedDates.map(f => `${f} (${visitasByDate.get(f)})`).join(', ')}`, 18, y); 
+                } 
+                
                 const fechaInicioStr = formatearFechaLocal(fechaInicio); 
                 const fechaFinStr = formatearFechaLocal(fechaFin); 
                 doc.save(`reporte_general_${fechaInicioStr}_a_${fechaFinStr}.pdf`); 
@@ -2136,12 +2215,25 @@
                 const { jsPDF } = window.jspdf; 
                 const doc = new jsPDF({ orientation: 'landscape' }); 
                 const ahoraLocal = formatearFechaHoraLocal(hoyLocal); 
-                doc.setFontSize(14); doc.setFont('helvetica', 'bold'); doc.text('INFORME DETALLADO DE GESTION DE RECUPERO', 14, 20); 
-                doc.setFontSize(9); doc.setFont('helvetica', 'normal'); doc.text(periodoTexto, 14, 28); doc.text(`Fecha de generacion: ${ahoraLocal}`, 14, 34); doc.text(`Generado por: ${appCurrentUser?.fullName || 'Sistema'}`, 14, 40); 
-                doc.setFontSize(10); doc.setFont('helvetica', 'bold'); doc.text(`RESUMEN: ${totalGestiones} gestiones | ${totalRecuperados} recuperados | ${totalPerdidos} bajas | Efectividad: ${tasaExito}%`, 14, 50); 
+                
+                // Aumentar tamaño de fuente en reporte detallado
+                doc.setFontSize(16); doc.setFont('helvetica', 'bold'); doc.text('INFORME DETALLADO DE GESTION DE RECUPERO', 14, 20); 
+                doc.setFontSize(11); doc.setFont('helvetica', 'normal'); doc.text(periodoTexto, 14, 28); 
+                doc.text(`Fecha de generacion: ${ahoraLocal}`, 14, 34); 
+                doc.text(`Generado por: ${appCurrentUser?.fullName || 'Sistema'}`, 14, 40); 
+                doc.setFontSize(12); doc.setFont('helvetica', 'bold'); 
+                doc.text(`RESUMEN: ${totalGestiones} gestiones | ${totalRecuperados} recuperados | ${totalPerdidos} bajas | Efectividad: ${tasaExito}%`, 14, 50); 
                 doc.line(14, 54, 280, 54); 
+                
                 const tableData = gestiones.slice(0, 600).map(g => [formatearFechaHoraLocal(g.fecha), g.agente, (g.cliente || '-').substring(0, 30), g.documento, g.telefono, g.plan, g.centroOp, g.tipo, (g.resultado || '-').substring(0, 25)]); 
-                doc.autoTable({ startY: 58, head: [['Fecha/Hora', 'Agente', 'Cliente', 'Documento', 'Telefono', 'Plan', 'CO', 'Tipo', 'Resultado']], body: tableData, theme: 'striped', headStyles: { fillColor: [79, 70, 229], textColor: [255, 255, 255], fontStyle: 'bold' }, bodyStyles: { fontSize: 7 } }); 
+                doc.autoTable({ 
+                    startY: 58, 
+                    head: [['Fecha/Hora', 'Agente', 'Cliente', 'Documento', 'Telefono', 'Plan', 'CO', 'Tipo', 'Resultado']], 
+                    body: tableData, 
+                    theme: 'striped', 
+                    headStyles: { fillColor: [79, 70, 229], textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 9 }, 
+                    bodyStyles: { fontSize: 8 } 
+                }); 
                 const fechaInicioStr = formatearFechaLocal(fechaInicio); 
                 const fechaFinStr = formatearFechaLocal(fechaFin); 
                 doc.save(`reporte_detallado_${fechaInicioStr}_a_${fechaFinStr}.pdf`); 

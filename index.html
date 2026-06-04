@@ -112,7 +112,6 @@
         .rank-2 { background: linear-gradient(90deg, #f1f5f9 0%, transparent 100%); border-radius: 8px; }
         .rank-3 { background: linear-gradient(90deg, #ffedd5 0%, transparent 100%); border-radius: 8px; }
         .char-counter { font-size: 10px; color: #6b7280; text-align: right; margin-top: 2px; }
-        /* Estilos para desglose por fecha en dashboard */
         .date-breakdown { font-size: 9px; color: #6b7280; margin-top: 6px; border-top: 1px solid #e5e7eb; padding-top: 4px; }
         .date-breakdown-item { display: inline-block; background: #f3f4f6; padding: 1px 5px; border-radius: 10px; margin: 2px; font-size: 8px; }
         .main-number { font-size: 1.5rem; font-weight: 700; }
@@ -266,7 +265,7 @@
                     <div class="overflow-x-auto">
                         <table class="top-agents-table" id="topAgentsTable">
                             <thead><tr><th class="w-12">#</th><th>Agente</th><th class="text-center">Llamadas</th><th class="text-center">Recuperados</th><th class="text-center">Bajas</th><th>Efectividad</th></tr></thead>
-                            <tbody id="topAgentsTableBody"><tr><td colspan="6" class="text-center py-4 text-gray-500">Cargando datos...</div></tr></tbody>
+                            <tbody id="topAgentsTableBody"><tr><td colspan="6" class="text-center py-4 text-gray-500">Cargando datos...</td></tr></tbody>
                         </table>
                     </div>
                     <div class="mt-3 pt-2 border-t flex justify-between items-center text-xs text-gray-500">
@@ -338,7 +337,7 @@
                     <div class="incontactable-summary" id="incontactablesSummary"></div>
                     <div class="filters-grid mt-2"><input type="text" id="searchIncontactable" placeholder="Buscar por nombre..." class="search-input border rounded-lg px-2 py-1 text-xs"><input type="text" id="searchIncontactableId" placeholder="Buscar por ID..." class="search-input border rounded-lg px-2 py-1 text-xs"><input type="text" id="searchIncontactableAgente" placeholder="Buscar por agente..." class="search-input border rounded-lg px-2 py-1 text-xs"><input type="date" id="filterIncontactableFecha" class="search-input border rounded-lg px-2 py-1 text-xs"><select id="filterIncontactableMotivo" class="border rounded-lg px-2 py-1 text-xs"><option value="">Todos los motivos</option><option value="mensaje_tercero">Mensaje con tercero</option><option value="numero_no_valido">Numero no valido</option></select><select id="filterIncontactableCO" class="border rounded-lg px-2 py-1 text-xs"><option value="">Todos los CO</option><option value="RUICES">CO Los Ruices</option><option value="NAYA">CO La Naya</option><option value="ROSAL">CO El Rosal</option><option value="PARAISO">CO Paraiso</option></select><div class="text-right text-xs text-gray-500"><span id="incontactablesTotalCount" class="font-bold">0</span> incontactables</div></div>
                 </div>
-                <div class="table-container desktop-table"><table class="customers-table"><thead><tr><th>ID Abonado</th><th>Nombre</th><th>Documento</th><th>Telefono</th><th>Plan</th><th>CO</th><th>Motivo</th><th>Agente</th><th>Fecha/Hora</th><th>Acciones</th><tr></thead><tbody id="incontactablesTableBodyDesktop"></tbody></table></div>
+                <div class="table-container desktop-table"><table class="customers-table"><thead><tr><th>ID Abonado</th><th>Nombre</th><th>Documento</th><th>Telefono</th><th>Plan</th><th>CO</th><th>Motivo</th><th>Agente</th><th>Fecha/Hora</th><th>Acciones</th></tr></thead><tbody id="incontactablesTableBodyDesktop"></tbody></table></div>
                 <div id="incontactablesMobileList" class="mobile-cards"></div><div id="incontactablesPagination" class="flex justify-center items-center gap-1 mt-3"></div>
             </div>
 
@@ -433,10 +432,10 @@
         </div>
     </div>
 
-    <!-- Modales (Estructura completa) -->
-    <div id="registerCallModal" class="modal hidden"><div class="modal-content"><div class="flex justify-between items-center mb-3"><h3 class="text-base font-bold"><i class="fas fa-phone-alt text-green-500 mr-1"></i>Registrar Llamada</h3><button onclick="window.closeRegisterCallModal()"><i class="fas fa-times text-lg"></i></button></div><div id="callCustomerInfo" class="bg-gray-50 p-2 rounded mb-3 text-xs"></div><form id="registerCallForm"><input type="hidden" id="callCustomerId"><input type="hidden" id="callCustomerType"><div class="mb-2"><label class="block text-xs font-medium mb-1">Telefono utilizado</label><select id="callPhoneUsed" class="w-full border rounded-lg px-2 py-1 text-sm" required></select></div><div class="mb-2"><label class="block text-xs font-medium mb-1">Resultado *</label><select id="callResult" class="w-full border rounded-lg px-2 py-1 text-sm" required><option value="">Seleccionar</option><option value="recuperado">RECUPERADO</option><option value="dado_baja">DADO DE BAJA</option><option value="no_contacto">No se logro contacto</option><option value="promesa_pago">Promesa de pago</option><option value="visita_tecnica">Requiere visita tecnica</option><option value="no_aplica">No aplica</option><option value="abonado_hfc">Abonado HFC</option><option value="extravio_equipos">Extravio de equipos</option><option value="ab_ocupado">AB ocupado</option><option value="ab_conectado_solvente">AB conectado / solvente</option><option value="baja_procesada_oficina">Baja Procesada</option><option value="venta_inmueble">Venta de inmueble</option><option value="mensaje_tercero">Mensaje con tercero</option><option value="numero_no_valido">Numero no valido</option></select></div><div id="bajaReasonDiv" class="hidden mb-2"><label class="block text-xs font-medium mb-1">Motivo de baja</label><select id="bajaMotivo" class="w-full border rounded-lg px-2 py-1 text-sm"><option value="price">Precio</option><option value="service_issues">Problemas servicio</option><option value="relocation">Mudanza</option><option value="deceased">Fallecimiento</option><option value="other">Otro</option></select></div><div id="visitaFields" class="hidden mb-2"><label class="block text-xs font-medium mb-1">Numero de Abonado *</label><input type="text" id="visitAbonadoId" class="w-full border rounded-lg px-2 py-1 text-sm mb-1"><label class="block text-xs font-medium mb-1">Fecha de Visita *</label><input type="date" id="visitDate" class="w-full border rounded-lg px-2 py-1 text-sm mb-1"><label class="block text-xs font-medium mb-1">Hora *</label><select id="visitTime" class="w-full border rounded-lg px-2 py-1 text-sm mb-1"><option value="">Seleccionar</option><option value="08:00">08:00</option><option value="09:00">09:00</option><option value="10:00">10:00</option><option value="11:00">11:00</option><option value="12:00">12:00</option><option value="13:00">13:00</option><option value="14:00">14:00</option><option value="15:00">15:00</option><option value="16:00">16:00</option><option value="17:00">17:00</option></select><label class="block text-xs font-medium mb-1">Tecnico *</label><select id="visitTechnician" class="w-full border rounded-lg px-2 py-1 text-sm mb-1"></select><label class="block text-xs font-medium mb-1">Observaciones</label><textarea id="visitInstructions" rows="2" class="w-full border rounded-lg px-2 py-1 text-sm" maxlength="300"></textarea><div class="char-counter" id="visitInstructionsCount">0/300</div><div id="availabilityWarning" class="availability-warning hidden"></div></div><div class="mb-2"><label class="block text-xs font-medium mb-1">Observaciones generales</label><textarea id="callObservations" rows="2" class="w-full border rounded-lg px-2 py-1 text-sm" maxlength="500"></textarea><div class="char-counter" id="callObservationsCount">0/500</div></div><div class="flex gap-2"><button type="button" id="saveCallBtn" class="flex-1 bg-green-600 text-white py-1 rounded-lg text-sm">Guardar</button><button type="button" onclick="window.closeRegisterCallModal()" class="flex-1 bg-gray-500 text-white py-1 rounded-lg text-sm">Cancelar</button></div></form></div></div>
+    <!-- Modales -->
+    <div id="registerCallModal" class="modal hidden"><div class="modal-content"><div class="flex justify-between items-center mb-3"><h3 class="text-base font-bold"><i class="fas fa-phone-alt text-green-500 mr-1"></i>Registrar Llamada</h3><button onclick="window.closeRegisterCallModal()"><i class="fas fa-times text-lg"></i></button></div><div id="callCustomerInfo" class="bg-gray-50 p-2 rounded mb-3 text-xs"></div><form id="registerCallForm"><input type="hidden" id="callCustomerId"><input type="hidden" id="callCustomerType"><div class="mb-2"><label class="block text-xs font-medium mb-1">Telefono utilizado</label><select id="callPhoneUsed" class="w-full border rounded-lg px-2 py-1 text-sm" required></select></div><div class="mb-2"><label class="block text-xs font-medium mb-1">Resultado *</label><select id="callResult" class="w-full border rounded-lg px-2 py-1 text-sm" required><option value="">Seleccionar</option><option value="recuperado">RECUPERADO</option><option value="dado_baja">DADO DE BAJA</option><option value="no_contacto">No se logro contacto</option><option value="promesa_pago">Promesa de pago</option><option value="visita_tecnica">Requiere visita tecnica</option><option value="no_aplica">No aplica</option><option value="abonado_hfc">Abonado HFC</option><option value="extravio_equipos">Extravio de equipos</option><option value="ab_ocupado">AB ocupado</option><option value="ab_conectado_solvente">AB conectado / solvente</option><option value="baja_procesada_oficina">Baja Procesada</option><option value="venta_inmueble">Venta de inmueble</option><option value="mensaje_tercero">Mensaje con tercero</option><option value="numero_no_valido">Numero no valido</option></select></div><div id="bajaReasonDiv" class="hidden mb-2"><label class="block text-xs font-medium mb-1">Motivo de baja</label><select id="bajaMotivo" class="w-full border rounded-lg px-2 py-1 text-sm"><option value="price">Precio</option><option value="service_issues">Problemas servicio</option><option value="relocation">Mudanza</option><option value="deceased">Fallecimiento</option><option value="other">Otro</option></select></div><div id="visitaFields" class="hidden mb-2"><label class="block text-xs font-medium mb-1">Numero de Abonado *</label><input type="text" id="visitAbonadoId" class="w-full border rounded-lg px-2 py-1 text-sm mb-1"><label class="block text-xs font-medium mb-1">Fecha de Visita *</label><input type="date" id="visitDate" class="w-full border rounded-lg px-2 py-1 text-sm mb-1"><label class="block text-xs font-medium mb-1">Hora *</label><select id="visitTime" class="w-full border rounded-lg px-2 py-1 text-sm mb-1"><option value="">Seleccionar</option><option value="08:00">08:00</option><option value="09:00">09:00</option><option value="10:00">10:00</option><option value="11:00">11:00</option><option value="12:00">12:00</option><option value="13:00">13:00</option><option value="14:00">14:00</option><option value="15:00">15:00</option><option value="16:00">16:00</option><option value="17:00">17:00</option></select><label class="block text-xs font-medium mb-1">Tecnico *</label><select id="visitTechnician" class="w-full border rounded-lg px-2 py-1 text-sm mb-1"></select><label class="block text-xs font-medium mb-1">Observaciones</label><textarea id="visitInstructions" rows="2" class="w-full border rounded-lg px-2 py-1 text-sm" maxlength="300"></textarea><div class="char-counter" id="visitInstructionsCount">0/300</div><div id="availabilityWarning" class="availability-warning hidden text-xs text-red-500 mt-1"></div></div><div class="mb-2"><label class="block text-xs font-medium mb-1">Observaciones generales</label><textarea id="callObservations" rows="2" class="w-full border rounded-lg px-2 py-1 text-sm" maxlength="500"></textarea><div class="char-counter" id="callObservationsCount">0/500</div></div><div class="flex gap-2"><button type="button" id="saveCallBtn" class="flex-1 bg-green-600 text-white py-1 rounded-lg text-sm">Guardar</button><button type="button" onclick="window.closeRegisterCallModal()" class="flex-1 bg-gray-500 text-white py-1 rounded-lg text-sm">Cancelar</button></div></form></div></div>
 
-    <div id="editVisitModal" class="modal hidden"><div class="modal-content"><div class="flex justify-between items-center mb-3"><h3 class="text-base font-bold"><i class="fas fa-edit text-blue-500 mr-1"></i>Editar Visita</h3><button onclick="window.closeEditVisitModal()"><i class="fas fa-times text-lg"></i></button></div><form id="editVisitForm"><input type="hidden" id="editVisitId"><div class="mb-2"><label class="block text-xs font-medium mb-1">Numero Abonado</label><input type="text" id="editAbonadoId" class="w-full border rounded-lg px-2 py-1 text-sm"></div><div class="mb-2"><label class="block text-xs font-medium mb-1">Fecha</label><input type="date" id="editVisitDate" class="w-full border rounded-lg px-2 py-1 text-sm"></div><div class="mb-2"><label class="block text-xs font-medium mb-1">Hora</label><select id="editVisitTime" class="w-full border rounded-lg px-2 py-1 text-sm"><option value="">Seleccionar</option><option value="08:00">08:00</option><option value="09:00">09:00</option><option value="10:00">10:00</option><option value="11:00">11:00</option><option value="12:00">12:00</option><option value="13:00">13:00</option><option value="14:00">14:00</option><option value="15:00">15:00</option><option value="16:00">16:00</option><option value="17:00">17:00</option></select></div><div class="mb-2"><label class="block text-xs font-medium mb-1">Tecnico</label><select id="editVisitTechnician" class="w-full border rounded-lg px-2 py-1 text-sm"></select></div><div class="mb-2"><label class="block text-xs font-medium mb-1">Observaciones</label><textarea id="editVisitInstructions" rows="2" class="w-full border rounded-lg px-2 py-1 text-sm" maxlength="300"></textarea><div class="char-counter" id="editVisitInstructionsCount">0/300</div></div><div id="editAvailabilityWarning" class="availability-warning hidden"></div><div class="flex gap-2"><button type="button" id="updateVisitBtn" class="flex-1 bg-blue-600 text-white py-1 rounded-lg text-sm">Actualizar</button><button type="button" onclick="window.closeEditVisitModal()" class="flex-1 bg-gray-500 text-white py-1 rounded-lg text-sm">Cancelar</button></div></form></div></div>
+    <div id="editVisitModal" class="modal hidden"><div class="modal-content"><div class="flex justify-between items-center mb-3"><h3 class="text-base font-bold"><i class="fas fa-edit text-blue-500 mr-1"></i>Editar Visita</h3><button onclick="window.closeEditVisitModal()"><i class="fas fa-times text-lg"></i></button></div><form id="editVisitForm"><input type="hidden" id="editVisitId"><div class="mb-2"><label class="block text-xs font-medium mb-1">Numero Abonado</label><input type="text" id="editAbonadoId" class="w-full border rounded-lg px-2 py-1 text-sm"></div><div class="mb-2"><label class="block text-xs font-medium mb-1">Fecha</label><input type="date" id="editVisitDate" class="w-full border rounded-lg px-2 py-1 text-sm"></div><div class="mb-2"><label class="block text-xs font-medium mb-1">Hora</label><select id="editVisitTime" class="w-full border rounded-lg px-2 py-1 text-sm"><option value="">Seleccionar</option><option value="08:00">08:00</option><option value="09:00">09:00</option><option value="10:00">10:00</option><option value="11:00">11:00</option><option value="12:00">12:00</option><option value="13:00">13:00</option><option value="14:00">14:00</option><option value="15:00">15:00</option><option value="16:00">16:00</option><option value="17:00">17:00</option></select></div><div class="mb-2"><label class="block text-xs font-medium mb-1">Tecnico</label><select id="editVisitTechnician" class="w-full border rounded-lg px-2 py-1 text-sm"></select></div><div class="mb-2"><label class="block text-xs font-medium mb-1">Observaciones</label><textarea id="editVisitInstructions" rows="2" class="w-full border rounded-lg px-2 py-1 text-sm" maxlength="300"></textarea><div class="char-counter" id="editVisitInstructionsCount">0/300</div></div><div id="editAvailabilityWarning" class="availability-warning hidden text-xs text-red-500 mt-1"></div><div class="flex gap-2"><button type="button" id="updateVisitBtn" class="flex-1 bg-blue-600 text-white py-1 rounded-lg text-sm">Actualizar</button><button type="button" onclick="window.closeEditVisitModal()" class="flex-1 bg-gray-500 text-white py-1 rounded-lg text-sm">Cancelar</button></div></form></div></div>
 
     <div id="retirarEquipoModal" class="modal hidden"><div class="modal-content"><div class="flex justify-between items-center mb-3"><h3 class="text-base font-bold"><i class="fas fa-box-open text-green-500 mr-1"></i>Confirmar Retiro de Equipo</h3><button onclick="window.closeRetirarEquipoModal()"><i class="fas fa-times text-lg"></i></button></div><div id="retirarEquipoInfo" class="bg-gray-50 p-2 rounded mb-3 text-xs"></div><form id="retirarEquipoForm"><input type="hidden" id="retirarEquipoId"><div class="mb-2"><label class="block text-xs font-medium mb-1">El equipo fue retirado correctamente?</label><select id="retiroConfirmacion" class="w-full border rounded-lg px-2 py-1 text-sm" required><option value="">Seleccionar</option><option value="si">SI, equipo retirado exitosamente</option><option value="no">NO, no se pudo retirar</option></select></div><div id="retiroNoDiv" class="hidden mb-2"><label class="block text-xs font-medium mb-1">Motivo</label><select id="retiroMotivoNo" class="w-full border rounded-lg px-2 py-1 text-sm"><option value="no_acceso">Sin acceso al inmueble</option><option value="cliente_no_tenia_equipo">El cliente no tenia el equipo</option><option value="reagendar">Reagendar visita</option></select></div><div class="mb-2"><label class="block text-xs font-medium mb-1">Observaciones</label><textarea id="retiroObservaciones" rows="2" class="w-full border rounded-lg px-2 py-1 text-sm" maxlength="300"></textarea><div class="char-counter" id="retiroObservacionesCount">0/300</div></div><div class="flex gap-2"><button type="button" id="confirmarRetiroBtn" class="flex-1 bg-green-600 text-white py-1 rounded-lg text-sm">Confirmar</button><button type="button" onclick="window.closeRetirarEquipoModal()" class="flex-1 bg-gray-500 text-white py-1 rounded-lg text-sm">Cancelar</button></div></form></div></div>
 
@@ -457,7 +456,7 @@
         const db = firebase.firestore();
         db.enablePersistence({ synchronizeTabs: true }).catch(err => console.log('Persistencia offline:', err.code));
 
-        // ==================== FUNCIONES DE FECHA ====================
+        // ==================== FUNCIONES DE FECHA CORREGIDAS ====================
         function getDateObjectVenezuela() {
             const ahora = new Date();
             const formatter = new Intl.DateTimeFormat('es-VE', { timeZone: 'America/Caracas', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
@@ -474,14 +473,100 @@
             return new Date(`${year}-${month}-${day}T${hour}:${minute}:${second}`);
         }
 
+        function getFechaActualVenezuelaInput() {
+            const ahora = getDateObjectVenezuela();
+            const year = ahora.getFullYear();
+            const month = String(ahora.getMonth() + 1).padStart(2, '0');
+            const day = String(ahora.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
         function formatearFechaVenezuela(fecha) {
             if (!fecha) return '';
-            return new Intl.DateTimeFormat('es-VE', { timeZone: 'America/Caracas', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(fecha));
+            try {
+                const d = new Date(fecha);
+                if (isNaN(d.getTime())) return '';
+                return new Intl.DateTimeFormat('es-VE', { 
+                    timeZone: 'America/Caracas', 
+                    year: 'numeric', 
+                    month: '2-digit', 
+                    day: '2-digit' 
+                }).format(d);
+            } catch (e) {
+                return '';
+            }
         }
 
         function formatearFechaHoraVenezuela(fecha) {
             if (!fecha) return '';
-            return new Intl.DateTimeFormat('es-VE', { timeZone: 'America/Caracas', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date(fecha));
+            try {
+                const d = new Date(fecha);
+                if (isNaN(d.getTime())) return '';
+                return new Intl.DateTimeFormat('es-VE', { 
+                    timeZone: 'America/Caracas', 
+                    year: 'numeric', 
+                    month: '2-digit', 
+                    day: '2-digit', 
+                    hour: '2-digit', 
+                    minute: '2-digit', 
+                    hour12: false 
+                }).format(d);
+            } catch (e) {
+                return '';
+            }
+        }
+
+        function formatearFechaYYYYMMDD(fecha) {
+            if (!fecha) return '';
+            const d = new Date(fecha);
+            if (isNaN(d.getTime())) return '';
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function formatearFechaDDMMYYYY(fecha) {
+            if (!fecha) return '';
+            const d = new Date(fecha);
+            if (isNaN(d.getTime())) return '';
+            const day = String(d.getDate()).padStart(2, '0');
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const year = d.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+
+        // ==================== FUNCIÓN DE VALIDACIÓN CORREGIDA ====================
+        function validarFechaHoraVisita(fechaStr, horaStr) {
+            if (!fechaStr || !horaStr) {
+                return { valido: false, mensaje: 'Complete fecha y hora' };
+            }
+            
+            // Usar UTC para evitar problemas de zona horaria
+            const [year, month, day] = fechaStr.split('-');
+            const fecha = new Date(Date.UTC(parseInt(year), parseInt(month) - 1, parseInt(day), 0, 0, 0));
+            
+            const ahora = getDateObjectVenezuela();
+            const hoyUTC = new Date(Date.UTC(ahora.getFullYear(), ahora.getMonth(), ahora.getDate()));
+            
+            // Validar que no sea fecha pasada
+            if (fecha < hoyUTC) {
+                return { valido: false, mensaje: 'No se puede programar en fecha pasada' };
+            }
+            
+            // Validar hora laboral
+            const hora = parseInt(horaStr.split(':')[0]);
+            if (isNaN(hora) || hora < 8 || hora > 18) {
+                return { valido: false, mensaje: 'Horario laboral 8:00-18:00' };
+            }
+            
+            // CORRECCIÓN: Obtener día de la semana en UTC
+            const diaSemana = fecha.getUTCDay();
+            if (diaSemana === 0) {
+                return { valido: false, mensaje: 'No hay visitas los domingos' };
+            }
+            
+            return { valido: true, mensaje: '' };
         }
 
         function generarIdSeguro(identificador) {
@@ -553,17 +638,19 @@
         let contadorCargas = 0;
         const TOTAL_COLECCIONES = 11;
 
-        // ==================== FUNCIÓN DE DESGLOSE POR FECHA ====================
+        // ==================== FUNCIÓN DE DESGLOSE POR FECHA CORREGIDA ====================
         function getBreakdownByDate(items, dateField = 'fechaGestion') {
             const breakdown = new Map();
             items.forEach(item => {
                 let fecha = item[dateField];
                 if (fecha) {
-                    const fechaStr = formatearFechaVenezuela(fecha);
-                    breakdown.set(fechaStr, (breakdown.get(fechaStr) || 0) + 1);
+                    const fechaStr = formatearFechaYYYYMMDD(fecha);
+                    if (fechaStr) {
+                        breakdown.set(fechaStr, (breakdown.get(fechaStr) || 0) + 1);
+                    }
                 }
             });
-            const sorted = Array.from(breakdown.entries()).sort((a, b) => new Date(b[0]) - new Date(a[0]));
+            const sorted = Array.from(breakdown.entries()).sort((a, b) => b[0].localeCompare(a[0]));
             return sorted.slice(0, 5);
         }
 
@@ -571,7 +658,7 @@
             const container = document.getElementById(elementId);
             if (!container) return;
             if (!breakdownData || breakdownData.length === 0) { container.innerHTML = ''; return; }
-            container.innerHTML = breakdownData.map(([fecha, count]) => `<span class="date-breakdown-item">${fecha}: ${count}</span>`).join('');
+            container.innerHTML = breakdownData.map(([fecha, count]) => `<span class="date-breakdown-item">${formatearFechaDDMMYYYY(fecha)}: ${count}</span>`).join('');
         }
 
         function updateDashboardBreakdowns() {
@@ -669,26 +756,60 @@
             for (const key of misLocks) await colecciones.lockedCustomers.doc(key).delete();
         });
 
+        // ==================== FUNCIÓN VERIFICAR HORARIO CORREGIDA ====================
         async function verificarHorarioDisponible(tecnicoId, fecha, hora, excludeVisitId = null) {
-            let visitasExistentes = visitasTecnicas.filter(v => v.tecnicoId === tecnicoId && v.fechaVisita === fecha && v.horaVisita === hora);
-            if (excludeVisitId) visitasExistentes = visitasExistentes.filter(v => v.id !== excludeVisitId);
-            let visitasCompletadas = visitasFinalizadas.filter(v => v.tecnicoId === tecnicoId && v.fechaVisita === fecha && v.horaVisita === hora);
-            if (excludeVisitId) visitasCompletadas = visitasCompletadas.filter(v => v.id !== excludeVisitId);
+            if (!tecnicoId || !fecha || !hora) return true;
+            
+            const fechaNormalizada = fecha;
+            
+            let visitasExistentes = visitasTecnicas.filter(v => 
+                v.tecnicoId === tecnicoId && 
+                v.fechaVisita === fechaNormalizada && 
+                v.horaVisita === hora
+            );
+            if (excludeVisitId) {
+                visitasExistentes = visitasExistentes.filter(v => v.id !== excludeVisitId);
+            }
+            
+            let visitasCompletadas = visitasFinalizadas.filter(v => 
+                v.tecnicoId === tecnicoId && 
+                v.fechaVisita === fechaNormalizada && 
+                v.horaVisita === hora
+            );
+            if (excludeVisitId) {
+                visitasCompletadas = visitasCompletadas.filter(v => v.id !== excludeVisitId);
+            }
+            
             return visitasExistentes.length === 0 && visitasCompletadas.length === 0;
         }
         
+        // ==================== FUNCIÓN CHECK AVAILABILITY CORREGIDA ====================
         window.checkAvailability = async function() {
-            const tecnicoId = document.getElementById('visitTechnician').value;
-            const fecha = document.getElementById('visitDate').value;
-            const hora = document.getElementById('visitTime').value;
+            const tecnicoId = document.getElementById('visitTechnician')?.value;
+            const fecha = document.getElementById('visitDate')?.value;
+            const hora = document.getElementById('visitTime')?.value;
             const warningDiv = document.getElementById('availabilityWarning');
+            
+            if (!warningDiv) return;
+            
             if (tecnicoId && fecha && hora) {
+                const validacion = validarFechaHoraVisita(fecha, hora);
+                if (!validacion.valido) {
+                    warningDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${validacion.mensaje}`;
+                    warningDiv.classList.remove('hidden');
+                    return;
+                }
+                
                 const disponible = await verificarHorarioDisponible(tecnicoId, fecha, hora);
                 if (!disponible) {
-                    warningDiv.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Horario no disponible';
+                    warningDiv.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Horario no disponible - El técnico ya tiene una visita asignada en ese horario';
                     warningDiv.classList.remove('hidden');
-                } else warningDiv.classList.add('hidden');
-            } else warningDiv.classList.add('hidden');
+                } else {
+                    warningDiv.classList.add('hidden');
+                }
+            } else {
+                warningDiv.classList.add('hidden');
+            }
         };
         
         function refrescarSelectsTecnicos() {
@@ -769,64 +890,142 @@
             return map[resultado] || resultado;
         }
 
+        // ==================== FUNCIÓN SAVE CALL CORREGIDA CON TRY-CATCH ====================
         window.saveCall = async function() {
             const customerId = document.getElementById('callCustomerId').value;
             const customerType = document.getElementById('callCustomerType').value;
-            let customer = customerType === 'rezagado' ? clientesRezagados.find(c => c.id === customerId) : clientesPerdidos.find(c => c.id === customerId);
-            if (!customer) { showToast('Cliente no encontrado', 'error'); closeRegisterCallModal(); return; }
-            const resultado = document.getElementById('callResult').value;
-            let observaciones = document.getElementById('callObservations').value;
-            const telefonoUsado = document.getElementById('callPhoneUsed').value;
-            if (observaciones && observaciones.length > 500) observaciones = observaciones.substring(0, 500);
-            if (!resultado) { alert('Seleccione un resultado'); return; }
-            let visitaData = null;
-            if (resultado === 'visita_tecnica' || resultado === 'dado_baja') {
-                const fecha = document.getElementById('visitDate').value;
-                const hora = document.getElementById('visitTime').value;
-                if (resultado === 'visita_tecnica' && (!fecha || !hora)) { alert('Complete fecha y hora'); return; }
-                if (fecha && hora) {
-                    const validacion = validarFechaHoraVisita(fecha, hora);
-                    if (!validacion.valido) { alert(validacion.mensaje); return; }
-                }
-                const tecnicoId = document.getElementById('visitTechnician').value;
-                if (tecnicoId && fecha && hora) {
-                    const disponible = await verificarHorarioDisponible(tecnicoId, fecha, hora);
-                    if (!disponible) { alert('Horario no disponible'); return; }
-                }
-                const tecnico = technicians.find(t => t.id === tecnicoId);
-                visitaData = { fecha, hora, tecnicoId: tecnicoId || null, tecnicoNombre: tecnico ? tecnico.nombre : 'No asignado', instrucciones: document.getElementById('visitInstructions').value };
+            
+            let customer = customerType === 'rezagado' ? 
+                clientesRezagados.find(c => c.id === customerId) : 
+                clientesPerdidos.find(c => c.id === customerId);
+            
+            if (!customer) { 
+                showToast('Cliente no encontrado', 'error'); 
+                closeRegisterCallModal(); 
+                return; 
             }
-            const motivoBaja = resultado === 'dado_baja' ? document.getElementById('bajaMotivo').value : '';
-            await processCallResult(customer, customerType, resultado, observaciones, motivoBaja, visitaData, telefonoUsado);
+            
+            const resultado = document.getElementById('callResult').value;
+            let observaciones = document.getElementById('callObservations').value || '';
+            const telefonoUsado = document.getElementById('callPhoneUsed').value;
+            
+            if (observaciones && observaciones.length > 500) {
+                observaciones = observaciones.substring(0, 500);
+            }
+            
+            if (!resultado) { 
+                alert('Seleccione un resultado'); 
+                return; 
+            }
+            
+            let visitaData = null;
+            
+            try {
+                if (resultado === 'visita_tecnica' || resultado === 'dado_baja') {
+                    const fecha = document.getElementById('visitDate').value;
+                    const hora = document.getElementById('visitTime').value;
+                    
+                    if (resultado === 'visita_tecnica' && (!fecha || !hora)) { 
+                        alert('Complete fecha y hora para la visita'); 
+                        return; 
+                    }
+                    
+                    if (fecha && hora) {
+                        const validacion = validarFechaHoraVisita(fecha, hora);
+                        if (!validacion.valido) { 
+                            alert(validacion.mensaje); 
+                            return; 
+                        }
+                    }
+                    
+                    const tecnicoId = document.getElementById('visitTechnician').value;
+                    if (tecnicoId && fecha && hora) {
+                        const disponible = await verificarHorarioDisponible(tecnicoId, fecha, hora);
+                        if (!disponible) { 
+                            alert('Horario no disponible - El técnico ya tiene una visita asignada'); 
+                            return; 
+                        }
+                    }
+                    
+                    const tecnico = technicians.find(t => t.id === tecnicoId);
+                    visitaData = { 
+                        fecha, 
+                        hora, 
+                        tecnicoId: tecnicoId || null, 
+                        tecnicoNombre: tecnico ? tecnico.nombre : 'No asignado', 
+                        instrucciones: document.getElementById('visitInstructions').value || '' 
+                    };
+                }
+                
+                const motivoBaja = resultado === 'dado_baja' ? document.getElementById('bajaMotivo').value : '';
+                
+                await processCallResult(customer, customerType, resultado, observaciones, motivoBaja, visitaData, telefonoUsado);
+                
+            } catch (error) {
+                console.error('Error en saveCall:', error);
+                showToast('Error al procesar la llamada', 'error');
+                await unlockCustomer(customerId, customerType);
+                closeRegisterCallModal();
+            }
         };
 
-        // ==================== FUNCIONES DE ACCIONES ====================
+        // ==================== FUNCIÓN OPEN REGISTER CALL MODAL CORREGIDA ====================
         window.openRegisterCallModal = async function(customerId, customerType) {
             await cleanExpiredLocks();
             const lock = await lockCustomer(customerId, customerType);
-            if (lock.locked && !isCustomerLockedByMe(customerId, customerType)) { showToast(`Gestionado por ${lock.agente}`, 'error'); return; }
-            const customer = customerType === 'rezagado' ? clientesRezagados.find(c => c.id === customerId) : clientesPerdidos.find(c => c.id === customerId);
-            if (!customer) { showToast('Cliente no encontrado', 'error'); return; }
-            if (customerType === 'rezagado') await guardarEnFirestore(colecciones.rezagados, { estado: 'en_gestion' }, customerId);
-            else await guardarEnFirestore(colecciones.perdidos, { estado: 'en_gestion' }, customerId);
+            if (lock.locked && !isCustomerLockedByMe(customerId, customerType)) { 
+                showToast(`Gestionado por ${lock.agente}`, 'error'); 
+                return; 
+            }
+            
+            const customer = customerType === 'rezagado' ? 
+                clientesRezagados.find(c => c.id === customerId) : 
+                clientesPerdidos.find(c => c.id === customerId);
+            
+            if (!customer) { 
+                showToast('Cliente no encontrado', 'error'); 
+                return; 
+            }
+            
+            if (customerType === 'rezagado') {
+                await guardarEnFirestore(colecciones.rezagados, { estado: 'en_gestion' }, customerId);
+            } else {
+                await guardarEnFirestore(colecciones.perdidos, { estado: 'en_gestion' }, customerId);
+            }
             
             document.getElementById('callCustomerId').value = customerId;
             document.getElementById('callCustomerType').value = customerType;
             document.getElementById('callCustomerInfo').innerHTML = `<div class="font-bold">${escapeHtml(customer.nombre)}</div><div class="text-xs">ID: ${escapeHtml(customer.identificador || customer.clienteIdOriginal)} | Doc: ${escapeHtml(customer.documento)} | CO: ${escapeHtml(customer.centroOp)}</div>`;
+            
             const phoneSelect = document.getElementById('callPhoneUsed');
             phoneSelect.innerHTML = '';
             const phones = [customer.telefono1, customer.telefono2, customer.telefono3].filter(p => p && p !== '');
             if (phones.length === 0) phones.push('Sin telefono');
-            phones.forEach(p => { const opt = document.createElement('option'); opt.value = p; opt.textContent = p; phoneSelect.appendChild(opt); });
+            phones.forEach(p => { 
+                const opt = document.createElement('option'); 
+                opt.value = p; 
+                opt.textContent = p; 
+                phoneSelect.appendChild(opt); 
+            });
+            
             const techSelect = document.getElementById('visitTechnician');
             techSelect.innerHTML = '<option value="">Seleccionar tecnico</option>' + technicians.map(t => `<option value="${escapeAttr(t.id)}">${escapeHtml(t.nombre)} - ${escapeHtml(t.co)}</option>`).join('');
+            
             document.getElementById('callResult').value = '';
             document.getElementById('bajaReasonDiv').classList.add('hidden');
             document.getElementById('visitaFields').classList.add('hidden');
             document.getElementById('callObservations').value = '';
-            document.getElementById('visitDate').value = formatearFechaVenezuela(getDateObjectVenezuela());
+            
+            // CORRECCIÓN: Usar la nueva función para la fecha
+            document.getElementById('visitDate').value = getFechaActualVenezuelaInput();
             document.getElementById('visitTime').value = '';
             document.getElementById('visitInstructions').value = '';
+            
+            const counter = document.getElementById('callObservationsCount');
+            if (counter) counter.innerHTML = '0/500';
+            const visitCounter = document.getElementById('visitInstructionsCount');
+            if (visitCounter) visitCounter.innerHTML = '0/300';
+            
             document.getElementById('registerCallModal').classList.remove('hidden');
         };
         
@@ -843,17 +1042,6 @@
             }
             document.getElementById('registerCallModal').classList.add('hidden');
         };
-        
-        function validarFechaHoraVisita(fechaStr, horaStr) {
-            const fecha = new Date(fechaStr);
-            const hoy = getDateObjectVenezuela();
-            hoy.setHours(0, 0, 0, 0);
-            if (fecha < hoy) return { valido: false, mensaje: 'No se puede programar en fecha pasada' };
-            const hora = parseInt(horaStr.split(':')[0]);
-            if (hora < 8 || hora > 18) return { valido: false, mensaje: 'Horario laboral 8:00-18:00' };
-            if (fecha.getDay() === 0) return { valido: false, mensaje: 'No hay visitas los domingos' };
-            return { valido: true, mensaje: '' };
-        }
 
         window.openAssignTechnicianModal = async function(visitaId) {
             if (technicians.length === 0) { showToast('No hay tecnicos registrados', 'error'); return; }
@@ -884,17 +1072,31 @@
         
         window.deleteTechnician = async function(techId) { if (confirm('Eliminar?')) await eliminarDeFirestore(colecciones.technicians, techId); };
         
+        // ==================== FUNCIÓN OPEN EDIT VISIT MODAL CORREGIDA ====================
         window.openEditVisitModal = async function(visitaId) {
-            if (!puedeEditarVisitas()) { showToast('Sin permisos', 'error'); return; }
+            if (!puedeEditarVisitas()) { 
+                showToast('Sin permisos', 'error'); 
+                return; 
+            }
+            
             const visita = visitasTecnicas.find(v => v.id === visitaId);
             if (!visita) return;
+            
             document.getElementById('editVisitId').value = visitaId;
             document.getElementById('editAbonadoId').value = visita.clienteIdOriginal || '';
             document.getElementById('editVisitDate').value = visita.fechaVisita || '';
             document.getElementById('editVisitTime').value = visita.horaVisita || '';
-            document.getElementById('editVisitInstructions').value = visita.instrucciones || '';
+            
+            const instrucciones = visita.instrucciones || '';
+            document.getElementById('editVisitInstructions').value = instrucciones;
+            
+            const counter = document.getElementById('editVisitInstructionsCount');
+            if (counter) counter.innerHTML = `${instrucciones.length}/300`;
+            
             const techSelect = document.getElementById('editVisitTechnician');
-            techSelect.innerHTML = '<option value="">Seleccionar</option>' + technicians.map(t => `<option value="${escapeAttr(t.id)}" ${t.id === visita.tecnicoId ? 'selected' : ''}>${escapeHtml(t.nombre)} - ${escapeHtml(t.co)}</option>`).join('');
+            techSelect.innerHTML = '<option value="">Seleccionar</option>' + 
+                technicians.map(t => `<option value="${escapeAttr(t.id)}" ${t.id === visita.tecnicoId ? 'selected' : ''}>${escapeHtml(t.nombre)} - ${escapeHtml(t.co)}</option>`).join('');
+            
             document.getElementById('editVisitModal').classList.remove('hidden');
         };
         
@@ -1007,6 +1209,8 @@
             document.getElementById('editCustomerTelefono').value = customer.telefono || '';
             document.getElementById('editCustomerPlan').value = customer.plan || '';
             document.getElementById('editCustomerDireccion').value = customer.direccion || '';
+            const counter = document.getElementById('editCustomerDireccionCount');
+            if (counter) counter.innerHTML = `${(customer.direccion || '').length}/500`;
             document.getElementById('editCustomerModal').classList.remove('hidden');
         };
         
@@ -1140,10 +1344,10 @@
             document.getElementById('dashboardRezagadosCount') && (document.getElementById('dashboardRezagadosCount').innerText = clientesRezagados.length);
             const tbody = document.getElementById('rezagadosTableBodyDesktop');
             if (!tbody) return;
-            if (items.length === 0) { tbody.innerHTML = '<tr><td colspan="9" class="text-center py-8 text-gray-400"><i class="fas fa-inbox text-2xl mb-2 block"></i>No hay clientes rezagados</div></tr>'; return; }
+            if (items.length === 0) { tbody.innerHTML = '<tr><td colspan="9" class="text-center py-8 text-gray-400"><i class="fas fa-inbox text-2xl mb-2 block"></i>No hay clientes rezagados</td></tr>'; return; }
             const start = (rezagadosPage - 1) * ITEMS_PER_PAGE;
             const pageItems = items.slice(start, start + ITEMS_PER_PAGE);
-            tbody.innerHTML = pageItems.map(c => `<tr class="hover:bg-gray-50"><td class="px-3 py-2 text-xs font-mono">${escapeHtml(c.identificador || c.clienteIdOriginal || c.id)}</div><td class="px-3 py-2 text-xs font-medium">${escapeHtml(c.nombre)}</div><td class="px-3 py-2 text-xs">${escapeHtml(c.documento)}</div><td class="px-3 py-2 text-xs">${escapeHtml(c.telefono1 || '-')}</div><td class="px-3 py-2 text-xs">${escapeHtml(c.plan)}</div><td class="px-3 py-2 text-xs"><span class="px-1.5 py-0.5 rounded bg-gray-100">${escapeHtml(c.centroOp)}</span></div><td class="px-3 py-2 text-xs">${c.fechaCorte || '-'}</div><td class="px-3 py-2 text-xs"><span class="status-badge bg-pendiente">PENDIENTE</span></div><td class="px-3 py-2"><div class="flex gap-1">${c.telefono1 ? `<button onclick="window.openRegisterCallModal('${escapeAttr(c.id)}', 'rezagado')" class="call-btn"><i class="fas fa-phone-alt"></i> Gestionar</button>` : '<button class="call-btn opacity-50" disabled>Sin telefono</button>'}${c.telefono1 ? `<a href="tel:${c.telefono1}" class="call-link"><i class="fas fa-phone"></i></a><a href="https://wa.me/${c.telefono1.replace(/[^0-9]/g, '')}" target="_blank" class="whatsapp-link"><i class="fab fa-whatsapp"></i></a>` : ''}</div></div></tr>`).join('');
+            tbody.innerHTML = pageItems.map(c => `<tr class="hover:bg-gray-50"><td class="px-3 py-2 text-xs font-mono">${escapeHtml(c.identificador || c.clienteIdOriginal || c.id)}</td><td class="px-3 py-2 text-xs font-medium">${escapeHtml(c.nombre)}</td><td class="px-3 py-2 text-xs">${escapeHtml(c.documento)}</td><td class="px-3 py-2 text-xs">${escapeHtml(c.telefono1 || '-')}</td><td class="px-3 py-2 text-xs">${escapeHtml(c.plan)}</td><td class="px-3 py-2 text-xs"><span class="px-1.5 py-0.5 rounded bg-gray-100">${escapeHtml(c.centroOp)}</span></td><td class="px-3 py-2 text-xs">${c.fechaCorte || '-'}</td><td class="px-3 py-2 text-xs"><span class="status-badge bg-pendiente">PENDIENTE</span></td><td class="px-3 py-2"><div class="flex gap-1">${c.telefono1 ? `<button onclick="window.openRegisterCallModal('${escapeAttr(c.id)}', 'rezagado')" class="call-btn"><i class="fas fa-phone-alt"></i> Gestionar</button>` : '<button class="call-btn opacity-50" disabled>Sin telefono</button>'}${c.telefono1 ? `<a href="tel:${c.telefono1}" class="call-link"><i class="fas fa-phone"></i></a><a href="https://wa.me/${c.telefono1.replace(/[^0-9]/g, '')}" target="_blank" class="whatsapp-link"><i class="fab fa-whatsapp"></i></a>` : ''}</div></td></tr>`).join('');
             const totalPages = Math.ceil(items.length / ITEMS_PER_PAGE);
             const pagDiv = document.getElementById('rezagadosPagination');
             if (pagDiv && totalPages > 1) pagDiv.innerHTML = `<button onclick="changeRezagadosPage(-1)" class="pagination-btn" ${rezagadosPage===1?'disabled style="opacity:0.5"':''}>Anterior</button><span class="text-xs mx-2">${rezagadosPage}/${totalPages}</span><button onclick="changeRezagadosPage(1)" class="pagination-btn" ${rezagadosPage===totalPages?'disabled style="opacity:0.5"':''}>Siguiente</button>`;
@@ -1159,7 +1363,7 @@
             if (items.length === 0) { tbody.innerHTML = '<tr><td colspan="9" class="text-center py-8 text-gray-400"><i class="fas fa-inbox text-2xl mb-2 block"></i>No hay clientes perdidos</div></tr>'; return; }
             const start = (perdidosPage - 1) * ITEMS_PER_PAGE;
             const pageItems = items.slice(start, start + ITEMS_PER_PAGE);
-            tbody.innerHTML = pageItems.map(c => `<tr class="hover:bg-gray-50"><td class="px-3 py-2 text-xs font-mono">${escapeHtml(c.identificador || c.clienteIdOriginal || c.id)}</div><td class="px-3 py-2 text-xs font-medium">${escapeHtml(c.nombre)}</div><td class="px-3 py-2 text-xs">${escapeHtml(c.documento)}</div><td class="px-3 py-2 text-xs">${escapeHtml(c.telefono1 || '-')}</div><td class="px-3 py-2 text-xs">${escapeHtml(c.plan)}</div><td class="px-3 py-2 text-xs"><span class="px-1.5 py-0.5 rounded bg-gray-100">${escapeHtml(c.centroOp)}</span></div><td class="px-3 py-2 text-xs">${c.fechaCorte || '-'}</div><td class="px-3 py-2 text-xs"><span class="status-badge bg-pendiente">PENDIENTE</span></div><td class="px-3 py-2"><div class="flex gap-1">${c.telefono1 ? `<button onclick="window.openRegisterCallModal('${escapeAttr(c.id)}', 'perdido')" class="call-btn"><i class="fas fa-phone-alt"></i> Gestionar</button>` : '<button class="call-btn opacity-50" disabled>Sin telefono</button>'}${c.telefono1 ? `<a href="tel:${c.telefono1}" class="call-link"><i class="fas fa-phone"></i></a><a href="https://wa.me/${c.telefono1.replace(/[^0-9]/g, '')}" target="_blank" class="whatsapp-link"><i class="fab fa-whatsapp"></i></a>` : ''}</div></div></tr>`).join('');
+            tbody.innerHTML = pageItems.map(c => `<tr class="hover:bg-gray-50"><td class="px-3 py-2 text-xs font-mono">${escapeHtml(c.identificador || c.clienteIdOriginal || c.id)}</td><td class="px-3 py-2 text-xs font-medium">${escapeHtml(c.nombre)}</td><td class="px-3 py-2 text-xs">${escapeHtml(c.documento)}</td><td class="px-3 py-2 text-xs">${escapeHtml(c.telefono1 || '-')}</td><td class="px-3 py-2 text-xs">${escapeHtml(c.plan)}</td><td class="px-3 py-2 text-xs"><span class="px-1.5 py-0.5 rounded bg-gray-100">${escapeHtml(c.centroOp)}</span></td><td class="px-3 py-2 text-xs">${c.fechaCorte || '-'}</td><td class="px-3 py-2 text-xs"><span class="status-badge bg-pendiente">PENDIENTE</span></td><td class="px-3 py-2"><div class="flex gap-1">${c.telefono1 ? `<button onclick="window.openRegisterCallModal('${escapeAttr(c.id)}', 'perdido')" class="call-btn"><i class="fas fa-phone-alt"></i> Gestionar</button>` : '<button class="call-btn opacity-50" disabled>Sin telefono</button>'}${c.telefono1 ? `<a href="tel:${c.telefono1}" class="call-link"><i class="fas fa-phone"></i></a><a href="https://wa.me/${c.telefono1.replace(/[^0-9]/g, '')}" target="_blank" class="whatsapp-link"><i class="fab fa-whatsapp"></i></a>` : ''}</div></td></tr>`).join('');
             const totalPages = Math.ceil(items.length / ITEMS_PER_PAGE);
             const pagDiv = document.getElementById('perdidosPagination');
             if (pagDiv && totalPages > 1) pagDiv.innerHTML = `<button onclick="changePerdidosPage(-1)" class="pagination-btn" ${perdidosPage===1?'disabled style="opacity:0.5"':''}>Anterior</button><span class="text-xs mx-2">${perdidosPage}/${totalPages}</span><button onclick="changePerdidosPage(1)" class="pagination-btn" ${perdidosPage===totalPages?'disabled style="opacity:0.5"':''}>Siguiente</button>`;
@@ -1187,7 +1391,7 @@
                 else tbody.innerHTML = pageItems.map(c => {
                     const badgeColor = c.resultadoTexto?.includes('RECUPERADO') ? 'bg-green-100 text-green-800' : (c.resultadoTexto?.includes('visita') || c.resultadoTexto?.includes('REQUIERE')) ? 'bg-orange-100 text-orange-800' : c.resultadoTexto?.includes('PROMESA') ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800';
                     const fechaGestion = c.fechaGestion ? new Date(c.fechaGestion).toLocaleString() : '-';
-                    return `<tr class="hover:bg-gray-50"><td class="px-3 py-2 text-xs font-mono">${escapeHtml(c.clienteIdOriginal || c.id)}</div><td class="px-3 py-2 text-xs font-medium">${escapeHtml(c.nombre)}</div><td class="px-3 py-2 text-xs">${escapeHtml(c.documento)}</div><td class="px-3 py-2 text-xs">${c.telefono ? `<a href="tel:${c.telefono}" class="text-blue-600 hover:underline">${escapeHtml(c.telefono)}</a>` : '-'}</div><td class="px-3 py-2 text-xs">${escapeHtml(c.plan || '-')}</div><td class="px-3 py-2 text-xs"><span class="px-1.5 py-0.5 rounded bg-gray-100">${escapeHtml(c.centroOp || '-')}</span></div><td class="px-3 py-2 text-xs max-w-[200px] truncate">${escapeHtml(c.resumenGestion || '-')}</div><td class="px-3 py-2 text-xs"><span class="px-2 py-0.5 rounded-full text-xs font-medium ${badgeColor}">${escapeHtml(c.resultadoTexto || '-')}</span></div><td class="px-3 py-2 text-xs">${escapeHtml(c.agente)}</div><td class="px-3 py-2 text-xs">${fechaGestion}</div><td class="px-3 py-2 text-center"><div class="flex gap-1 justify-center"><button onclick="window.editCustomer('${escapeAttr(c.id)}', 'contactado', 'contactados')" class="bg-blue-100 hover:bg-blue-200 text-blue-700 p-1 rounded"><i class="fas fa-edit text-xs"></i></button><button onclick="window.reclasificarContactado('${escapeAttr(c.id)}', 'rezagado')" class="bg-amber-100 hover:bg-amber-200 text-amber-700 p-1 rounded"><i class="fas fa-arrow-left text-xs"></i></button><button onclick="window.reclasificarContactado('${escapeAttr(c.id)}', 'perdido')" class="bg-orange-100 hover:bg-orange-200 text-orange-700 p-1 rounded"><i class="fas fa-arrow-right text-xs"></i></button>${puedeEliminarDatos() ? `<button onclick="window.deleteHistorialRegistro('${escapeAttr(c.id)}', 'contactado')" class="bg-red-100 hover:bg-red-200 text-red-700 p-1 rounded"><i class="fas fa-trash-alt text-xs"></i></button>` : ''}</div></div></tr>`;
+                    return `<tr class="hover:bg-gray-50"><td class="px-3 py-2 text-xs font-mono">${escapeHtml(c.clienteIdOriginal || c.id)}</td><td class="px-3 py-2 text-xs font-medium">${escapeHtml(c.nombre)}</td><td class="px-3 py-2 text-xs">${escapeHtml(c.documento)}</td><td class="px-3 py-2 text-xs">${c.telefono ? `<a href="tel:${c.telefono}" class="text-blue-600 hover:underline">${escapeHtml(c.telefono)}</a>` : '-'}</td><td class="px-3 py-2 text-xs">${escapeHtml(c.plan || '-')}</td><td class="px-3 py-2 text-xs"><span class="px-1.5 py-0.5 rounded bg-gray-100">${escapeHtml(c.centroOp || '-')}</span></td><td class="px-3 py-2 text-xs max-w-[200px] truncate">${escapeHtml(c.resumenGestion || '-')}</td><td class="px-3 py-2 text-xs"><span class="px-2 py-0.5 rounded-full text-xs font-medium ${badgeColor}">${escapeHtml(c.resultadoTexto || '-')}</span></td><td class="px-3 py-2 text-xs">${escapeHtml(c.agente)}</td><td class="px-3 py-2 text-xs">${fechaGestion}</td><td class="px-3 py-2 text-center"><div class="flex gap-1 justify-center"><button onclick="window.editCustomer('${escapeAttr(c.id)}', 'contactado', 'contactados')" class="bg-blue-100 hover:bg-blue-200 text-blue-700 p-1 rounded"><i class="fas fa-edit text-xs"></i></button><button onclick="window.reclasificarContactado('${escapeAttr(c.id)}', 'rezagado')" class="bg-amber-100 hover:bg-amber-200 text-amber-700 p-1 rounded"><i class="fas fa-arrow-left text-xs"></i></button><button onclick="window.reclasificarContactado('${escapeAttr(c.id)}', 'perdido')" class="bg-orange-100 hover:bg-orange-200 text-orange-700 p-1 rounded"><i class="fas fa-arrow-right text-xs"></i></button>${puedeEliminarDatos() ? `<button onclick="window.deleteHistorialRegistro('${escapeAttr(c.id)}', 'contactado')" class="bg-red-100 hover:bg-red-200 text-red-700 p-1 rounded"><i class="fas fa-trash-alt text-xs"></i></button>` : ''}</div></td></tr>`;
                 }).join('');
             }
             const pagination = document.getElementById('contactadosPagination');
@@ -1209,7 +1413,7 @@
             const tbody = document.getElementById('incontactablesTableBodyDesktop');
             if (tbody) {
                 if (items.length === 0) tbody.innerHTML = '<tr><td colspan="10" class="text-center py-4">No hay registros</div></tr>';
-                else tbody.innerHTML = pageItems.map(c => `<tr class="hover:bg-gray-50"><td class="px-3 py-2 text-xs font-mono">${escapeHtml(c.clienteIdOriginal || c.id)}</div><td class="px-3 py-2 text-xs font-medium">${escapeHtml(c.nombre)}</div><td class="px-3 py-2 text-xs">${escapeHtml(c.documento)}</div><td class="px-3 py-2 text-xs">${escapeHtml(c.telefono)}</div><td class="px-3 py-2 text-xs">${escapeHtml(c.plan)}</div><td class="px-3 py-2 text-xs"><span class="px-1.5 py-0.5 rounded bg-gray-100">${escapeHtml(c.centroOp)}</span></div><td class="px-3 py-2 text-xs"><span class="status-badge bg-incontactable">${escapeHtml(c.motivoIncontactabilidad || '-')}</span></div><td class="px-3 py-2 text-xs">${escapeHtml(c.agente)}</div><td class="px-3 py-2 text-xs">${c.fechaGestion ? new Date(c.fechaGestion).toLocaleString() : '-'}</div><td class="px-3 py-2"><div class="flex gap-1"><button onclick="window.reclasificarIncontactable('${escapeAttr(c.id)}', 'rezagado')" class="assign-btn"><i class="fas fa-arrow-left"></i></button><button onclick="window.reclasificarIncontactable('${escapeAttr(c.id)}', 'perdido')" class="assign-btn"><i class="fas fa-arrow-right"></i></button>${puedeEliminarDatos() ? `<button onclick="window.deleteIncontactable('${escapeAttr(c.id)}')" class="delete-single-btn"><i class="fas fa-trash"></i></button>` : ''}</div></div></tr>`).join('');
+                else tbody.innerHTML = pageItems.map(c => `<tr class="hover:bg-gray-50"><td class="px-3 py-2 text-xs font-mono">${escapeHtml(c.clienteIdOriginal || c.id)}</td><td class="px-3 py-2 text-xs font-medium">${escapeHtml(c.nombre)}</td><td class="px-3 py-2 text-xs">${escapeHtml(c.documento)}</td><td class="px-3 py-2 text-xs">${escapeHtml(c.telefono)}</td><td class="px-3 py-2 text-xs">${escapeHtml(c.plan)}</td><td class="px-3 py-2 text-xs"><span class="px-1.5 py-0.5 rounded bg-gray-100">${escapeHtml(c.centroOp)}</span></td><td class="px-3 py-2 text-xs"><span class="status-badge bg-incontactable">${escapeHtml(c.motivoIncontactabilidad || '-')}</span></td><td class="px-3 py-2 text-xs">${escapeHtml(c.agente)}</td><td class="px-3 py-2 text-xs">${c.fechaGestion ? new Date(c.fechaGestion).toLocaleString() : '-'}</td><td class="px-3 py-2"><div class="flex gap-1"><button onclick="window.reclasificarIncontactable('${escapeAttr(c.id)}', 'rezagado')" class="assign-btn"><i class="fas fa-arrow-left"></i></button><button onclick="window.reclasificarIncontactable('${escapeAttr(c.id)}', 'perdido')" class="assign-btn"><i class="fas fa-arrow-right"></i></button>${puedeEliminarDatos() ? `<button onclick="window.deleteIncontactable('${escapeAttr(c.id)}')" class="delete-single-btn"><i class="fas fa-trash"></i></button>` : ''}</div></td></tr>`).join('');
             }
             const pagination = document.getElementById('incontactablesPagination');
             if (pagination && totalPages > 1) pagination.innerHTML = `<button onclick="changeIncontactablesPage(-1)" class="pagination-btn" ${incontactablesPage === 1 ? 'disabled style="opacity:0.5"' : ''}>Anterior</button><span class="text-xs mx-2">${incontactablesPage}/${totalPages}</span><button onclick="changeIncontactablesPage(1)" class="pagination-btn" ${incontactablesPage === totalPages ? 'disabled style="opacity:0.5"' : ''}>Siguiente</button>`;
@@ -1229,7 +1433,7 @@
             const tbody = document.getElementById('recuperadosTableBody');
             if (tbody) {
                 if (items.length === 0) tbody.innerHTML = '<tr><td colspan="10" class="text-center py-8 text-gray-400"><i class="fas fa-inbox text-2xl mb-2 block"></i>No hay clientes reconectados</div></tr>';
-                else tbody.innerHTML = items.slice(0, ITEMS_PER_PAGE).map(c => `<tr class="hover:bg-gray-50"><td class="px-3 py-2 text-xs font-mono">${escapeHtml(c.clienteIdOriginal || c.clienteId)}</div><td class="px-3 py-2 text-xs font-medium">${escapeHtml(c.nombre)}</div><td class="px-3 py-2 text-xs">${escapeHtml(c.documento)}</div><td class="px-3 py-2 text-xs">${escapeHtml(c.telefono)}</div><td class="px-3 py-2 text-xs">${escapeHtml(c.plan)}</div><td class="px-3 py-2 text-xs">${escapeHtml(c.direccion || '-')}</div><td class="px-3 py-2 text-xs"><span class="px-1.5 py-0.5 rounded bg-gray-100">${escapeHtml(c.centroOp || '-')}</span></div><td class="px-3 py-2 text-xs">${c.fechaGestion ? formatearFechaVenezuela(c.fechaGestion) : '-'}</div><td class="px-3 py-2 text-xs">${escapeHtml(c.agente)}</div><td class="px-3 py-2"><div class="flex gap-1"><button onclick="window.editCustomer('${escapeAttr(c.id)}', 'recuperado', 'recuperados')" class="edit-customer-btn"><i class="fas fa-edit"></i></button>${puedeEliminarDatos() ? `<button onclick="window.deleteHistorialRegistro('${escapeAttr(c.id)}', 'recuperado')" class="delete-single-btn"><i class="fas fa-trash"></i></button>` : ''}</div></div></tr>`).join('');
+                else tbody.innerHTML = items.slice(0, ITEMS_PER_PAGE).map(c => `<tr class="hover:bg-gray-50"><td class="px-3 py-2 text-xs font-mono">${escapeHtml(c.clienteIdOriginal || c.clienteId)}</td><td class="px-3 py-2 text-xs font-medium">${escapeHtml(c.nombre)}</td><td class="px-3 py-2 text-xs">${escapeHtml(c.documento)}</td><td class="px-3 py-2 text-xs">${escapeHtml(c.telefono)}</td><td class="px-3 py-2 text-xs">${escapeHtml(c.plan)}</td><td class="px-3 py-2 text-xs">${escapeHtml(c.direccion || '-')}</td><td class="px-3 py-2 text-xs"><span class="px-1.5 py-0.5 rounded bg-gray-100">${escapeHtml(c.centroOp || '-')}</span></td><td class="px-3 py-2 text-xs">${c.fechaGestion ? formatearFechaVenezuela(c.fechaGestion) : '-'}</td><td class="px-3 py-2 text-xs">${escapeHtml(c.agente)}</td><td class="px-3 py-2"><div class="flex gap-1"><button onclick="window.editCustomer('${escapeAttr(c.id)}', 'recuperado', 'recuperados')" class="edit-customer-btn"><i class="fas fa-edit"></i></button>${puedeEliminarDatos() ? `<button onclick="window.deleteHistorialRegistro('${escapeAttr(c.id)}', 'recuperado')" class="delete-single-btn"><i class="fas fa-trash"></i></button>` : ''}</div></td></tr>`).join('');
             }
         }
         
@@ -1246,7 +1450,7 @@
                 else if (c.motivoBaja === 'relocation') motivoTexto = 'Mudanza';
                 else if (c.motivoBaja === 'deceased') motivoTexto = 'Fallecimiento';
                 else if (c.motivoBaja) motivoTexto = c.motivoBaja;
-                return `<tr class="hover:bg-gray-50"><td class="px-3 py-2 text-xs font-mono">${escapeHtml(c.clienteIdOriginal || c.clienteId || c.id)}</div><td class="px-3 py-2 text-xs font-medium">${escapeHtml(c.nombre)}</div><td class="px-3 py-2 text-xs">${escapeHtml(c.documento)}</div><td class="px-3 py-2 text-xs">${escapeHtml(c.telefono)}</div><td class="px-3 py-2 text-xs">${escapeHtml(c.plan)}</div><td class="px-3 py-2 text-xs">${escapeHtml(c.direccion ? c.direccion.substring(0, 40) : '-')}</div><td class="px-3 py-2 text-xs"><span class="px-1.5 py-0.5 rounded bg-gray-100">${escapeHtml(c.centroOp)}</span></div><td class="px-3 py-2 text-xs"><span class="px-1.5 py-0.5 rounded bg-red-100 text-red-700">${escapeHtml(motivoTexto)}</span></div><td class="px-3 py-2 text-xs">${c.fechaGestion ? formatearFechaVenezuela(c.fechaGestion) : '-'}</div><td class="px-3 py-2 text-xs">${escapeHtml(c.agente)}</div><td class="px-3 py-2 text-center"><div class="flex gap-1 justify-center"><button onclick="window.editCustomer('${escapeAttr(c.id)}', 'perdidoFinal', 'perdidosFinal')" class="bg-blue-100 hover:bg-blue-200 text-blue-700 p-1 rounded"><i class="fas fa-edit text-xs"></i></button>${puedeEliminarDatos() ? `<button onclick="window.deleteHistorialRegistro('${escapeAttr(c.id)}', 'perdidoFinal')" class="bg-red-100 hover:bg-red-200 text-red-700 p-1 rounded"><i class="fas fa-trash-alt text-xs"></i></button>` : ''}</div></div></tr>`;
+                return `<tr class="hover:bg-gray-50"><td class="px-3 py-2 text-xs font-mono">${escapeHtml(c.clienteIdOriginal || c.clienteId || c.id)}</td><td class="px-3 py-2 text-xs font-medium">${escapeHtml(c.nombre)}</td><td class="px-3 py-2 text-xs">${escapeHtml(c.documento)}</td><td class="px-3 py-2 text-xs">${escapeHtml(c.telefono)}</td><td class="px-3 py-2 text-xs">${escapeHtml(c.plan)}</td><td class="px-3 py-2 text-xs">${escapeHtml(c.direccion ? c.direccion.substring(0, 40) : '-')}</td><td class="px-3 py-2 text-xs"><span class="px-1.5 py-0.5 rounded bg-gray-100">${escapeHtml(c.centroOp)}</span></td><td class="px-3 py-2 text-xs"><span class="px-1.5 py-0.5 rounded bg-red-100 text-red-700">${escapeHtml(motivoTexto)}</span></td><td class="px-3 py-2 text-xs">${c.fechaGestion ? formatearFechaVenezuela(c.fechaGestion) : '-'}</td><td class="px-3 py-2 text-xs">${escapeHtml(c.agente)}</td><td class="px-3 py-2 text-center"><div class="flex gap-1 justify-center"><button onclick="window.editCustomer('${escapeAttr(c.id)}', 'perdidoFinal', 'perdidosFinal')" class="bg-blue-100 hover:bg-blue-200 text-blue-700 p-1 rounded"><i class="fas fa-edit text-xs"></i></button>${puedeEliminarDatos() ? `<button onclick="window.deleteHistorialRegistro('${escapeAttr(c.id)}', 'perdidoFinal')" class="bg-red-100 hover:bg-red-200 text-red-700 p-1 rounded"><i class="fas fa-trash-alt text-xs"></i></button>` : ''}</div></td></tr>`;
             }).join('');
         }
         
@@ -1255,8 +1459,8 @@
             document.getElementById('dashboardEquiposCount') && (document.getElementById('dashboardEquiposCount').innerText = items.length);
             const tbody = document.getElementById('equiposTableBody');
             if (!tbody) return;
-            if (items.length === 0) { tbody.innerHTML = '<td><td colspan="10" class="text-center py-8 text-gray-400"><i class="fas fa-inbox text-2xl mb-2 block"></i>No hay visitas programadas</div></tr>'; return; }
-            tbody.innerHTML = items.map(v => `<tr class="hover:bg-gray-50"><td class="px-3 py-2 text-xs font-mono">${escapeHtml(v.clienteIdOriginal || v.clienteId)}</div><td class="px-3 py-2 text-xs">${escapeHtml(v.clienteNombre)}</div><td class="px-3 py-2 text-xs">${escapeHtml(v.clienteTelefono)}</div><td class="px-3 py-2 text-xs">${escapeHtml(v.direccion)}</div><td class="px-3 py-2 text-xs">${escapeHtml(v.zona || v.centroOp)}</div><td class="px-3 py-2 text-xs">${v.tecnicoNombre || 'Por asignar'}</div><td class="px-3 py-2 text-xs">${v.fechaVisita || '-'}</div><td class="px-3 py-2 text-xs">${v.horaVisita || '-'}</div><td class="px-3 py-2 text-xs"><span class="status-badge bg-pendiente">PENDIENTE</span></div><td class="px-3 py-2"><div class="flex gap-1 flex-wrap"><button onclick="window.openAssignTechnicianModal('${escapeAttr(v.id)}')" class="assign-btn"><i class="fas fa-user-cog"></i> Asignar</button><button onclick="window.openEditVisitModal('${escapeAttr(v.id)}')" class="edit-btn"><i class="fas fa-edit"></i> Editar</button><button onclick="window.openRetirarEquipoModal('${escapeAttr(v.id)}')" class="retirar-equipo-btn"><i class="fas fa-box-open"></i> Retirar</button><button onclick="window.reprogramarVisita('${escapeAttr(v.id)}')" class="assign-btn"><i class="fas fa-calendar-alt"></i> Reprogramar</button>${puedeEliminarDatos() ? `<button onclick="window.eliminarVisita('${escapeAttr(v.id)}')" class="delete-single-btn"><i class="fas fa-trash"></i> Eliminar</button>` : ''}<a href="https://wa.me/${v.clienteTelefono?.replace(/[^0-9]/g, '')}" target="_blank" class="whatsapp-link"><i class="fab fa-whatsapp"></i></a></div></div></tr>`).join('');
+            if (items.length === 0) { tbody.innerHTML = '<tr><td colspan="10" class="text-center py-8 text-gray-400"><i class="fas fa-inbox text-2xl mb-2 block"></i>No hay visitas programadas</div></tr>'; return; }
+            tbody.innerHTML = items.map(v => `<tr class="hover:bg-gray-50"><td class="px-3 py-2 text-xs font-mono">${escapeHtml(v.clienteIdOriginal || v.clienteId)}</td><td class="px-3 py-2 text-xs">${escapeHtml(v.clienteNombre)}</td><td class="px-3 py-2 text-xs">${escapeHtml(v.clienteTelefono)}</td><td class="px-3 py-2 text-xs">${escapeHtml(v.direccion)}</td><td class="px-3 py-2 text-xs">${escapeHtml(v.zona || v.centroOp)}</td><td class="px-3 py-2 text-xs">${v.tecnicoNombre || 'Por asignar'}</td><td class="px-3 py-2 text-xs">${v.fechaVisita || '-'}</td><td class="px-3 py-2 text-xs">${v.horaVisita || '-'}</td><td class="px-3 py-2 text-xs"><span class="status-badge bg-pendiente">PENDIENTE</span></td><td class="px-3 py-2"><div class="flex gap-1 flex-wrap"><button onclick="window.openAssignTechnicianModal('${escapeAttr(v.id)}')" class="assign-btn"><i class="fas fa-user-cog"></i> Asignar</button><button onclick="window.openEditVisitModal('${escapeAttr(v.id)}')" class="edit-btn"><i class="fas fa-edit"></i> Editar</button><button onclick="window.openRetirarEquipoModal('${escapeAttr(v.id)}')" class="retirar-equipo-btn"><i class="fas fa-box-open"></i> Retirar</button><button onclick="window.reprogramarVisita('${escapeAttr(v.id)}')" class="assign-btn"><i class="fas fa-calendar-alt"></i> Reprogramar</button>${puedeEliminarDatos() ? `<button onclick="window.eliminarVisita('${escapeAttr(v.id)}')" class="delete-single-btn"><i class="fas fa-trash"></i> Eliminar</button>` : ''}<a href="https://wa.me/${v.clienteTelefono?.replace(/[^0-9]/g, '')}" target="_blank" class="whatsapp-link"><i class="fab fa-whatsapp"></i></a></div></td></tr>`).join('');
         }
         
         function renderVisitasTable() {
@@ -1271,7 +1475,7 @@
             const tbody = document.getElementById('visitasTableBody');
             if (!tbody) return;
             if (items.length === 0) { tbody.innerHTML = '<tr><td colspan="8" class="text-center py-8 text-gray-400"><i class="fas fa-inbox text-2xl mb-2 block"></i>No hay equipos retirados</div></tr>'; return; }
-            tbody.innerHTML = items.slice(0, 100).map(v => `<tr class="hover:bg-gray-50"><td class="px-3 py-2 text-xs font-mono">${escapeHtml(v.clienteIdOriginal || v.clienteId)}</div><td class="px-3 py-2 text-xs">${escapeHtml(v.clienteNombre)}</div><td class="px-3 py-2 text-xs">${escapeHtml(v.clienteTelefono)}</div><td class="px-3 py-2 text-xs">${escapeHtml(v.direccion)}</div><td class="px-3 py-2 text-xs">${escapeHtml(v.zona || v.centroOp)}</div><td class="px-3 py-2 text-xs">${v.tecnicoNombre || 'No asignado'}</div><td class="px-3 py-2 text-xs">${v.fechaRetiro ? formatearFechaHoraVenezuela(v.fechaRetiro) : (v.fechaCompletado ? formatearFechaHoraVenezuela(v.fechaCompletado) : '-')}</div><td class="px-3 py-2 text-xs">${v.completadoPor || v.agente || '-'}</div></tr>`).join('');
+            tbody.innerHTML = items.slice(0, 100).map(v => `<tr class="hover:bg-gray-50"><td class="px-3 py-2 text-xs font-mono">${escapeHtml(v.clienteIdOriginal || v.clienteId)}</td><td class="px-3 py-2 text-xs">${escapeHtml(v.clienteNombre)}</td><td class="px-3 py-2 text-xs">${escapeHtml(v.clienteTelefono)}</td><td class="px-3 py-2 text-xs">${escapeHtml(v.direccion)}</td><td class="px-3 py-2 text-xs">${escapeHtml(v.zona || v.centroOp)}</td><td class="px-3 py-2 text-xs">${v.tecnicoNombre || 'No asignado'}</td><td class="px-3 py-2 text-xs">${v.fechaRetiro ? formatearFechaHoraVenezuela(v.fechaRetiro) : (v.fechaCompletado ? formatearFechaHoraVenezuela(v.fechaCompletado) : '-')}</td><td class="px-3 py-2 text-xs">${v.completadoPor || v.agente || '-'}</td></tr>`).join('');
         }
         
         function renderTechniciansList() {
@@ -1312,7 +1516,7 @@
                 const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i+1}.`;
                 const barWidth = a.efectividad;
                 const barColor = barWidth >= 25 ? '#10b981' : (barWidth >= 15 ? '#f59e0b' : '#ef4444');
-                return `<tr class="${rankClass}"><td class="text-center font-bold">${medal}</div><td class="font-medium">${escapeHtml(a.nombre)}</div><td class="text-center">${a.llamadas}</div><td class="text-center text-green-600">${a.recuperados}</div><td class="text-center text-red-500">${a.bajas}</div><td class="text-center"><div class="flex items-center gap-2"><div class="progress-bar-bg flex-1"><div class="progress-bar-fill" style="width: ${barWidth}%; background-color: ${barColor};"></div></div><span class="text-xs font-medium">${a.efectividad}%</span></div></div></tr>`;
+                return `<tr class="${rankClass}"><td class="text-center font-bold">${medal}</td><td class="font-medium">${escapeHtml(a.nombre)}</td><td class="text-center">${a.llamadas}</td><td class="text-center text-green-600">${a.recuperados}</td><td class="text-center text-red-500">${a.bajas}</td><td class="text-center"><div class="flex items-center gap-2"><div class="progress-bar-bg flex-1"><div class="progress-bar-fill" style="width: ${barWidth}%; background-color: ${barColor};"></div></div><span class="text-xs font-medium">${a.efectividad}%</span></div></td></tr>`;
             }).join('');
         }
         
@@ -1399,7 +1603,7 @@
             const tbody = document.getElementById('historialTableBody');
             if (tbody) {
                 if (registros.length === 0) tbody.innerHTML = '<tr><td colspan="11" class="text-center py-4">No hay registros</div></tr>';
-                else tbody.innerHTML = registros.slice(0, 200).map(r => `<tr class="hover:bg-gray-50"><td class="px-2 py-1 text-xs">${formatearFechaHoraVenezuela(r.fechaGestion)}</div><td class="px-2 py-1 text-xs">${escapeHtml(r.agente)}</div><td class="px-2 py-1 text-xs">${escapeHtml(r.nombre)}</div><td class="px-2 py-1 text-xs">${escapeHtml(r.clienteIdOriginal || '-')}</div><td class="px-2 py-1 text-xs">${escapeHtml(r.documento || '-')}</div><td class="px-2 py-1 text-xs"><span class="px-1 py-0.5 rounded ${r.tipoReg === 'Reconexion' ? 'bg-green-100' : r.tipoReg === 'Baja' ? 'bg-red-100' : r.tipoReg === 'RetiroEquipo' ? 'bg-emerald-100' : 'bg-gray-100'}">${r.tipoReg}</span></div><td class="px-2 py-1 text-xs">${escapeHtml(r.resultadoTexto || r.resultado || '-')}</div><td class="px-2 py-1 text-xs">${escapeHtml(r.telefono || '-')}</div><td class="px-2 py-1 text-xs">${escapeHtml(r.plan || '-')}</div><td class="px-2 py-1 text-xs">${escapeHtml(r.centroOp || '-')}</div><td class="px-2 py-1 text-center">${puedeEliminarDatos() ? `<button onclick="window.deleteHistorialRegistro('${escapeAttr(r.id)}', '${r.tipoReg === 'Llamada' ? 'callLog' : r.tipoReg === 'Reconexion' ? 'recuperado' : r.tipoReg === 'Baja' ? 'perdidoFinal' : r.tipoReg === 'RetiroEquipo' ? 'visitaFinalizada' : 'incontactable'}')" class="delete-single-btn"><i class="fas fa-trash"></i></button>` : ''}</div></td>`).join('');
+                else tbody.innerHTML = registros.slice(0, 200).map(r => `<tr class="hover:bg-gray-50"><td class="px-2 py-1 text-xs">${formatearFechaHoraVenezuela(r.fechaGestion)}</div><td class="px-2 py-1 text-xs">${escapeHtml(r.agente)}</div><td class="px-2 py-1 text-xs">${escapeHtml(r.nombre)}</div><td class="px-2 py-1 text-xs">${escapeHtml(r.clienteIdOriginal || '-')}</div><td class="px-2 py-1 text-xs">${escapeHtml(r.documento || '-')}</div><td class="px-2 py-1 text-xs"><span class="px-1 py-0.5 rounded ${r.tipoReg === 'Reconexion' ? 'bg-green-100' : r.tipoReg === 'Baja' ? 'bg-red-100' : r.tipoReg === 'RetiroEquipo' ? 'bg-emerald-100' : 'bg-gray-100'}">${r.tipoReg}</span></div><td class="px-2 py-1 text-xs">${escapeHtml(r.resultadoTexto || r.resultado || '-')}</div><td class="px-2 py-1 text-xs">${escapeHtml(r.telefono || '-')}</div><td class="px-2 py-1 text-xs">${escapeHtml(r.plan || '-')}</div><td class="px-2 py-1 text-xs">${escapeHtml(r.centroOp || '-')}</div><td class="px-2 py-1 text-center">${puedeEliminarDatos() ? `<button onclick="window.deleteHistorialRegistro('${escapeAttr(r.id)}', '${r.tipoReg === 'Llamada' ? 'callLog' : r.tipoReg === 'Reconexion' ? 'recuperado' : r.tipoReg === 'Baja' ? 'perdidoFinal' : r.tipoReg === 'RetiroEquipo' ? 'visitaFinalizada' : 'incontactable'}')" class="delete-single-btn"><i class="fas fa-trash"></i></button>` : ''}</div></tr>`).join('');
             }
         };
         
@@ -1576,7 +1780,7 @@
             if (period === 'day') {
                 singleDateDiv.classList.remove('hidden');
                 rangeDiv.classList.add('hidden');
-                document.getElementById('reportSingleDate').value = fechaHoyStr;
+                document.getElementById('reportSingleDate').value = getFechaActualVenezuelaInput();
             } else {
                 singleDateDiv.classList.add('hidden');
                 rangeDiv.classList.remove('hidden');
@@ -1587,8 +1791,8 @@
                     start.setDate(hoyDate.getDate() - diff);
                     const end = new Date(start);
                     end.setDate(start.getDate() + 6);
-                    document.getElementById('reportDateStart').value = formatearFechaVenezuela(start);
-                    document.getElementById('reportDateEnd').value = formatearFechaVenezuela(end);
+                    document.getElementById('reportDateStart').value = formatearFechaYYYYMMDD(start);
+                    document.getElementById('reportDateEnd').value = formatearFechaYYYYMMDD(end);
                 } else if (period === 'month') {
                     const year = hoyDate.getFullYear();
                     const month = hoyDate.getMonth();
@@ -1607,7 +1811,7 @@
             const hoyDate = getDateObjectVenezuela();
             if (currentPeriod === 'day') {
                 let fechaStr = document.getElementById('reportSingleDate')?.value;
-                if (!fechaStr) fechaStr = formatearFechaVenezuela(hoyDate);
+                if (!fechaStr) fechaStr = getFechaActualVenezuelaInput();
                 const [year, month, day] = fechaStr.split('-');
                 fechaInicio = new Date(Date.UTC(year, month-1, day, 0, 0, 0));
                 fechaFin = new Date(Date.UTC(year, month-1, day, 23, 59, 59, 999));
@@ -1639,7 +1843,7 @@
                 const hoyDate = getDateObjectVenezuela();
                 if (currentPeriod === 'day') {
                     let fechaStr = document.getElementById('reportSingleDate').value;
-                    if (!fechaStr) { fechaStr = formatearFechaVenezuela(hoyDate); document.getElementById('reportSingleDate').value = fechaStr; }
+                    if (!fechaStr) { fechaStr = getFechaActualVenezuelaInput(); document.getElementById('reportSingleDate').value = fechaStr; }
                     const [year, month, day] = fechaStr.split('-');
                     fechaInicio = new Date(Date.UTC(year, month-1, day, 0, 0, 0));
                     fechaFin = new Date(Date.UTC(year, month-1, day, 23, 59, 59, 999));
@@ -1673,11 +1877,15 @@
                     items.forEach(item => {
                         let fecha = item[fechaCampo];
                         if (fecha) {
-                            const fechaStr = formatearFechaVenezuela(fecha);
+                            const fechaStr = formatearFechaDDMMYYYY(fecha);
                             grupo.set(fechaStr, (grupo.get(fechaStr) || 0) + 1);
                         }
                     });
-                    return Array.from(grupo.entries()).sort((a, b) => new Date(b[0]) - new Date(a[0]));
+                    return Array.from(grupo.entries()).sort((a, b) => {
+                        const [da, ma, aa] = a[0].split('/');
+                        const [db, mb, ab] = b[0].split('/');
+                        return new Date(`${ab}-${mb}-${db}`) - new Date(`${aa}-${ma}-${da}`);
+                    }).reverse();
                 }
                 
                 const recuperadosPorFecha = agruparPorFecha(recuperadosEnPeriodo, 'fechaGestion');
@@ -1750,8 +1958,8 @@
                 doc.text('Nota: Este reporte NO incluye clientes Rezagados ni Perdidos pendientes.', 14, y + 8);
                 doc.text('Solo muestra las gestiones completadas dentro del periodo seleccionado.', 14, y + 14);
                 
-                const fechaInicioStr = formatearFechaVenezuela(fechaInicio);
-                const fechaFinStr = formatearFechaVenezuela(fechaFin);
+                const fechaInicioStr = formatearFechaDDMMYYYY(fechaInicio);
+                const fechaFinStr = formatearFechaDDMMYYYY(fechaFin);
                 doc.save(`reporte_gestion_${fechaInicioStr}_a_${fechaFinStr}.pdf`);
                 showToast('Reporte General generado exitosamente');
             } catch (error) { console.error(error); showToast('Error al generar el reporte', 'error'); } finally { showLoading(false); }
@@ -1765,7 +1973,7 @@
                 const hoyDate = getDateObjectVenezuela();
                 if (currentPeriod === 'day') {
                     let fechaStr = document.getElementById('reportSingleDate').value;
-                    if (!fechaStr) { fechaStr = formatearFechaVenezuela(hoyDate); document.getElementById('reportSingleDate').value = fechaStr; }
+                    if (!fechaStr) { fechaStr = getFechaActualVenezuelaInput(); document.getElementById('reportSingleDate').value = fechaStr; }
                     const [year, month, day] = fechaStr.split('-');
                     fechaInicio = new Date(Date.UTC(year, month-1, day, 0, 0, 0));
                     fechaFin = new Date(Date.UTC(year, month-1, day, 23, 59, 59, 999));
@@ -1810,8 +2018,8 @@
                 
                 doc.autoTable({ startY: 58, head: [['Fecha/Hora', 'Agente', 'Cliente', 'Documento', 'Telefono', 'Plan', 'CO', 'Tipo', 'Resultado']], body: tableData, theme: 'striped', headStyles: { fillColor: [79, 70, 229], textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 8 }, bodyStyles: { fontSize: 7 } });
                 
-                const fechaInicioStr = formatearFechaVenezuela(fechaInicio);
-                const fechaFinStr = formatearFechaVenezuela(fechaFin);
+                const fechaInicioStr = formatearFechaDDMMYYYY(fechaInicio);
+                const fechaFinStr = formatearFechaDDMMYYYY(fechaFin);
                 doc.save(`reporte_detallado_${fechaInicioStr}_a_${fechaFinStr}.pdf`);
                 showToast('Reporte Detallado generado exitosamente');
             } catch (error) { console.error(error); showToast('Error al generar el reporte', 'error'); } finally { showLoading(false); }
@@ -1825,7 +2033,7 @@
                 const hoyDate = getDateObjectVenezuela();
                 if (currentPeriod === 'day') {
                     let fechaStr = document.getElementById('reportSingleDate').value;
-                    if (!fechaStr) { fechaStr = formatearFechaVenezuela(hoyDate); document.getElementById('reportSingleDate').value = fechaStr; }
+                    if (!fechaStr) { fechaStr = getFechaActualVenezuelaInput(); document.getElementById('reportSingleDate').value = fechaStr; }
                     const [year, month, day] = fechaStr.split('-');
                     fechaInicio = new Date(Date.UTC(year, month-1, day, 0, 0, 0));
                     fechaFin = new Date(Date.UTC(year, month-1, day, 23, 59, 59, 999));
@@ -1847,8 +2055,8 @@
                 const { gestiones, totalGestiones, totalRecuperados, totalPerdidos } = getReportData(fechaInicio, fechaFin);
                 const tasaExito = totalGestiones > 0 ? ((totalRecuperados / totalGestiones) * 100).toFixed(1) : 0;
                 const ahoraLocal = formatearFechaHoraVenezuela(hoyDate);
-                const fechaInicioLocal = formatearFechaVenezuela(fechaInicio);
-                const fechaFinLocal = formatearFechaVenezuela(fechaFin);
+                const fechaInicioLocal = formatearFechaDDMMYYYY(fechaInicio);
+                const fechaFinLocal = formatearFechaDDMMYYYY(fechaFin);
                 
                 const wsData = [['INFORME DE GESTION'], [`Periodo: ${fechaInicioLocal} - ${fechaFinLocal}`], [`Fecha de exportacion: ${ahoraLocal}`], [`Generado por: ${appCurrentUser?.fullName || 'Sistema'}`], [], ['RESUMEN DE METRICAS'], ['Total de gestiones:', totalGestiones], ['Total recuperados:', totalRecuperados], ['Total dados de baja:', totalPerdidos], ['Tasa de efectividad:', `${tasaExito}%`], [], ['DETALLE DE GESTIONES'], ['Fecha/Hora', 'Agente', 'Cliente', 'Documento', 'Telefono', 'Plan', 'CO', 'Tipo', 'Resultado']];
                 gestiones.forEach(g => { wsData.push([formatearFechaHoraVenezuela(g.fecha), g.agente, g.cliente, g.documento, g.telefono, g.plan, g.centroOp, g.tipo, g.resultado]); });
@@ -2135,20 +2343,11 @@
         window.importRezagadosDirect = function() { showToast('Función en desarrollo', 'info'); };
         window.importPerdidosDirect = function() { showToast('Función en desarrollo', 'info'); };
         
-        console.log('✅ SISTEMA COMPLETAMENTE INICIALIZADO - Todas las pestañas funcionan correctamente');
-        console.log('📊 Dashboard: métricas con desglose por fecha');
-        console.log('📋 Rezagados: tabla con gestión de llamadas');
-        console.log('📋 Perdidos: tabla con gestión de llamadas');
-        console.log('📞 Contactados: estadísticas, filtros, edición y reclasificación');
-        console.log('🚫 Incontactables: resumen, filtros, reclasificación y exportación');
-        console.log('✅ Reconectados: lista con edición');
-        console.log('📦 Dados de Baja: lista con motivos y edición');
-        console.log('🔧 Retiro Equipos: visitas programadas con acciones (Asignar, Editar, Retirar, Reprogramar, Eliminar)');
-        console.log('📅 Equipos Retirados: historial de equipos retirados');
-        console.log('👨‍🔧 Técnicos: registro y eliminación');
-        console.log('📜 Historial: filtros y exportación');
-        console.log('📊 Reportes: generación de PDF/Excel con desglose por fecha');
-        console.log('⚙️ Config: eliminación de datos');
+        console.log('✅ SISTEMA COMPLETAMENTE INICIALIZADO - CORRECCIONES APLICADAS');
+        console.log('📅 Corrección de validación de fechas (domingos y horarios)');
+        console.log('🔧 Corrección de verificación de disponibilidad');
+        console.log('🔒 Corrección de locks con try-catch');
+        console.log('📊 Dashboard con desglose por fecha corregido');
     </script>
 </body>
 </html>

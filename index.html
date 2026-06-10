@@ -265,7 +265,7 @@
                     <div class="overflow-x-auto">
                         <table class="top-agents-table" id="topAgentsTable">
                             <thead><tr><th class="w-12">#</th><th>Agente</th><th class="text-center">Llamadas</th><th class="text-center">Recuperados</th><th class="text-center">Bajas</th><th>Efectividad</th></tr></thead>
-                            <tbody id="topAgentsTableBody"><tr><td colspan="6" class="text-center py-4 text-gray-500">Cargando datos...</td></tr></tbody>
+                            <tbody id="topAgentsTableBody"><tr><td colspan="6" class="text-center py-4 text-gray-500">Cargando datos...</td></table></tbody>
                         </table>
                     </div>
                     <div class="mt-3 pt-2 border-t flex justify-between items-center text-xs text-gray-500">
@@ -1344,7 +1344,7 @@
             document.getElementById('dashboardRezagadosCount') && (document.getElementById('dashboardRezagadosCount').innerText = clientesRezagados.length);
             const tbody = document.getElementById('rezagadosTableBodyDesktop');
             if (!tbody) return;
-            if (items.length === 0) { tbody.innerHTML = '<tr><td colspan="9" class="text-center py-8 text-gray-400"><i class="fas fa-inbox text-2xl mb-2 block"></i>No hay clientes rezagados</td></tr>'; return; }
+            if (items.length === 0) { tbody.innerHTML = '<tr><td colspan="9" class="text-center py-8 text-gray-400"><i class="fas fa-inbox text-2xl mb-2 block"></i>No hay clientes rezagados</div></tr>'; return; }
             const start = (rezagadosPage - 1) * ITEMS_PER_PAGE;
             const pageItems = items.slice(start, start + ITEMS_PER_PAGE);
             tbody.innerHTML = pageItems.map(c => `<tr class="hover:bg-gray-50"><td class="px-3 py-2 text-xs font-mono">${escapeHtml(c.identificador || c.clienteIdOriginal || c.id)}</td><td class="px-3 py-2 text-xs font-medium">${escapeHtml(c.nombre)}</td><td class="px-3 py-2 text-xs">${escapeHtml(c.documento)}</td><td class="px-3 py-2 text-xs">${escapeHtml(c.telefono1 || '-')}</td><td class="px-3 py-2 text-xs">${escapeHtml(c.plan)}</td><td class="px-3 py-2 text-xs"><span class="px-1.5 py-0.5 rounded bg-gray-100">${escapeHtml(c.centroOp)}</span></td><td class="px-3 py-2 text-xs">${c.fechaCorte || '-'}</td><td class="px-3 py-2 text-xs"><span class="status-badge bg-pendiente">PENDIENTE</span></td><td class="px-3 py-2"><div class="flex gap-1">${c.telefono1 ? `<button onclick="window.openRegisterCallModal('${escapeAttr(c.id)}', 'rezagado')" class="call-btn"><i class="fas fa-phone-alt"></i> Gestionar</button>` : '<button class="call-btn opacity-50" disabled>Sin telefono</button>'}${c.telefono1 ? `<a href="tel:${c.telefono1}" class="call-link"><i class="fas fa-phone"></i></a><a href="https://wa.me/${c.telefono1.replace(/[^0-9]/g, '')}" target="_blank" class="whatsapp-link"><i class="fab fa-whatsapp"></i></a>` : ''}</div></td></tr>`).join('');
@@ -1363,7 +1363,7 @@
             if (items.length === 0) { tbody.innerHTML = '<tr><td colspan="9" class="text-center py-8 text-gray-400"><i class="fas fa-inbox text-2xl mb-2 block"></i>No hay clientes perdidos</div></tr>'; return; }
             const start = (perdidosPage - 1) * ITEMS_PER_PAGE;
             const pageItems = items.slice(start, start + ITEMS_PER_PAGE);
-            tbody.innerHTML = pageItems.map(c => `<tr class="hover:bg-gray-50"><td class="px-3 py-2 text-xs font-mono">${escapeHtml(c.identificador || c.clienteIdOriginal || c.id)}</td><td class="px-3 py-2 text-xs font-medium">${escapeHtml(c.nombre)}</td><td class="px-3 py-2 text-xs">${escapeHtml(c.documento)}</td><td class="px-3 py-2 text-xs">${escapeHtml(c.telefono1 || '-')}</td><td class="px-3 py-2 text-xs">${escapeHtml(c.plan)}</td><td class="px-3 py-2 text-xs"><span class="px-1.5 py-0.5 rounded bg-gray-100">${escapeHtml(c.centroOp)}</span></td><td class="px-3 py-2 text-xs">${c.fechaCorte || '-'}</td><td class="px-3 py-2 text-xs"><span class="status-badge bg-pendiente">PENDIENTE</span></td><td class="px-3 py-2"><div class="flex gap-1">${c.telefono1 ? `<button onclick="window.openRegisterCallModal('${escapeAttr(c.id)}', 'perdido')" class="call-btn"><i class="fas fa-phone-alt"></i> Gestionar</button>` : '<button class="call-btn opacity-50" disabled>Sin telefono</button>'}${c.telefono1 ? `<a href="tel:${c.telefono1}" class="call-link"><i class="fas fa-phone"></i></a><a href="https://wa.me/${c.telefono1.replace(/[^0-9]/g, '')}" target="_blank" class="whatsapp-link"><i class="fab fa-whatsapp"></i></a>` : ''}</div></td></tr>`).join('');
+            tbody.innerHTML = pageItems.map(c => `<tr class="hover:bg-gray-50"><td class="px-3 py-2 text-xs font-mono">${escapeHtml(c.identificador || c.clienteIdOriginal || c.id)}</td><td class="px-3 py-2 text-xs font-medium">${escapeHtml(c.nombre)}</td><td class="px-3 py-2 text-xs">${escapeHtml(c.documento)}</td><td class="px-3 py-2 text-xs">${escapeHtml(c.telefono1 || '-')}</td><td class="px-3 py-2 text-xs">${escapeHtml(c.plan)}</td><td class="px-3 py-2 text-xs"><span class="px-1.5 py-0.5 rounded bg-gray-100">${escapeHtml(c.centroOp)}</span></td><td class="px-3 py-2 text-xs">${c.fechaCorte || '-'}</td><td class="px-3 py-2 text-xs"><span class="status-badge bg-pendiente">PENDIENTE</span></td><td class="px-3 py-2"><div class="flex gap-1">${c.telefono1 ? `<button onclick="window.openRegisterCallModal('${escapeAttr(c.id)}', 'perdido')" class="call-btn"><i class="fas fa-phone-alt"></i> Gestionar</button>` : '<button class="call-btn opacity-50" disabled>Sin telefono</button>'}</div></td></tr>`).join('');
             const totalPages = Math.ceil(items.length / ITEMS_PER_PAGE);
             const pagDiv = document.getElementById('perdidosPagination');
             if (pagDiv && totalPages > 1) pagDiv.innerHTML = `<button onclick="changePerdidosPage(-1)" class="pagination-btn" ${perdidosPage===1?'disabled style="opacity:0.5"':''}>Anterior</button><span class="text-xs mx-2">${perdidosPage}/${totalPages}</span><button onclick="changePerdidosPage(1)" class="pagination-btn" ${perdidosPage===totalPages?'disabled style="opacity:0.5"':''}>Siguiente</button>`;
@@ -1459,7 +1459,7 @@
             document.getElementById('dashboardEquiposCount') && (document.getElementById('dashboardEquiposCount').innerText = items.length);
             const tbody = document.getElementById('equiposTableBody');
             if (!tbody) return;
-            if (items.length === 0) { tbody.innerHTML = '<tr><td colspan="10" class="text-center py-8 text-gray-400"><i class="fas fa-inbox text-2xl mb-2 block"></i>No hay visitas programadas</div></tr>'; return; }
+            if (items.length === 0) { tbody.innerHTML = '</table><td colspan="10" class="text-center py-8 text-gray-400"><i class="fas fa-inbox text-2xl mb-2 block"></i>No hay visitas programadas</div></tr>'; return; }
             tbody.innerHTML = items.map(v => `<tr class="hover:bg-gray-50"><td class="px-3 py-2 text-xs font-mono">${escapeHtml(v.clienteIdOriginal || v.clienteId)}</td><td class="px-3 py-2 text-xs">${escapeHtml(v.clienteNombre)}</td><td class="px-3 py-2 text-xs">${escapeHtml(v.clienteTelefono)}</td><td class="px-3 py-2 text-xs">${escapeHtml(v.direccion)}</td><td class="px-3 py-2 text-xs">${escapeHtml(v.zona || v.centroOp)}</td><td class="px-3 py-2 text-xs">${v.tecnicoNombre || 'Por asignar'}</td><td class="px-3 py-2 text-xs">${v.fechaVisita || '-'}</td><td class="px-3 py-2 text-xs">${v.horaVisita || '-'}</td><td class="px-3 py-2 text-xs"><span class="status-badge bg-pendiente">PENDIENTE</span></td><td class="px-3 py-2"><div class="flex gap-1 flex-wrap"><button onclick="window.openAssignTechnicianModal('${escapeAttr(v.id)}')" class="assign-btn"><i class="fas fa-user-cog"></i> Asignar</button><button onclick="window.openEditVisitModal('${escapeAttr(v.id)}')" class="edit-btn"><i class="fas fa-edit"></i> Editar</button><button onclick="window.openRetirarEquipoModal('${escapeAttr(v.id)}')" class="retirar-equipo-btn"><i class="fas fa-box-open"></i> Retirar</button><button onclick="window.reprogramarVisita('${escapeAttr(v.id)}')" class="assign-btn"><i class="fas fa-calendar-alt"></i> Reprogramar</button>${puedeEliminarDatos() ? `<button onclick="window.eliminarVisita('${escapeAttr(v.id)}')" class="delete-single-btn"><i class="fas fa-trash"></i> Eliminar</button>` : ''}<a href="https://wa.me/${v.clienteTelefono?.replace(/[^0-9]/g, '')}" target="_blank" class="whatsapp-link"><i class="fab fa-whatsapp"></i></a></div></td></tr>`).join('');
         }
         
@@ -1736,6 +1736,661 @@
             XLSX.writeFile(wb, `dados_de_baja_${formatearFechaVenezuela(getDateObjectVenezuela())}.xlsx`);
             showToast('Exportado a Excel');
         };
+        
+        // ==================== FUNCIONES DE IMPORTACIÓN CORREGIDAS ====================
+
+        window.importPerdidosDirect = async function() {
+            const fileInput = document.getElementById('perdidosExcel');
+            const file = fileInput.files[0];
+            if (!file) { showToast('Seleccione un archivo Excel', 'error'); return; }
+            
+            showLoading(true, 'Procesando archivo de perdidos...');
+            
+            try {
+                const data = await file.arrayBuffer();
+                const workbook = XLSX.read(data);
+                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '' });
+                
+                if (!rows || rows.length < 2) {
+                    showLoading(false);
+                    showToast('El archivo está vacío', 'error');
+                    return;
+                }
+                
+                const headers = rows[0].map(h => String(h || '').trim().toUpperCase());
+                
+                // Detectar columnas
+                let colId = -1, colNombre = -1, colDoc = -1, colTel1 = -1, colTel2 = -1, colTel3 = -1;
+                let colPlan = -1, colCO = -1, colFecha = -1;
+                
+                for (let i = 0; i < headers.length; i++) {
+                    const h = headers[i];
+                    if (h === 'IDENTIFICADOR' || h === 'ID' || h === 'CODIGO') colId = i;
+                    if (h === 'NOMBRE CLIENTE' || h === 'NOMBRE' || h === 'CLIENTE') colNombre = i;
+                    if (h === 'DOCUMENTO' || h === 'CEDULA' || h === 'CI') colDoc = i;
+                    if (h === 'TELEFONO_1' || h === 'TELEFONO1') colTel1 = i;
+                    if (h === 'TELEFONO_2' || h === 'TELEFONO2') colTel2 = i;
+                    if (h === 'TELEFONO_3' || h === 'TELEFONO3') colTel3 = i;
+                    if (h === 'DESC_IOPCION' || h === 'PLAN') colPlan = i;
+                    if (h === 'CENTRO_OP' || h === 'CENTRO' || h === 'CO') colCO = i;
+                    if (h === 'FECHA_INGRESO_ORDEN' || h === 'FECHA CORTE') colFecha = i;
+                }
+                
+                if (colId === -1 || colNombre === -1) {
+                    showLoading(false);
+                    showToast('El archivo debe tener columnas: IDENTIFICADOR y NOMBRE CLIENTE', 'error');
+                    return;
+                }
+                
+                let importados = 0;
+                let errores = 0;
+                let duplicados = 0;
+                
+                // Obtener IDs existentes para evitar duplicados
+                const idsExistentes = new Set(clientesPerdidos.map(c => String(c.clienteIdOriginal || c.identificador)));
+                
+                for (let i = 1; i < rows.length; i++) {
+                    const row = rows[i];
+                    if (!row || row.length === 0) continue;
+                    
+                    const identificador = row[colId] ? String(row[colId]).trim() : '';
+                    const nombre = row[colNombre] ? String(row[colNombre]).trim() : '';
+                    
+                    if (!identificador || !nombre) continue;
+                    
+                    // Saltar duplicados
+                    if (idsExistentes.has(identificador)) {
+                        duplicados++;
+                        continue;
+                    }
+                    idsExistentes.add(identificador);
+                    
+                    // Limpiar teléfonos
+                    let telefono1 = '', telefono2 = '', telefono3 = '';
+                    if (colTel1 !== -1 && row[colTel1]) telefono1 = String(row[colTel1]).replace(/[^0-9]/g, '');
+                    if (colTel2 !== -1 && row[colTel2]) telefono2 = String(row[colTel2]).replace(/[^0-9]/g, '');
+                    if (colTel3 !== -1 && row[colTel3]) telefono3 = String(row[colTel3]).replace(/[^0-9]/g, '');
+                    
+                    // Ajustar teléfonos (agregar 0 si tiene 10 dígitos)
+                    if (telefono1 && telefono1.length === 10) telefono1 = '0' + telefono1;
+                    if (telefono2 && telefono2.length === 10) telefono2 = '0' + telefono2;
+                    if (telefono3 && telefono3.length === 10) telefono3 = '0' + telefono3;
+                    
+                    // Obtener plan
+                    let plan = 'No especificado';
+                    if (colPlan !== -1 && row[colPlan]) {
+                        plan = String(row[colPlan]).trim();
+                        if (plan.length > 100) plan = plan.substring(0, 100);
+                    }
+                    
+                    // Obtener centro de operación
+                    let centroOp = '';
+                    if (colCO !== -1 && row[colCO]) {
+                        centroOp = String(row[colCO]).trim();
+                        // Simplificar nombres de CO
+                        if (centroOp.includes('RUICES')) centroOp = 'RUICES';
+                        else if (centroOp.includes('NAYA')) centroOp = 'NAYA';
+                        else if (centroOp.includes('ROSAL')) centroOp = 'ROSAL';
+                        else if (centroOp.includes('PARAISO')) centroOp = 'PARAISO';
+                        else if (centroOp.includes('URBINA')) centroOp = 'LA URBINA';
+                        else if (centroOp.includes('MACARACUAY')) centroOp = 'MACARACUAY';
+                    }
+                    
+                    // Obtener fecha de corte
+                    let fechaCorte = '';
+                    if (colFecha !== -1 && row[colFecha]) {
+                        let fechaRaw = String(row[colFecha]);
+                        if (fechaRaw && fechaRaw.length >= 10) {
+                            fechaCorte = fechaRaw.substring(0, 10);
+                        }
+                    }
+                    
+                    // Obtener documento
+                    let documento = '';
+                    if (colDoc !== -1 && row[colDoc]) {
+                        documento = String(row[colDoc]).trim();
+                    }
+                    
+                    const idSeguro = generarIdSeguro(identificador);
+                    const clienteData = {
+                        id: idSeguro,
+                        clienteIdOriginal: String(identificador),
+                        identificador: String(identificador),
+                        nombre: nombre,
+                        documento: documento,
+                        telefono1: telefono1,
+                        telefono2: telefono2,
+                        telefono3: telefono3,
+                        plan: plan,
+                        centroOp: centroOp || 'SIN ASIGNAR',
+                        fechaCorte: fechaCorte,
+                        estado: 'pendiente',
+                        timestamp: Date.now()
+                    };
+                    
+                    try {
+                        await guardarEnFirestore(colecciones.perdidos, clienteData, idSeguro);
+                        importados++;
+                    } catch (err) {
+                        errores++;
+                        console.error('Error importando:', err);
+                    }
+                }
+                
+                showLoading(false);
+                
+                let mensaje = `Importación completada: ${importados} registros importados`;
+                if (duplicados > 0) mensaje += `, ${duplicados} duplicados omitidos`;
+                if (errores > 0) mensaje += `, ${errores} errores`;
+                showToast(mensaje);
+                
+                // Limpiar preview y input
+                const previewDiv = document.getElementById('perdidosPreview');
+                if (previewDiv) previewDiv.classList.add('hidden');
+                document.getElementById('perdidosExcel').value = '';
+                
+                refreshAllViews();
+                
+            } catch (error) {
+                showLoading(false);
+                console.error('Error al importar:', error);
+                showToast('Error al procesar el archivo: ' + error.message, 'error');
+            }
+        };
+
+        window.importRezagadosDirect = async function() {
+            const fileInput = document.getElementById('rezagadosExcel');
+            const file = fileInput.files[0];
+            if (!file) { showToast('Seleccione un archivo Excel', 'error'); return; }
+            
+            showLoading(true, 'Procesando archivo de rezagados...');
+            
+            try {
+                const data = await file.arrayBuffer();
+                const workbook = XLSX.read(data);
+                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '' });
+                
+                if (!rows || rows.length < 2) {
+                    showLoading(false);
+                    showToast('El archivo está vacío', 'error');
+                    return;
+                }
+                
+                const headers = rows[0].map(h => String(h || '').trim().toUpperCase());
+                
+                // Detectar columnas
+                let colId = -1, colNombre = -1, colDoc = -1, colTel1 = -1, colPlan = -1, colCO = -1, colFecha = -1;
+                
+                for (let i = 0; i < headers.length; i++) {
+                    const h = headers[i];
+                    if (h === 'IDENTIFICADOR' || h === 'ID' || h === 'CODIGO') colId = i;
+                    if (h === 'NOMBRE CLIENTE' || h === 'NOMBRE' || h === 'CLIENTE') colNombre = i;
+                    if (h === 'DOCUMENTO' || h === 'CEDULA' || h === 'CI') colDoc = i;
+                    if (h === 'TELEFONO_1' || h === 'TELEFONO1') colTel1 = i;
+                    if (h === 'DESC_IOPCION' || h === 'PLAN') colPlan = i;
+                    if (h === 'CENTRO_OP' || h === 'CENTRO' || h === 'CO') colCO = i;
+                    if (h === 'FECHA_INGRESO_ORDEN' || h === 'FECHA CORTE') colFecha = i;
+                }
+                
+                if (colId === -1 || colNombre === -1) {
+                    showLoading(false);
+                    showToast('El archivo debe tener columnas: IDENTIFICADOR y NOMBRE CLIENTE', 'error');
+                    return;
+                }
+                
+                let importados = 0;
+                let errores = 0;
+                let duplicados = 0;
+                
+                const idsExistentes = new Set(clientesRezagados.map(c => String(c.clienteIdOriginal || c.identificador)));
+                
+                for (let i = 1; i < rows.length; i++) {
+                    const row = rows[i];
+                    if (!row || row.length === 0) continue;
+                    
+                    const identificador = row[colId] ? String(row[colId]).trim() : '';
+                    const nombre = row[colNombre] ? String(row[colNombre]).trim() : '';
+                    
+                    if (!identificador || !nombre) continue;
+                    
+                    if (idsExistentes.has(identificador)) {
+                        duplicados++;
+                        continue;
+                    }
+                    idsExistentes.add(identificador);
+                    
+                    let telefono1 = '';
+                    if (colTel1 !== -1 && row[colTel1]) {
+                        telefono1 = String(row[colTel1]).replace(/[^0-9]/g, '');
+                        if (telefono1.length === 10) telefono1 = '0' + telefono1;
+                    }
+                    
+                    let plan = 'No especificado';
+                    if (colPlan !== -1 && row[colPlan]) {
+                        plan = String(row[colPlan]).trim();
+                    }
+                    
+                    let centroOp = '';
+                    if (colCO !== -1 && row[colCO]) {
+                        centroOp = String(row[colCO]).trim();
+                        if (centroOp.includes('RUICES')) centroOp = 'RUICES';
+                        else if (centroOp.includes('NAYA')) centroOp = 'NAYA';
+                        else if (centroOp.includes('ROSAL')) centroOp = 'ROSAL';
+                        else if (centroOp.includes('PARAISO')) centroOp = 'PARAISO';
+                    }
+                    
+                    let fechaCorte = '';
+                    if (colFecha !== -1 && row[colFecha]) {
+                        let fechaRaw = String(row[colFecha]);
+                        if (fechaRaw && fechaRaw.length >= 10) {
+                            fechaCorte = fechaRaw.substring(0, 10);
+                        }
+                    }
+                    
+                    let documento = '';
+                    if (colDoc !== -1 && row[colDoc]) {
+                        documento = String(row[colDoc]).trim();
+                    }
+                    
+                    const idSeguro = generarIdSeguro(identificador);
+                    const clienteData = {
+                        id: idSeguro,
+                        clienteIdOriginal: String(identificador),
+                        identificador: String(identificador),
+                        nombre: nombre,
+                        documento: documento,
+                        telefono1: telefono1,
+                        plan: plan,
+                        centroOp: centroOp || 'SIN ASIGNAR',
+                        fechaCorte: fechaCorte,
+                        estado: 'pendiente',
+                        timestamp: Date.now()
+                    };
+                    
+                    try {
+                        await guardarEnFirestore(colecciones.rezagados, clienteData, idSeguro);
+                        importados++;
+                    } catch (err) {
+                        errores++;
+                        console.error('Error importando:', err);
+                    }
+                }
+                
+                showLoading(false);
+                
+                let mensaje = `Importación completada: ${importados} registros importados`;
+                if (duplicados > 0) mensaje += `, ${duplicados} duplicados omitidos`;
+                if (errores > 0) mensaje += `, ${errores} errores`;
+                showToast(mensaje);
+                
+                const previewDiv = document.getElementById('rezagadosPreview');
+                if (previewDiv) previewDiv.classList.add('hidden');
+                document.getElementById('rezagadosExcel').value = '';
+                
+                refreshAllViews();
+                
+            } catch (error) {
+                showLoading(false);
+                console.error('Error al importar:', error);
+                showToast('Error al procesar el archivo: ' + error.message, 'error');
+            }
+        };
+
+        // ==================== FUNCIONES DE PREVIEW ====================
+        function previewPerdidosFile() {
+            const fileInput = document.getElementById('perdidosExcel');
+            const file = fileInput.files[0];
+            const previewDiv = document.getElementById('perdidosPreview');
+            const previewTable = document.getElementById('previewPerdidosTable');
+            
+            if (!file || !previewDiv || !previewTable) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '' });
+                
+                if (rows && rows.length > 0) {
+                    const previewRows = rows.slice(0, 11);
+                    let html = '<thead><tr>';
+                    if (previewRows[0]) {
+                        previewRows[0].forEach(cell => {
+                            html += `<th class="px-2 py-1 text-left text-xs">${escapeHtml(String(cell || '').substring(0, 30))}</th>`;
+                        });
+                    }
+                    html += '<tr></thead><tbody>';
+                    for (let i = 1; i < previewRows.length; i++) {
+                        html += '<tr>';
+                        previewRows[i].forEach(cell => {
+                            html += `<td class="px-2 py-1 text-left text-xs border">${escapeHtml(String(cell || '').substring(0, 40))}</td>`;
+                        });
+                        html += '</tr>';
+                    }
+                    html += '</tbody>';
+                    previewTable.innerHTML = html;
+                    previewDiv.classList.remove('hidden');
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function previewRezagadosFile() {
+            const fileInput = document.getElementById('rezagadosExcel');
+            const file = fileInput.files[0];
+            const previewDiv = document.getElementById('rezagadosPreview');
+            const previewTable = document.getElementById('previewRezagadosTable');
+            
+            if (!file || !previewDiv || !previewTable) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '' });
+                
+                if (rows && rows.length > 0) {
+                    const previewRows = rows.slice(0, 11);
+                    let html = '<thead><tr>';
+                    if (previewRows[0]) {
+                        previewRows[0].forEach(cell => {
+                            html += `<th class="px-2 py-1 text-left text-xs">${escapeHtml(String(cell || '').substring(0, 30))}</th>`;
+                        });
+                    }
+                    html += '</tr></thead><tbody>';
+                    for (let i = 1; i < previewRows.length; i++) {
+                        html += '<tr>';
+                        previewRows[i].forEach(cell => {
+                            html += `<td class="px-2 py-1 text-left text-xs border">${escapeHtml(String(cell || '').substring(0, 40))} </td>`;
+                        });
+                        html += '</tr>';
+                    }
+                    html += '</tbody>';
+                    previewTable.innerHTML = html;
+                    previewDiv.classList.remove('hidden');
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        // Event listeners para preview
+        document.getElementById('perdidosExcel')?.addEventListener('change', previewPerdidosFile);
+        document.getElementById('rezagadosExcel')?.addEventListener('change', previewRezagadosFile);
+
+        // ==================== FUNCIONES DE CONFIGURACIÓN ====================
+        function updateConfigCounters() {
+            const container = document.getElementById('configButtonsContainer');
+            if (!container) return;
+            if (!puedeEliminarDatos()) { container.innerHTML = '<div class="col-span-full text-center py-8 text-red-500"><i class="fas fa-lock text-2xl mb-2 block"></i>Sin permisos</div>'; return; }
+            container.innerHTML = `<button onclick="window.deleteAllContactados()" class="delete-all-btn bg-indigo-600">Eliminar Contactados (${clientesContactados.length})</button><button onclick="window.deleteAllIncontactables()" class="delete-all-btn bg-orange-700">Eliminar Incontactables (${clientesIncontactables.length})</button><button onclick="window.deleteAllRecuperados()" class="delete-all-btn bg-green-600">Eliminar Reconectados (${clientesRecuperados.length})</button><button onclick="window.deleteAllPerdidosFinal()" class="delete-all-btn bg-red-600">Eliminar Dados de Baja (${clientesPerdidosFinal.length})</button><button onclick="window.deleteAllEquiposVisitas()" class="delete-all-btn bg-purple-600">Eliminar Visitas Pendientes (${visitasTecnicas.length})</button><button onclick="window.deleteAllVisitasFinalizadas()" class="delete-all-btn bg-blue-600">Eliminar Equipos Retirados (${visitasFinalizadas.length})</button><button onclick="window.deleteAllTechnicians()" class="delete-all-btn bg-gray-600">Eliminar Tecnicos (${technicians.length})</button>`;
+            actualizarInfoConfiguracion();
+        }
+        
+        window.deleteAllContactados = async function() {
+            if (!puedeEliminarDatos()) { showToast('No tiene permisos', 'error'); return; }
+            if (confirm(`Eliminar TODOS LOS ${clientesContactados.length} CONTACTADOS?`)) {
+                showLoading(true, 'Eliminando...');
+                const snapshot = await colecciones.contactados.get();
+                const batch = db.batch();
+                snapshot.forEach(doc => batch.delete(doc.ref));
+                await batch.commit();
+                showLoading(false);
+                showToast(`${snapshot.size} eliminados`);
+                refreshAllViews();
+            }
+        };
+        
+        window.deleteAllIncontactables = async function() {
+            if (!puedeEliminarDatos()) { showToast('No tiene permisos', 'error'); return; }
+            if (confirm(`Eliminar TODOS LOS ${clientesIncontactables.length} INCONTACTABLES?`)) {
+                showLoading(true, 'Eliminando...');
+                const snapshot = await colecciones.incontactables.get();
+                const batch = db.batch();
+                snapshot.forEach(doc => batch.delete(doc.ref));
+                await batch.commit();
+                showLoading(false);
+                showToast(`${snapshot.size} eliminados`);
+                refreshAllViews();
+            }
+        };
+        
+        window.deleteAllRecuperados = async function() {
+            if (!puedeEliminarDatos()) { showToast('No tiene permisos', 'error'); return; }
+            if (confirm(`Eliminar TODOS LOS ${clientesRecuperados.length} RECUPERADOS?`)) {
+                showLoading(true, 'Eliminando...');
+                const snapshot = await colecciones.recuperados.get();
+                const batch = db.batch();
+                snapshot.forEach(doc => batch.delete(doc.ref));
+                await batch.commit();
+                showLoading(false);
+                showToast(`${snapshot.size} eliminados`);
+                refreshAllViews();
+            }
+        };
+        
+        window.deleteAllPerdidosFinal = async function() {
+            if (!puedeEliminarDatos()) { showToast('No tiene permisos', 'error'); return; }
+            if (confirm(`Eliminar TODOS LOS ${clientesPerdidosFinal.length} DADOS DE BAJA?`)) {
+                showLoading(true, 'Eliminando...');
+                const snapshot = await colecciones.perdidosFinal.get();
+                const batch = db.batch();
+                snapshot.forEach(doc => batch.delete(doc.ref));
+                await batch.commit();
+                showLoading(false);
+                showToast(`${snapshot.size} eliminados`);
+                refreshAllViews();
+            }
+        };
+        
+        window.deleteAllEquiposVisitas = async function() {
+            if (!puedeEliminarDatos()) { showToast('No tiene permisos', 'error'); return; }
+            if (confirm(`Eliminar TODAS LAS ${visitasTecnicas.length} VISITAS PENDIENTES?`)) {
+                showLoading(true, 'Eliminando...');
+                const snapshot = await colecciones.visitasTecnicas.get();
+                const batch = db.batch();
+                snapshot.forEach(doc => batch.delete(doc.ref));
+                await batch.commit();
+                showLoading(false);
+                showToast(`${snapshot.size} eliminadas`);
+                refreshAllViews();
+            }
+        };
+        
+        window.deleteAllVisitasFinalizadas = async function() {
+            if (!puedeEliminarDatos()) { showToast('No tiene permisos', 'error'); return; }
+            if (confirm(`Eliminar TODAS LAS ${visitasFinalizadas.length} VISITAS FINALIZADAS?`)) {
+                showLoading(true, 'Eliminando...');
+                const snapshot = await colecciones.visitasFinalizadas.get();
+                const batch = db.batch();
+                snapshot.forEach(doc => batch.delete(doc.ref));
+                await batch.commit();
+                showLoading(false);
+                showToast(`${snapshot.size} eliminadas`);
+                refreshAllViews();
+            }
+        };
+        
+        window.deleteAllTechnicians = async function() {
+            if (!puedeEliminarDatos()) { showToast('No tiene permisos', 'error'); return; }
+            if (confirm(`Eliminar TODOS LOS ${technicians.length} TECNICOS?`)) {
+                showLoading(true, 'Eliminando...');
+                const snapshot = await colecciones.technicians.get();
+                const batch = db.batch();
+                snapshot.forEach(doc => batch.delete(doc.ref));
+                await batch.commit();
+                showLoading(false);
+                showToast(`${snapshot.size} eliminados`);
+                refreshAllViews();
+            }
+        };
+        
+        window.deleteAllRezagados = async function() {
+            if (!puedeEliminarDatos()) { showToast('No tiene permisos', 'error'); return; }
+            if (confirm(`¿Eliminar TODOS LOS ${clientesRezagados.length} REZAGADOS?`)) {
+                showLoading(true, 'Eliminando...');
+                const snapshot = await colecciones.rezagados.get();
+                const batch = db.batch();
+                snapshot.forEach(doc => batch.delete(doc.ref));
+                await batch.commit();
+                showLoading(false);
+                showToast(`${snapshot.size} eliminados`);
+                refreshAllViews();
+            }
+        };
+        
+        window.deleteAllPerdidos = async function() {
+            if (!puedeEliminarDatos()) { showToast('No tiene permisos', 'error'); return; }
+            if (confirm(`¿Eliminar TODOS LOS ${clientesPerdidos.length} PERDIDOS?`)) {
+                showLoading(true, 'Eliminando...');
+                const snapshot = await colecciones.perdidos.get();
+                const batch = db.batch();
+                snapshot.forEach(doc => batch.delete(doc.ref));
+                await batch.commit();
+                showLoading(false);
+                showToast(`${snapshot.size} eliminados`);
+                refreshAllViews();
+            }
+        };
+        
+        window.deleteAllData = async function() {
+            if (!puedeEliminarDatos()) { showToast('Sin permisos', 'error'); return; }
+            if (confirm('ELIMINAR TODOS LOS DATOS? IRREVERSIBLE.')) {
+                if (prompt('Escriba "ELIMINAR" para confirmar:') === 'ELIMINAR') {
+                    showLoading(true, 'Eliminando TODO...');
+                    const list = [colecciones.rezagados, colecciones.perdidos, colecciones.contactados, colecciones.incontactables, colecciones.recuperados, colecciones.perdidosFinal, colecciones.visitasTecnicas, colecciones.visitasFinalizadas, colecciones.technicians, colecciones.callLogs, colecciones.lockedCustomers];
+                    for (const col of list) { const snap = await col.get(); const batch = db.batch(); snap.forEach(doc => batch.delete(doc.ref)); await batch.commit(); }
+                    showLoading(false);
+                    showToast('TODOS LOS DATOS ELIMINADOS');
+                    setTimeout(() => location.reload(), 1500);
+                } else showToast('Cancelado', 'error');
+            }
+        };
+        
+        function actualizarInfoConfiguracion() {
+            document.getElementById('infoRezagadosCount') && (document.getElementById('infoRezagadosCount').innerText = clientesRezagados.length);
+            document.getElementById('infoPerdidosCount') && (document.getElementById('infoPerdidosCount').innerText = clientesPerdidos.length);
+            document.getElementById('infoContactadosCount') && (document.getElementById('infoContactadosCount').innerText = clientesContactados.length);
+            document.getElementById('infoIncontactablesCount') && (document.getElementById('infoIncontactablesCount').innerText = clientesIncontactables.length);
+            document.getElementById('infoRecuperadosCount') && (document.getElementById('infoRecuperadosCount').innerText = clientesRecuperados.length);
+            document.getElementById('infoPerdidosFinalCount') && (document.getElementById('infoPerdidosFinalCount').innerText = clientesPerdidosFinal.length);
+            document.getElementById('infoVisitasPendientesCount') && (document.getElementById('infoVisitasPendientesCount').innerText = visitasTecnicas.length);
+            document.getElementById('infoVisitasCompletadasCount') && (document.getElementById('infoVisitasCompletadasCount').innerText = visitasFinalizadas.length);
+            document.getElementById('infoTecnicosCount') && (document.getElementById('infoTecnicosCount').innerText = technicians.length);
+            document.getElementById('infoLlamadasCount') && (document.getElementById('infoLlamadasCount').innerText = callLogs.length);
+        }
+        
+        function refreshAllViews() {
+            renderRezagadosTable();
+            renderPerdidosTable();
+            renderContactadosTable();
+            renderIncontactablesTable();
+            renderRecuperadosTable();
+            renderPerdidosFinalTable();
+            renderEquiposTable();
+            renderVisitasTable();
+            renderTechniciansList();
+            updateDashboardMetrics();
+            cargarSelectAgentes();
+            renderTopAgents();
+            updateConfigCounters();
+            actualizarInfoConfiguracion();
+            if (document.getElementById('infoSystemGrid')) {
+                document.getElementById('infoSystemGrid').innerHTML = `
+                    <div>Total Rezagados:</div><div>${clientesRezagados.length}</div>
+                    <div>Total Perdidos:</div><div>${clientesPerdidos.length}</div>
+                    <div>Total Contactados:</div><div>${clientesContactados.length}</div>
+                    <div>Total Incontactables:</div><div>${clientesIncontactables.length}</div>
+                    <div>Total Reconectados:</div><div>${clientesRecuperados.length}</div>
+                    <div>Total Dados de Baja:</div><div>${clientesPerdidosFinal.length}</div>
+                    <div>Visitas Pendientes:</div><div>${visitasTecnicas.length}</div>
+                    <div>Equipos Retirados:</div><div>${visitasFinalizadas.length}</div>
+                    <div>Tecnicos:</div><div>${technicians.length}</div>
+                    <div>Llamadas:</div><div>${callLogs.length}</div>
+                `;
+            }
+        }
+        
+        function changeRezagadosPage(delta) { rezagadosPage += delta; renderRezagadosTable(); }
+        function changePerdidosPage(delta) { perdidosPage += delta; renderPerdidosTable(); }
+        function changeContactadosPage(delta) { contactadosPage += delta; renderContactadosTable(); }
+        function changeIncontactablesPage(delta) { incontactablesPage += delta; renderIncontactablesTable(); }
+        
+        window.showTab = function(tabName) {
+            const tabs = ['dashboard', 'rezagados', 'perdidos', 'contactados', 'incontactables', 'recuperados', 'perdidosFinal', 'equipos', 'visitas', 'tecnicos', 'historial', 'importar', 'reportes', 'config'];
+            tabs.forEach(t => {
+                const tabEl = document.getElementById(`${t}Tab`);
+                if (tabEl) tabEl.classList.add('hidden');
+                const btnEl = document.getElementById(`tab-${t}-btn`);
+                if (btnEl) { btnEl.classList.remove('tab-active'); btnEl.classList.add('tab-inactive'); }
+            });
+            if (tabName === 'historial' && !puedeVerHistorial()) { showToast('Sin permisos', 'error'); return; }
+            if (tabName === 'reportes' && !puedeGenerarReportes()) { showToast('Sin permisos', 'error'); return; }
+            if (tabName === 'config' && !puedeEliminarDatos()) { showToast('Sin permisos', 'error'); return; }
+            const activeTab = document.getElementById(`${tabName}Tab`);
+            if (activeTab) activeTab.classList.remove('hidden');
+            const activeBtn = document.getElementById(`tab-${tabName}-btn`);
+            if (activeBtn) { activeBtn.classList.add('tab-active'); activeBtn.classList.remove('tab-inactive'); }
+            if (tabName === 'historial') window.filtrarHistorial();
+            if (tabName === 'equipos') renderEquiposTable();
+            if (tabName === 'visitas') renderVisitasTable();
+            if (tabName === 'dashboard') { updateDashboardMetrics(); renderTopAgents(); }
+        };
+        
+        function initCharCounters() {
+            const fields = [{ id: 'callObservations', counter: 'callObservationsCount', max: 500 }, { id: 'visitInstructions', counter: 'visitInstructionsCount', max: 300 }, { id: 'editVisitInstructions', counter: 'editVisitInstructionsCount', max: 300 }, { id: 'retiroObservaciones', counter: 'retiroObservacionesCount', max: 300 }, { id: 'editCustomerDireccion', counter: 'editCustomerDireccionCount', max: 500 }];
+            fields.forEach(f => { const el = document.getElementById(f.id); if (el) { el.addEventListener('input', () => { let count = el.value.length; if (count > f.max) { el.value = el.value.substring(0, f.max); count = f.max; } const counter = document.getElementById(f.counter); if (counter) counter.innerHTML = `${count}/${f.max}`; }); } });
+        }
+        
+        document.getElementById('loginBtn')?.addEventListener('click', () => {
+            const userId = document.getElementById('loginUserSelect').value;
+            const password = document.getElementById('loginPassword').value;
+            const user = appUsers.find(u => u.id === userId);
+            if (!user) { document.getElementById('loginError').textContent = 'Perfil invalido'; document.getElementById('loginError').classList.remove('hidden'); return; }
+            if (user.password === password) {
+                appCurrentUser = user;
+                document.getElementById('loginModal').classList.add('hidden');
+                document.getElementById('mainContent').classList.remove('hidden');
+                document.getElementById('currentUserName').innerText = user.fullName;
+                document.getElementById('userRoleBadge').innerText = user.role === 'admin' ? 'Administrador' : (user.role === 'supervisor' ? 'Supervisor' : 'Agente');
+                document.getElementById('userAvatar').innerHTML = user.fullName.charAt(0).toUpperCase();
+                cargarDatosIniciales();
+                window.showTab('dashboard');
+            } else { document.getElementById('loginError').textContent = 'Contraseña incorrecta'; document.getElementById('loginError').classList.remove('hidden'); }
+        });
+        
+        document.getElementById('logoutBtn')?.addEventListener('click', () => { appCurrentUser = null; document.getElementById('mainContent').classList.add('hidden'); document.getElementById('loginModal').classList.remove('hidden'); });
+        
+        document.getElementById('saveCallBtn')?.addEventListener('click', window.saveCall);
+        document.getElementById('updateVisitBtn')?.addEventListener('click', window.updateVisit);
+        document.getElementById('saveCustomerEditBtn')?.addEventListener('click', window.saveCustomerEdit);
+        
+        document.getElementById('callResult')?.addEventListener('change', (e) => { document.getElementById('bajaReasonDiv').classList.toggle('hidden', e.target.value !== 'dado_baja'); document.getElementById('visitaFields').classList.toggle('hidden', e.target.value !== 'visita_tecnica' && e.target.value !== 'dado_baja'); });
+        
+        document.getElementById('visitTechnician')?.addEventListener('change', window.checkAvailability);
+        document.getElementById('visitDate')?.addEventListener('change', window.checkAvailability);
+        document.getElementById('visitTime')?.addEventListener('change', window.checkAvailability);
+        document.getElementById('editVisitTechnician')?.addEventListener('change', window.checkAvailability);
+        document.getElementById('editVisitDate')?.addEventListener('change', window.checkAvailability);
+        document.getElementById('editVisitTime')?.addEventListener('change', window.checkAvailability);
+        
+        ['searchRezagado', 'searchRezagadoId', 'filterRezagadoCO'].forEach(id => { const el = document.getElementById(id); if (el) el.addEventListener('input', () => { rezagadosPage = 1; renderRezagadosTable(); }); });
+        ['searchPerdido', 'searchPerdidoId', 'filterPerdidoCO'].forEach(id => { const el = document.getElementById(id); if (el) el.addEventListener('input', () => { perdidosPage = 1; renderPerdidosTable(); }); });
+        ['searchContactado', 'searchContactadoId', 'searchContactadoAgente', 'filterContactadoFecha', 'filterContactadoCO'].forEach(id => { const el = document.getElementById(id); if (el) el.addEventListener('input', () => { contactadosPage = 1; renderContactadosTable(); }); });
+        ['searchIncontactable', 'searchIncontactableId', 'searchIncontactableAgente', 'filterIncontactableFecha', 'filterIncontactableMotivo', 'filterIncontactableCO'].forEach(id => { const el = document.getElementById(id); if (el) el.addEventListener('input', () => { incontactablesPage = 1; renderIncontactablesTable(); }); });
+        ['searchEquipo', 'searchEquipoId', 'filterEquipoFecha'].forEach(id => { const el = document.getElementById(id); if (el) el.addEventListener('input', () => renderEquiposTable()); });
+        ['searchVisita', 'searchVisitaId'].forEach(id => { const el = document.getElementById(id); if (el) el.addEventListener('input', () => renderVisitasTable()); });
+        
+        setInterval(cleanExpiredLocks, 60000);
+        initCharCounters();
+        
+        window.changeRezagadosPage = changeRezagadosPage;
+        window.changePerdidosPage = changePerdidosPage;
+        window.changeContactadosPage = changeContactadosPage;
+        window.changeIncontactablesPage = changeIncontactablesPage;
         
         // ==================== FUNCIONES DE REPORTES ====================
         function getReportData(fechaInicio, fechaFin) {
@@ -2069,285 +2724,12 @@
             } catch (error) { console.error(error); showToast('Error al exportar', 'error'); } finally { showLoading(false); }
         };
         
-        // ==================== FUNCIONES DE CONFIGURACIÓN ====================
-        function updateConfigCounters() {
-            const container = document.getElementById('configButtonsContainer');
-            if (!container) return;
-            if (!puedeEliminarDatos()) { container.innerHTML = '<div class="col-span-full text-center py-8 text-red-500"><i class="fas fa-lock text-2xl mb-2 block"></i>Sin permisos</div>'; return; }
-            container.innerHTML = `<button onclick="window.deleteAllContactados()" class="delete-all-btn bg-indigo-600">Eliminar Contactados (${clientesContactados.length})</button><button onclick="window.deleteAllIncontactables()" class="delete-all-btn bg-orange-700">Eliminar Incontactables (${clientesIncontactables.length})</button><button onclick="window.deleteAllRecuperados()" class="delete-all-btn bg-green-600">Eliminar Reconectados (${clientesRecuperados.length})</button><button onclick="window.deleteAllPerdidosFinal()" class="delete-all-btn bg-red-600">Eliminar Dados de Baja (${clientesPerdidosFinal.length})</button><button onclick="window.deleteAllEquiposVisitas()" class="delete-all-btn bg-purple-600">Eliminar Visitas Pendientes (${visitasTecnicas.length})</button><button onclick="window.deleteAllVisitasFinalizadas()" class="delete-all-btn bg-blue-600">Eliminar Equipos Retirados (${visitasFinalizadas.length})</button><button onclick="window.deleteAllTechnicians()" class="delete-all-btn bg-gray-600">Eliminar Tecnicos (${technicians.length})</button>`;
-            actualizarInfoConfiguracion();
-        }
-        
-        window.deleteAllContactados = async function() {
-            if (!puedeEliminarDatos()) { showToast('No tiene permisos', 'error'); return; }
-            if (confirm(`Eliminar TODOS LOS ${clientesContactados.length} CONTACTADOS?`)) {
-                showLoading(true, 'Eliminando...');
-                const snapshot = await colecciones.contactados.get();
-                const batch = db.batch();
-                snapshot.forEach(doc => batch.delete(doc.ref));
-                await batch.commit();
-                showLoading(false);
-                showToast(`${snapshot.size} eliminados`);
-                refreshAllViews();
-            }
-        };
-        
-        window.deleteAllIncontactables = async function() {
-            if (!puedeEliminarDatos()) { showToast('No tiene permisos', 'error'); return; }
-            if (confirm(`Eliminar TODOS LOS ${clientesIncontactables.length} INCONTACTABLES?`)) {
-                showLoading(true, 'Eliminando...');
-                const snapshot = await colecciones.incontactables.get();
-                const batch = db.batch();
-                snapshot.forEach(doc => batch.delete(doc.ref));
-                await batch.commit();
-                showLoading(false);
-                showToast(`${snapshot.size} eliminados`);
-                refreshAllViews();
-            }
-        };
-        
-        window.deleteAllRecuperados = async function() {
-            if (!puedeEliminarDatos()) { showToast('No tiene permisos', 'error'); return; }
-            if (confirm(`Eliminar TODOS LOS ${clientesRecuperados.length} RECUPERADOS?`)) {
-                showLoading(true, 'Eliminando...');
-                const snapshot = await colecciones.recuperados.get();
-                const batch = db.batch();
-                snapshot.forEach(doc => batch.delete(doc.ref));
-                await batch.commit();
-                showLoading(false);
-                showToast(`${snapshot.size} eliminados`);
-                refreshAllViews();
-            }
-        };
-        
-        window.deleteAllPerdidosFinal = async function() {
-            if (!puedeEliminarDatos()) { showToast('No tiene permisos', 'error'); return; }
-            if (confirm(`Eliminar TODOS LOS ${clientesPerdidosFinal.length} DADOS DE BAJA?`)) {
-                showLoading(true, 'Eliminando...');
-                const snapshot = await colecciones.perdidosFinal.get();
-                const batch = db.batch();
-                snapshot.forEach(doc => batch.delete(doc.ref));
-                await batch.commit();
-                showLoading(false);
-                showToast(`${snapshot.size} eliminados`);
-                refreshAllViews();
-            }
-        };
-        
-        window.deleteAllEquiposVisitas = async function() {
-            if (!puedeEliminarDatos()) { showToast('No tiene permisos', 'error'); return; }
-            if (confirm(`Eliminar TODAS LAS ${visitasTecnicas.length} VISITAS PENDIENTES?`)) {
-                showLoading(true, 'Eliminando...');
-                const snapshot = await colecciones.visitasTecnicas.get();
-                const batch = db.batch();
-                snapshot.forEach(doc => batch.delete(doc.ref));
-                await batch.commit();
-                showLoading(false);
-                showToast(`${snapshot.size} eliminadas`);
-                refreshAllViews();
-            }
-        };
-        
-        window.deleteAllVisitasFinalizadas = async function() {
-            if (!puedeEliminarDatos()) { showToast('No tiene permisos', 'error'); return; }
-            if (confirm(`Eliminar TODAS LAS ${visitasFinalizadas.length} VISITAS FINALIZADAS?`)) {
-                showLoading(true, 'Eliminando...');
-                const snapshot = await colecciones.visitasFinalizadas.get();
-                const batch = db.batch();
-                snapshot.forEach(doc => batch.delete(doc.ref));
-                await batch.commit();
-                showLoading(false);
-                showToast(`${snapshot.size} eliminadas`);
-                refreshAllViews();
-            }
-        };
-        
-        window.deleteAllTechnicians = async function() {
-            if (!puedeEliminarDatos()) { showToast('No tiene permisos', 'error'); return; }
-            if (confirm(`Eliminar TODOS LOS ${technicians.length} TECNICOS?`)) {
-                showLoading(true, 'Eliminando...');
-                const snapshot = await colecciones.technicians.get();
-                const batch = db.batch();
-                snapshot.forEach(doc => batch.delete(doc.ref));
-                await batch.commit();
-                showLoading(false);
-                showToast(`${snapshot.size} eliminados`);
-                refreshAllViews();
-            }
-        };
-        
-        window.deleteAllRezagados = async function() {
-            if (!puedeEliminarDatos()) { showToast('No tiene permisos', 'error'); return; }
-            if (confirm(`¿Eliminar TODOS LOS ${clientesRezagados.length} REZAGADOS?`)) {
-                showLoading(true, 'Eliminando...');
-                const snapshot = await colecciones.rezagados.get();
-                const batch = db.batch();
-                snapshot.forEach(doc => batch.delete(doc.ref));
-                await batch.commit();
-                showLoading(false);
-                showToast(`${snapshot.size} eliminados`);
-                refreshAllViews();
-            }
-        };
-        
-        window.deleteAllPerdidos = async function() {
-            if (!puedeEliminarDatos()) { showToast('No tiene permisos', 'error'); return; }
-            if (confirm(`¿Eliminar TODOS LOS ${clientesPerdidos.length} PERDIDOS?`)) {
-                showLoading(true, 'Eliminando...');
-                const snapshot = await colecciones.perdidos.get();
-                const batch = db.batch();
-                snapshot.forEach(doc => batch.delete(doc.ref));
-                await batch.commit();
-                showLoading(false);
-                showToast(`${snapshot.size} eliminados`);
-                refreshAllViews();
-            }
-        };
-        
-        window.deleteAllData = async function() {
-            if (!puedeEliminarDatos()) { showToast('Sin permisos', 'error'); return; }
-            if (confirm('ELIMINAR TODOS LOS DATOS? IRREVERSIBLE.')) {
-                if (prompt('Escriba "ELIMINAR" para confirmar:') === 'ELIMINAR') {
-                    showLoading(true, 'Eliminando TODO...');
-                    const list = [colecciones.rezagados, colecciones.perdidos, colecciones.contactados, colecciones.incontactables, colecciones.recuperados, colecciones.perdidosFinal, colecciones.visitasTecnicas, colecciones.visitasFinalizadas, colecciones.technicians, colecciones.callLogs, colecciones.lockedCustomers];
-                    for (const col of list) { const snap = await col.get(); const batch = db.batch(); snap.forEach(doc => batch.delete(doc.ref)); await batch.commit(); }
-                    showLoading(false);
-                    showToast('TODOS LOS DATOS ELIMINADOS');
-                    setTimeout(() => location.reload(), 1500);
-                } else showToast('Cancelado', 'error');
-            }
-        };
-        
-        function actualizarInfoConfiguracion() {
-            document.getElementById('infoRezagadosCount') && (document.getElementById('infoRezagadosCount').innerText = clientesRezagados.length);
-            document.getElementById('infoPerdidosCount') && (document.getElementById('infoPerdidosCount').innerText = clientesPerdidos.length);
-            document.getElementById('infoContactadosCount') && (document.getElementById('infoContactadosCount').innerText = clientesContactados.length);
-            document.getElementById('infoIncontactablesCount') && (document.getElementById('infoIncontactablesCount').innerText = clientesIncontactables.length);
-            document.getElementById('infoRecuperadosCount') && (document.getElementById('infoRecuperadosCount').innerText = clientesRecuperados.length);
-            document.getElementById('infoPerdidosFinalCount') && (document.getElementById('infoPerdidosFinalCount').innerText = clientesPerdidosFinal.length);
-            document.getElementById('infoVisitasPendientesCount') && (document.getElementById('infoVisitasPendientesCount').innerText = visitasTecnicas.length);
-            document.getElementById('infoVisitasCompletadasCount') && (document.getElementById('infoVisitasCompletadasCount').innerText = visitasFinalizadas.length);
-            document.getElementById('infoTecnicosCount') && (document.getElementById('infoTecnicosCount').innerText = technicians.length);
-            document.getElementById('infoLlamadasCount') && (document.getElementById('infoLlamadasCount').innerText = callLogs.length);
-        }
-        
-        function refreshAllViews() {
-            renderRezagadosTable();
-            renderPerdidosTable();
-            renderContactadosTable();
-            renderIncontactablesTable();
-            renderRecuperadosTable();
-            renderPerdidosFinalTable();
-            renderEquiposTable();
-            renderVisitasTable();
-            renderTechniciansList();
-            updateDashboardMetrics();
-            cargarSelectAgentes();
-            renderTopAgents();
-            updateConfigCounters();
-            actualizarInfoConfiguracion();
-            if (document.getElementById('infoSystemGrid')) {
-                document.getElementById('infoSystemGrid').innerHTML = `
-                    <div>Total Rezagados:</div><div>${clientesRezagados.length}</div>
-                    <div>Total Perdidos:</div><div>${clientesPerdidos.length}</div>
-                    <div>Total Contactados:</div><div>${clientesContactados.length}</div>
-                    <div>Total Incontactables:</div><div>${clientesIncontactables.length}</div>
-                    <div>Total Reconectados:</div><div>${clientesRecuperados.length}</div>
-                    <div>Total Dados de Baja:</div><div>${clientesPerdidosFinal.length}</div>
-                    <div>Visitas Pendientes:</div><div>${visitasTecnicas.length}</div>
-                    <div>Equipos Retirados:</div><div>${visitasFinalizadas.length}</div>
-                    <div>Tecnicos:</div><div>${technicians.length}</div>
-                    <div>Llamadas:</div><div>${callLogs.length}</div>
-                `;
-            }
-        }
-        
-        function changeRezagadosPage(delta) { rezagadosPage += delta; renderRezagadosTable(); }
-        function changePerdidosPage(delta) { perdidosPage += delta; renderPerdidosTable(); }
-        function changeContactadosPage(delta) { contactadosPage += delta; renderContactadosTable(); }
-        function changeIncontactablesPage(delta) { incontactablesPage += delta; renderIncontactablesTable(); }
-        
-        window.showTab = function(tabName) {
-            const tabs = ['dashboard', 'rezagados', 'perdidos', 'contactados', 'incontactables', 'recuperados', 'perdidosFinal', 'equipos', 'visitas', 'tecnicos', 'historial', 'importar', 'reportes', 'config'];
-            tabs.forEach(t => {
-                const tabEl = document.getElementById(`${t}Tab`);
-                if (tabEl) tabEl.classList.add('hidden');
-                const btnEl = document.getElementById(`tab-${t}-btn`);
-                if (btnEl) { btnEl.classList.remove('tab-active'); btnEl.classList.add('tab-inactive'); }
-            });
-            if (tabName === 'historial' && !puedeVerHistorial()) { showToast('Sin permisos', 'error'); return; }
-            if (tabName === 'reportes' && !puedeGenerarReportes()) { showToast('Sin permisos', 'error'); return; }
-            if (tabName === 'config' && !puedeEliminarDatos()) { showToast('Sin permisos', 'error'); return; }
-            const activeTab = document.getElementById(`${tabName}Tab`);
-            if (activeTab) activeTab.classList.remove('hidden');
-            const activeBtn = document.getElementById(`tab-${tabName}-btn`);
-            if (activeBtn) { activeBtn.classList.add('tab-active'); activeBtn.classList.remove('tab-inactive'); }
-            if (tabName === 'historial') window.filtrarHistorial();
-            if (tabName === 'equipos') renderEquiposTable();
-            if (tabName === 'visitas') renderVisitasTable();
-            if (tabName === 'dashboard') { updateDashboardMetrics(); renderTopAgents(); }
-        };
-        
-        function initCharCounters() {
-            const fields = [{ id: 'callObservations', counter: 'callObservationsCount', max: 500 }, { id: 'visitInstructions', counter: 'visitInstructionsCount', max: 300 }, { id: 'editVisitInstructions', counter: 'editVisitInstructionsCount', max: 300 }, { id: 'retiroObservaciones', counter: 'retiroObservacionesCount', max: 300 }, { id: 'editCustomerDireccion', counter: 'editCustomerDireccionCount', max: 500 }];
-            fields.forEach(f => { const el = document.getElementById(f.id); if (el) { el.addEventListener('input', () => { let count = el.value.length; if (count > f.max) { el.value = el.value.substring(0, f.max); count = f.max; } const counter = document.getElementById(f.counter); if (counter) counter.innerHTML = `${count}/${f.max}`; }); } });
-        }
-        
-        document.getElementById('loginBtn')?.addEventListener('click', () => {
-            const userId = document.getElementById('loginUserSelect').value;
-            const password = document.getElementById('loginPassword').value;
-            const user = appUsers.find(u => u.id === userId);
-            if (!user) { document.getElementById('loginError').textContent = 'Perfil invalido'; document.getElementById('loginError').classList.remove('hidden'); return; }
-            if (user.password === password) {
-                appCurrentUser = user;
-                document.getElementById('loginModal').classList.add('hidden');
-                document.getElementById('mainContent').classList.remove('hidden');
-                document.getElementById('currentUserName').innerText = user.fullName;
-                document.getElementById('userRoleBadge').innerText = user.role === 'admin' ? 'Administrador' : (user.role === 'supervisor' ? 'Supervisor' : 'Agente');
-                document.getElementById('userAvatar').innerHTML = user.fullName.charAt(0).toUpperCase();
-                cargarDatosIniciales();
-                window.showTab('dashboard');
-            } else { document.getElementById('loginError').textContent = 'Contraseña incorrecta'; document.getElementById('loginError').classList.remove('hidden'); }
-        });
-        
-        document.getElementById('logoutBtn')?.addEventListener('click', () => { appCurrentUser = null; document.getElementById('mainContent').classList.add('hidden'); document.getElementById('loginModal').classList.remove('hidden'); });
-        
-        document.getElementById('saveCallBtn')?.addEventListener('click', window.saveCall);
-        document.getElementById('updateVisitBtn')?.addEventListener('click', window.updateVisit);
-        document.getElementById('saveCustomerEditBtn')?.addEventListener('click', window.saveCustomerEdit);
-        
-        document.getElementById('callResult')?.addEventListener('change', (e) => { document.getElementById('bajaReasonDiv').classList.toggle('hidden', e.target.value !== 'dado_baja'); document.getElementById('visitaFields').classList.toggle('hidden', e.target.value !== 'visita_tecnica' && e.target.value !== 'dado_baja'); });
-        
-        document.getElementById('visitTechnician')?.addEventListener('change', window.checkAvailability);
-        document.getElementById('visitDate')?.addEventListener('change', window.checkAvailability);
-        document.getElementById('visitTime')?.addEventListener('change', window.checkAvailability);
-        document.getElementById('editVisitTechnician')?.addEventListener('change', window.checkAvailability);
-        document.getElementById('editVisitDate')?.addEventListener('change', window.checkAvailability);
-        document.getElementById('editVisitTime')?.addEventListener('change', window.checkAvailability);
-        
-        ['searchRezagado', 'searchRezagadoId', 'filterRezagadoCO'].forEach(id => { const el = document.getElementById(id); if (el) el.addEventListener('input', () => { rezagadosPage = 1; renderRezagadosTable(); }); });
-        ['searchPerdido', 'searchPerdidoId', 'filterPerdidoCO'].forEach(id => { const el = document.getElementById(id); if (el) el.addEventListener('input', () => { perdidosPage = 1; renderPerdidosTable(); }); });
-        ['searchContactado', 'searchContactadoId', 'searchContactadoAgente', 'filterContactadoFecha', 'filterContactadoCO'].forEach(id => { const el = document.getElementById(id); if (el) el.addEventListener('input', () => { contactadosPage = 1; renderContactadosTable(); }); });
-        ['searchIncontactable', 'searchIncontactableId', 'searchIncontactableAgente', 'filterIncontactableFecha', 'filterIncontactableMotivo', 'filterIncontactableCO'].forEach(id => { const el = document.getElementById(id); if (el) el.addEventListener('input', () => { incontactablesPage = 1; renderIncontactablesTable(); }); });
-        ['searchEquipo', 'searchEquipoId', 'filterEquipoFecha'].forEach(id => { const el = document.getElementById(id); if (el) el.addEventListener('input', () => renderEquiposTable()); });
-        ['searchVisita', 'searchVisitaId'].forEach(id => { const el = document.getElementById(id); if (el) el.addEventListener('input', () => renderVisitasTable()); });
-        
-        setInterval(cleanExpiredLocks, 60000);
-        initCharCounters();
-        
-        window.changeRezagadosPage = changeRezagadosPage;
-        window.changePerdidosPage = changePerdidosPage;
-        window.changeContactadosPage = changeContactadosPage;
-        window.changeIncontactablesPage = changeIncontactablesPage;
-        
-        window.importRezagadosDirect = function() { showToast('Función en desarrollo', 'info'); };
-        window.importPerdidosDirect = function() { showToast('Función en desarrollo', 'info'); };
-        
         console.log('✅ SISTEMA COMPLETAMENTE INICIALIZADO - CORRECCIONES APLICADAS');
         console.log('📅 Corrección de validación de fechas (domingos y horarios)');
         console.log('🔧 Corrección de verificación de disponibilidad');
         console.log('🔒 Corrección de locks con try-catch');
         console.log('📊 Dashboard con desglose por fecha corregido');
+        console.log('📥 Importación de Perdidos y Rezagados completamente funcional');
     </script>
 </body>
 </html>

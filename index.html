@@ -265,7 +265,7 @@
                     <div class="overflow-x-auto">
                         <table class="top-agents-table" id="topAgentsTable">
                             <thead><tr><th class="w-12">#</th><th>Agente</th><th class="text-center">Llamadas</th><th class="text-center">Recuperados</th><th class="text-center">Bajas</th><th>Efectividad</th></tr></thead>
-                            <tbody id="topAgentsTableBody"><tr><td colspan="6" class="text-center py-4 text-gray-500">Cargando datos...</td></table></tbody>
+                            <tbody id="topAgentsTableBody"><tr><td colspan="6" class="text-center py-4 text-gray-500">Cargando datos...</table></tbody>
                         </table>
                     </div>
                     <div class="mt-3 pt-2 border-t flex justify-between items-center text-xs text-gray-500">
@@ -433,7 +433,7 @@
     </div>
 
     <!-- Modales -->
-    <div id="registerCallModal" class="modal hidden"><div class="modal-content"><div class="flex justify-between items-center mb-3"><h3 class="text-base font-bold"><i class="fas fa-phone-alt text-green-500 mr-1"></i>Registrar Llamada</h3><button onclick="window.closeRegisterCallModal()"><i class="fas fa-times text-lg"></i></button></div><div id="callCustomerInfo" class="bg-gray-50 p-2 rounded mb-3 text-xs"></div><form id="registerCallForm"><input type="hidden" id="callCustomerId"><input type="hidden" id="callCustomerType"><div class="mb-2"><label class="block text-xs font-medium mb-1">Telefono utilizado</label><select id="callPhoneUsed" class="w-full border rounded-lg px-2 py-1 text-sm" required></select></div><div class="mb-2"><label class="block text-xs font-medium mb-1">Resultado *</label><select id="callResult" class="w-full border rounded-lg px-2 py-1 text-sm" required><option value="">Seleccionar</option><option value="recuperado">RECUPERADO</option><option value="dado_baja">DADO DE BAJA</option><option value="no_contacto">No se logro contacto</option><option value="promesa_pago">Promesa de pago</option><option value="visita_tecnica">Requiere visita tecnica</option><option value="no_aplica">No aplica</option><option value="abonado_hfc">Abonado HFC</option><option value="extravio_equipos">Extravio de equipos</option><option value="ab_ocupado">AB ocupado</option><option value="ab_conectado_solvente">AB conectado / solvente</option><option value="baja_procesada_oficina">Baja Procesada</option><option value="venta_inmueble">Venta de inmueble</option><option value="mensaje_tercero">Mensaje con tercero</option><option value="numero_no_valido">Numero no valido</option></select></div><div id="bajaReasonDiv" class="hidden mb-2"><label class="block text-xs font-medium mb-1">Motivo de baja</label><select id="bajaMotivo" class="w-full border rounded-lg px-2 py-1 text-sm"><option value="price">Precio</option><option value="service_issues">Problemas servicio</option><option value="relocation">Mudanza</option><option value="deceased">Fallecimiento</option><option value="other">Otro</option></select></div><div id="visitaFields" class="hidden mb-2"><label class="block text-xs font-medium mb-1">Numero de Abonado *</label><input type="text" id="visitAbonadoId" class="w-full border rounded-lg px-2 py-1 text-sm mb-1"><label class="block text-xs font-medium mb-1">Fecha de Visita *</label><input type="date" id="visitDate" class="w-full border rounded-lg px-2 py-1 text-sm mb-1"><label class="block text-xs font-medium mb-1">Hora *</label><select id="visitTime" class="w-full border rounded-lg px-2 py-1 text-sm mb-1"><option value="">Seleccionar</option><option value="08:00">08:00</option><option value="09:00">09:00</option><option value="10:00">10:00</option><option value="11:00">11:00</option><option value="12:00">12:00</option><option value="13:00">13:00</option><option value="14:00">14:00</option><option value="15:00">15:00</option><option value="16:00">16:00</option><option value="17:00">17:00</option></select><label class="block text-xs font-medium mb-1">Tecnico *</label><select id="visitTechnician" class="w-full border rounded-lg px-2 py-1 text-sm mb-1"></select><label class="block text-xs font-medium mb-1">Observaciones</label><textarea id="visitInstructions" rows="2" class="w-full border rounded-lg px-2 py-1 text-sm" maxlength="300"></textarea><div class="char-counter" id="visitInstructionsCount">0/300</div><div id="availabilityWarning" class="availability-warning hidden text-xs text-red-500 mt-1"></div></div><div class="mb-2"><label class="block text-xs font-medium mb-1">Observaciones generales</label><textarea id="callObservations" rows="2" class="w-full border rounded-lg px-2 py-1 text-sm" maxlength="500"></textarea><div class="char-counter" id="callObservationsCount">0/500</div></div><div class="flex gap-2"><button type="button" id="saveCallBtn" class="flex-1 bg-green-600 text-white py-1 rounded-lg text-sm">Guardar</button><button type="button" onclick="window.closeRegisterCallModal()" class="flex-1 bg-gray-500 text-white py-1 rounded-lg text-sm">Cancelar</button></div></form></div></div>
+    <div id="registerCallModal" class="modal hidden"><div class="modal-content"><div class="flex justify-between items-center mb-3"><h3 class="text-base font-bold"><i class="fas fa-phone-alt text-green-500 mr-1"></i>Registrar Llamada</h3><button onclick="window.closeRegisterCallModal()"><i class="fas fa-times text-lg"></i></button></div><div id="callCustomerInfo" class="bg-gray-50 p-2 rounded mb-3 text-xs"></div><form id="registerCallForm"><input type="hidden" id="callCustomerId"><input type="hidden" id="callCustomerType"><div class="mb-2"><label class="block text-xs font-medium mb-1">Telefono utilizado</label><select id="callPhoneUsed" class="w-full border rounded-lg px-2 py-1 text-sm" required></select></div><div class="mb-2"><label class="block text-xs font-medium mb-1">Resultado *</label><select id="callResult" class="w-full border rounded-lg px-2 py-1 text-sm" required><option value="">Seleccionar</option><option value="recuperado">RECUPERADO</option><option value="dado_baja">DADO DE BAJA</option><option value="no_contacto">No se logro contacto</option><option value="promesa_pago">Promesa de pago</option><option value="visita_tecnica">Requiere visita tecnica</option><option value="no_aplica">No aplica</option><option value="abonado_hfc">Abonado HFC</option><option value="extravio_equipos">Extravio de equipos</option><option value="ab_ocupado">AB ocupado</option><option value="ab_conectado_solvente">AB conectado / solvente</option><option value="baja_procesada_oficina">Baja Procesada</option><option value="venta_inmueble">Venta de inmueble</option><option value="mensaje_tercero">Mensaje con tercero</option><option value="numero_no_valido">Numero no valido</option><option value="perdida_total_inmueble">Perdida total de inmueble</option></select></div><div id="bajaReasonDiv" class="hidden mb-2"><label class="block text-xs font-medium mb-1">Motivo de baja</label><select id="bajaMotivo" class="w-full border rounded-lg px-2 py-1 text-sm"><option value="price">Precio</option><option value="service_issues">Problemas servicio</option><option value="relocation">Mudanza</option><option value="deceased">Fallecimiento</option><option value="other">Otro</option></select></div><div id="visitaFields" class="hidden mb-2"><label class="block text-xs font-medium mb-1">Numero de Abonado *</label><input type="text" id="visitAbonadoId" class="w-full border rounded-lg px-2 py-1 text-sm mb-1"><label class="block text-xs font-medium mb-1">Fecha de Visita *</label><input type="date" id="visitDate" class="w-full border rounded-lg px-2 py-1 text-sm mb-1"><label class="block text-xs font-medium mb-1">Hora *</label><select id="visitTime" class="w-full border rounded-lg px-2 py-1 text-sm mb-1"><option value="">Seleccionar</option><option value="08:00">08:00</option><option value="09:00">09:00</option><option value="10:00">10:00</option><option value="11:00">11:00</option><option value="12:00">12:00</option><option value="13:00">13:00</option><option value="14:00">14:00</option><option value="15:00">15:00</option><option value="16:00">16:00</option><option value="17:00">17:00</option></select><label class="block text-xs font-medium mb-1">Tecnico *</label><select id="visitTechnician" class="w-full border rounded-lg px-2 py-1 text-sm mb-1"></select><label class="block text-xs font-medium mb-1">Observaciones</label><textarea id="visitInstructions" rows="2" class="w-full border rounded-lg px-2 py-1 text-sm" maxlength="300"></textarea><div class="char-counter" id="visitInstructionsCount">0/300</div><div id="availabilityWarning" class="availability-warning hidden text-xs text-red-500 mt-1"></div></div><div class="mb-2"><label class="block text-xs font-medium mb-1">Observaciones generales</label><textarea id="callObservations" rows="2" class="w-full border rounded-lg px-2 py-1 text-sm" maxlength="500"></textarea><div class="char-counter" id="callObservationsCount">0/500</div></div><div class="flex gap-2"><button type="button" id="saveCallBtn" class="flex-1 bg-green-600 text-white py-1 rounded-lg text-sm">Guardar</button><button type="button" onclick="window.closeRegisterCallModal()" class="flex-1 bg-gray-500 text-white py-1 rounded-lg text-sm">Cancelar</button></div></form></div></div>
 
     <div id="editVisitModal" class="modal hidden"><div class="modal-content"><div class="flex justify-between items-center mb-3"><h3 class="text-base font-bold"><i class="fas fa-edit text-blue-500 mr-1"></i>Editar Visita</h3><button onclick="window.closeEditVisitModal()"><i class="fas fa-times text-lg"></i></button></div><form id="editVisitForm"><input type="hidden" id="editVisitId"><div class="mb-2"><label class="block text-xs font-medium mb-1">Numero Abonado</label><input type="text" id="editAbonadoId" class="w-full border rounded-lg px-2 py-1 text-sm"></div><div class="mb-2"><label class="block text-xs font-medium mb-1">Fecha</label><input type="date" id="editVisitDate" class="w-full border rounded-lg px-2 py-1 text-sm"></div><div class="mb-2"><label class="block text-xs font-medium mb-1">Hora</label><select id="editVisitTime" class="w-full border rounded-lg px-2 py-1 text-sm"><option value="">Seleccionar</option><option value="08:00">08:00</option><option value="09:00">09:00</option><option value="10:00">10:00</option><option value="11:00">11:00</option><option value="12:00">12:00</option><option value="13:00">13:00</option><option value="14:00">14:00</option><option value="15:00">15:00</option><option value="16:00">16:00</option><option value="17:00">17:00</option></select></div><div class="mb-2"><label class="block text-xs font-medium mb-1">Tecnico</label><select id="editVisitTechnician" class="w-full border rounded-lg px-2 py-1 text-sm"></select></div><div class="mb-2"><label class="block text-xs font-medium mb-1">Observaciones</label><textarea id="editVisitInstructions" rows="2" class="w-full border rounded-lg px-2 py-1 text-sm" maxlength="300"></textarea><div class="char-counter" id="editVisitInstructionsCount">0/300</div></div><div id="editAvailabilityWarning" class="availability-warning hidden text-xs text-red-500 mt-1"></div><div class="flex gap-2"><button type="button" id="updateVisitBtn" class="flex-1 bg-blue-600 text-white py-1 rounded-lg text-sm">Actualizar</button><button type="button" onclick="window.closeEditVisitModal()" class="flex-1 bg-gray-500 text-white py-1 rounded-lg text-sm">Cancelar</button></div></form></div></div>
 
@@ -576,7 +576,7 @@
             return seguro;
         }
 
-        function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;'); }
+        function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : m === '>' ? '&gt;' : ''); }
         function escapeAttr(str) { if (!str) return ''; return String(str).replace(/[&<>"]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : m === '>' ? '&gt;' : '&quot;'); }
 
         function showToast(msg, type = 'success') {
@@ -846,7 +846,7 @@
                 await guardarEnFirestore(colecciones.recuperados, recuperadoData, idSeguro);
                 await eliminarDeFirestore(colecciones[customerType === 'rezagado' ? 'rezagados' : 'perdidos'], customer.id);
                 showToast('Cliente marcado como RECUPERADO');
-            } else if (resultado === 'dado_baja') {
+            } else if (resultado === 'dado_baja' || resultado === 'perdida_total_inmueble') {
                 const bajaData = { clienteIdOriginal: customer.clienteIdOriginal || customer.id, nombre: customer.nombre, documento: customer.documento, telefono: customer.telefono1, plan: customer.plan, centroOp: customer.centroOp, direccion: customer.direccion, motivoBaja: motivoBaja || 'other', agente: appCurrentUser.fullName, agenteId: appCurrentUser.id, fechaGestion: fechaISO, observaciones: observaciones || '', timestamp: Date.now() };
                 const idSeguro = generarIdSeguro(customer.clienteIdOriginal || customer.id);
                 await guardarEnFirestore(colecciones.perdidosFinal, bajaData, idSeguro);
@@ -886,7 +886,7 @@
         }
         
         function getResultadoTexto(resultado) {
-            const map = { 'recuperado': 'RECUPERADO', 'dado_baja': 'DADO DE BAJA', 'no_contacto': 'NO CONTACTO', 'promesa_pago': 'PROMESA DE PAGO', 'visita_tecnica': 'REQUIERE VISITA', 'no_aplica': 'NO APLICA', 'abonado_hfc': 'ABONADO HFC', 'extravio_equipos': 'EXTRAVIO', 'ab_ocupado': 'OCUPADO', 'ab_conectado_solvente': 'CONECTADO', 'baja_procesada_oficina': 'BAJA OFICINA', 'venta_inmueble': 'VENTA', 'mensaje_tercero': 'MENSAJE TERCERO', 'numero_no_valido': 'NUMERO NO VALIDO' };
+            const map = { 'recuperado': 'RECUPERADO', 'dado_baja': 'DADO DE BAJA', 'no_contacto': 'NO CONTACTO', 'promesa_pago': 'PROMESA DE PAGO', 'visita_tecnica': 'REQUIERE VISITA', 'no_aplica': 'NO APLICA', 'abonado_hfc': 'ABONADO HFC', 'extravio_equipos': 'EXTRAVIO', 'ab_ocupado': 'OCUPADO', 'ab_conectado_solvente': 'CONECTADO', 'baja_procesada_oficina': 'BAJA OFICINA', 'venta_inmueble': 'VENTA', 'mensaje_tercero': 'MENSAJE TERCERO', 'numero_no_valido': 'NUMERO NO VALIDO', 'perdida_total_inmueble': 'PERDIDA TOTAL DE INMUEBLE' };
             return map[resultado] || resultado;
         }
 
@@ -921,7 +921,7 @@
             let visitaData = null;
             
             try {
-                if (resultado === 'visita_tecnica' || resultado === 'dado_baja') {
+                if (resultado === 'visita_tecnica' || resultado === 'dado_baja' || resultado === 'perdida_total_inmueble') {
                     const fecha = document.getElementById('visitDate').value;
                     const hora = document.getElementById('visitTime').value;
                     
@@ -957,7 +957,7 @@
                     };
                 }
                 
-                const motivoBaja = resultado === 'dado_baja' ? document.getElementById('bajaMotivo').value : '';
+                const motivoBaja = (resultado === 'dado_baja' || resultado === 'perdida_total_inmueble') ? document.getElementById('bajaMotivo').value : '';
                 
                 await processCallResult(customer, customerType, resultado, observaciones, motivoBaja, visitaData, telefonoUsado);
                 
@@ -1499,7 +1499,7 @@
                     const stat = stats.get(log.agente);
                     stat.llamadas++;
                     if (log.resultado === 'recuperado') stat.recuperados++;
-                    else if (log.resultado === 'dado_baja') stat.bajas++;
+                    else if (log.resultado === 'dado_baja' || log.resultado === 'perdida_total_inmueble') stat.bajas++;
                 }
             });
             const agentesArray = Array.from(stats.entries()).map(([nombre, data]) => ({ nombre, ...data, efectividad: data.llamadas > 0 ? Math.round((data.recuperados / data.llamadas) * 100) : 0 }));
@@ -1766,7 +1766,7 @@
                 
                 for (let i = 0; i < headers.length; i++) {
                     const h = headers[i];
-                    if (h === 'IDENTIFICADOR' || h === 'ID' || h === 'CODIGO') colId = i;
+                    if (h === 'IDENTIFICADOR' || h === 'ID' || h === 'CODIGO' || h === 'CLIENTE') colId = i;
                     if (h === 'NOMBRE CLIENTE' || h === 'NOMBRE' || h === 'CLIENTE') colNombre = i;
                     if (h === 'DOCUMENTO' || h === 'CEDULA' || h === 'CI') colDoc = i;
                     if (h === 'TELEFONO_1' || h === 'TELEFONO1') colTel1 = i;
@@ -1779,7 +1779,7 @@
                 
                 if (colId === -1 || colNombre === -1) {
                     showLoading(false);
-                    showToast('El archivo debe tener columnas: IDENTIFICADOR y NOMBRE CLIENTE', 'error');
+                    showToast('El archivo debe tener columnas: IDENTIFICADOR (o CLIENTE) y NOMBRE CLIENTE', 'error');
                     return;
                 }
                 
@@ -1925,7 +1925,7 @@
                 
                 for (let i = 0; i < headers.length; i++) {
                     const h = headers[i];
-                    if (h === 'IDENTIFICADOR' || h === 'ID' || h === 'CODIGO') colId = i;
+                    if (h === 'IDENTIFICADOR' || h === 'ID' || h === 'CODIGO' || h === 'CLIENTE') colId = i;
                     if (h === 'NOMBRE CLIENTE' || h === 'NOMBRE' || h === 'CLIENTE') colNombre = i;
                     if (h === 'DOCUMENTO' || h === 'CEDULA' || h === 'CI') colDoc = i;
                     if (h === 'TELEFONO_1' || h === 'TELEFONO1') colTel1 = i;
@@ -1936,7 +1936,7 @@
                 
                 if (colId === -1 || colNombre === -1) {
                     showLoading(false);
-                    showToast('El archivo debe tener columnas: IDENTIFICADOR y NOMBRE CLIENTE', 'error');
+                    showToast('El archivo debe tener columnas: IDENTIFICADOR (o CLIENTE) y NOMBRE CLIENTE', 'error');
                     return;
                 }
                 
@@ -2368,7 +2368,11 @@
         document.getElementById('updateVisitBtn')?.addEventListener('click', window.updateVisit);
         document.getElementById('saveCustomerEditBtn')?.addEventListener('click', window.saveCustomerEdit);
         
-        document.getElementById('callResult')?.addEventListener('change', (e) => { document.getElementById('bajaReasonDiv').classList.toggle('hidden', e.target.value !== 'dado_baja'); document.getElementById('visitaFields').classList.toggle('hidden', e.target.value !== 'visita_tecnica' && e.target.value !== 'dado_baja'); });
+        document.getElementById('callResult')?.addEventListener('change', (e) => {
+            const val = e.target.value;
+            document.getElementById('bajaReasonDiv').classList.toggle('hidden', val !== 'dado_baja' && val !== 'perdida_total_inmueble');
+            document.getElementById('visitaFields').classList.toggle('hidden', val !== 'visita_tecnica' && val !== 'dado_baja' && val !== 'perdida_total_inmueble');
+        });
         
         document.getElementById('visitTechnician')?.addEventListener('change', window.checkAvailability);
         document.getElementById('visitDate')?.addEventListener('change', window.checkAvailability);
@@ -2730,6 +2734,7 @@
         console.log('🔒 Corrección de locks con try-catch');
         console.log('📊 Dashboard con desglose por fecha corregido');
         console.log('📥 Importación de Perdidos y Rezagados completamente funcional');
+        console.log('➕ Nueva opción "Perdida total de inmueble" agregada');
     </script>
 </body>
 </html>

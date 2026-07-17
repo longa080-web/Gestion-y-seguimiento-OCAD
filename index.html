@@ -664,7 +664,7 @@
             technicians: db.collection('technicians'),
             callLogs: db.collection('callLogs'),
             lockedCustomers: db.collection('lockedCustomers'),
-            reagendamientos: db.collection('reagendamientos')  // NUEVA COLECCIÓN
+            reagendamientos: db.collection('reagendamientos')
         };
 
         // ==================== USUARIOS ====================
@@ -882,32 +882,45 @@
             }
         }
 
-        // ==================== FUNCIÓN PROCESAR LLAMADA CON REAGENDAMIENTO ====================
+        // ==================== FUNCIÓN PROCESAR LLAMADA CORREGIDA ====================
         async function processCallResult(customer, customerType, resultado, observaciones, motivoBaja, visitaData, telefonoUsado, reagendarData) {
             if (observaciones && observaciones.length > 500) observaciones = observaciones.substring(0, 500);
             const ahora = getDateObjectVenezuela();
             const fechaISO = ahora.toISOString();
             
+            const clienteIdOriginal = customer.clienteIdOriginal || customer.id;
+            const idSeguro = generarIdSeguro(clienteIdOriginal);
+            
             const callLogData = {
-                clienteIdOriginal: customer.clienteIdOriginal || customer.id,
-                nombre: customer.nombre, documento: customer.documento, telefono: telefonoUsado || customer.telefono1,
-                plan: customer.plan, centroOp: customer.centroOp, agente: appCurrentUser.fullName,
-                agenteId: appCurrentUser.id, fechaGestion: fechaISO, resultado: resultado,
-                resultadoTexto: getResultadoTexto(resultado), observaciones: observaciones || '', timestamp: Date.now()
+                clienteIdOriginal: clienteIdOriginal,
+                nombre: customer.nombre,
+                documento: customer.documento,
+                telefono: telefonoUsado || customer.telefono1 || customer.telefono || '',
+                plan: customer.plan,
+                centroOp: customer.centroOp,
+                agente: appCurrentUser.fullName,
+                agenteId: appCurrentUser.id,
+                fechaGestion: fechaISO,
+                resultado: resultado,
+                resultadoTexto: getResultadoTexto(resultado),
+                observaciones: observaciones || '',
+                timestamp: Date.now()
             };
             await guardarEnFirestore(colecciones.callLogs, callLogData);
             
-            // ===== NUEVO: REAGENDAMIENTO =====
+            const coleccionOriginal = customerType === 'rezagado' ? colecciones.rezagados : colecciones.perdidos;
+            const idOriginal = customer.id;
+            
             if (resultado === 'reagendar' && reagendarData) {
                 const reagendarId = `reag_${Date.now()}`;
                 const reagendarDoc = {
-                    clienteIdOriginal: customer.clienteIdOriginal || customer.id,
+                    clienteIdOriginal: clienteIdOriginal,
                     nombre: customer.nombre,
                     documento: customer.documento,
-                    telefono: telefonoUsado || customer.telefono1,
+                    telefono: telefonoUsado || customer.telefono1 || customer.telefono || '',
                     plan: customer.plan,
                     centroOp: customer.centroOp,
-                    direccion: customer.direccion,
+                    direccion: customer.direccion || '',
                     fechaReagendada: reagendarData.fecha,
                     horaReagendada: reagendarData.hora,
                     motivo: reagendarData.motivo || 'Cliente solicito ser llamado luego',
@@ -919,12 +932,11 @@
                 };
                 await guardarEnFirestore(colecciones.reagendamientos, reagendarDoc, reagendarId);
                 
-                // Registrar en historial
                 const histReagendamiento = {
-                    clienteIdOriginal: customer.clienteIdOriginal || customer.id,
+                    clienteIdOriginal: clienteIdOriginal,
                     nombre: customer.nombre,
                     documento: customer.documento,
-                    telefono: telefonoUsado || customer.telefono1,
+                    telefono: telefonoUsado || customer.telefono1 || customer.telefono || '',
                     plan: customer.plan,
                     centroOp: customer.centroOp,
                     agente: appCurrentUser.fullName,
@@ -938,54 +950,179 @@
                 };
                 await guardarEnFirestore(colecciones.callLogs, histReagendamiento);
                 
+                await eliminarDeFirestore(coleccionOriginal, idOriginal);
+                
                 showToast('Llamada reagendada exitosamente');
-                await unlockCustomer(customer.clienteIdOriginal || customer.id, customerType);
+                await unlockCustomer(clienteIdOriginal, customerType);
                 refreshAllViews();
                 closeRegisterCallModal();
                 return;
             }
             
             if (resultado === 'recuperado') {
-                const recuperadoData = { clienteIdOriginal: customer.clienteIdOriginal || customer.id, nombre: customer.nombre, documento: customer.documento, telefono: customer.telefono1, plan: customer.plan, centroOp: customer.centroOp, direccion: customer.direccion, agente: appCurrentUser.fullName, agenteId: appCurrentUser.id, fechaGestion: fechaISO, observaciones: observaciones || '', timestamp: Date.now() };
-                const idSeguro = generarIdSeguro(customer.clienteIdOriginal || customer.id);
+                const recuperadoData = {
+                    clienteIdOriginal: clienteIdOriginal,
+                    nombre: customer.nombre,
+                    documento: customer.documento,
+                    telefono: customer.telefono1 || customer.telefono || '',
+                    plan: customer.plan,
+                    centroOp: customer.centroOp,
+                    direccion: customer.direccion || '',
+                    agente: appCurrentUser.fullName,
+                    agenteId: appCurrentUser.id,
+                    fechaGestion: fechaISO,
+                    observaciones: observaciones || '',
+                    timestamp: Date.now()
+                };
                 await guardarEnFirestore(colecciones.recuperados, recuperadoData, idSeguro);
-                await eliminarDeFirestore(colecciones[customerType === 'rezagado' ? 'rezagados' : 'perdidos'], customer.id);
+                await eliminarDeFirestore(coleccionOriginal, idOriginal);
                 showToast('Cliente marcado como RECUPERADO');
-            } else if (resultado === 'dado_baja' || resultado === 'perdida_total_inmueble') {
-                const bajaData = { clienteIdOriginal: customer.clienteIdOriginal || customer.id, nombre: customer.nombre, documento: customer.documento, telefono: customer.telefono1, plan: customer.plan, centroOp: customer.centroOp, direccion: customer.direccion, motivoBaja: motivoBaja || 'other', agente: appCurrentUser.fullName, agenteId: appCurrentUser.id, fechaGestion: fechaISO, observaciones: observaciones || '', timestamp: Date.now() };
-                const idSeguro = generarIdSeguro(customer.clienteIdOriginal || customer.id);
+                await unlockCustomer(clienteIdOriginal, customerType);
+                refreshAllViews();
+                closeRegisterCallModal();
+                return;
+            }
+            
+            if (resultado === 'dado_baja' || resultado === 'perdida_total_inmueble') {
+                const bajaData = {
+                    clienteIdOriginal: clienteIdOriginal,
+                    nombre: customer.nombre,
+                    documento: customer.documento,
+                    telefono: customer.telefono1 || customer.telefono || '',
+                    plan: customer.plan,
+                    centroOp: customer.centroOp,
+                    direccion: customer.direccion || '',
+                    motivoBaja: motivoBaja || 'other',
+                    agente: appCurrentUser.fullName,
+                    agenteId: appCurrentUser.id,
+                    fechaGestion: fechaISO,
+                    observaciones: observaciones || '',
+                    timestamp: Date.now()
+                };
                 await guardarEnFirestore(colecciones.perdidosFinal, bajaData, idSeguro);
-                await eliminarDeFirestore(colecciones[customerType === 'rezagado' ? 'rezagados' : 'perdidos'], customer.id);
+                await eliminarDeFirestore(coleccionOriginal, idOriginal);
                 showToast('Cliente marcado como DADO DE BAJA');
+                
                 if (visitaData && visitaData.fecha) {
-                    const visitaTecnicaData = { clienteIdOriginal: customer.clienteIdOriginal || customer.id, clienteNombre: customer.nombre, clienteDocumento: customer.documento, clienteTelefono: customer.telefono1, direccion: customer.direccion, centroOp: customer.centroOp, fechaVisita: visitaData.fecha, horaVisita: visitaData.hora, tecnicoId: visitaData.tecnicoId || null, tecnicoNombre: visitaData.tecnicoNombre || 'Por asignar', instrucciones: visitaData.instrucciones || 'Retiro de equipo por baja', estado: 'pendiente', timestamp: Date.now() };
+                    const visitaTecnicaData = {
+                        clienteIdOriginal: clienteIdOriginal,
+                        clienteNombre: customer.nombre,
+                        clienteDocumento: customer.documento,
+                        clienteTelefono: customer.telefono1 || customer.telefono || '',
+                        direccion: customer.direccion || '',
+                        centroOp: customer.centroOp,
+                        fechaVisita: visitaData.fecha,
+                        horaVisita: visitaData.hora,
+                        tecnicoId: visitaData.tecnicoId || null,
+                        tecnicoNombre: visitaData.tecnicoNombre || 'Por asignar',
+                        instrucciones: visitaData.instrucciones || 'Retiro de equipo por baja',
+                        estado: 'pendiente',
+                        timestamp: Date.now()
+                    };
                     await guardarEnFirestore(colecciones.visitasTecnicas, visitaTecnicaData);
                     showToast('Visita tecnica programada para retiro de equipos');
                 }
-            } else if (resultado === 'no_contacto' || resultado === 'mensaje_tercero' || resultado === 'numero_no_valido') {
-                let motivo = resultado === 'no_contacto' ? 'No se logro contacto' : (resultado === 'mensaje_tercero' ? 'Mensaje con tercero' : 'Numero no valido');
-                const incontactableData = { clienteIdOriginal: customer.clienteIdOriginal || customer.id, nombre: customer.nombre, documento: customer.documento, telefono: customer.telefono1, plan: customer.plan, centroOp: customer.centroOp, direccion: customer.direccion, motivoIncontactabilidad: motivo, agente: appCurrentUser.fullName, agenteId: appCurrentUser.id, fechaGestion: fechaISO, observaciones: observaciones || '', timestamp: Date.now() };
-                const idSeguro = generarIdSeguro(customer.clienteIdOriginal || customer.id);
+                await unlockCustomer(clienteIdOriginal, customerType);
+                refreshAllViews();
+                closeRegisterCallModal();
+                return;
+            }
+            
+            if (resultado === 'no_contacto' || resultado === 'mensaje_tercero' || resultado === 'numero_no_valido') {
+                let motivo = resultado === 'no_contacto' ? 'No se logro contacto' : 
+                             (resultado === 'mensaje_tercero' ? 'Mensaje con tercero' : 'Numero no valido');
+                const incontactableData = {
+                    clienteIdOriginal: clienteIdOriginal,
+                    nombre: customer.nombre,
+                    documento: customer.documento,
+                    telefono: customer.telefono1 || customer.telefono || '',
+                    plan: customer.plan,
+                    centroOp: customer.centroOp,
+                    direccion: customer.direccion || '',
+                    motivoIncontactabilidad: motivo,
+                    agente: appCurrentUser.fullName,
+                    agenteId: appCurrentUser.id,
+                    fechaGestion: fechaISO,
+                    observaciones: observaciones || '',
+                    timestamp: Date.now()
+                };
                 await guardarEnFirestore(colecciones.incontactables, incontactableData, idSeguro);
-                await eliminarDeFirestore(colecciones[customerType === 'rezagado' ? 'rezagados' : 'perdidos'], customer.id);
+                await eliminarDeFirestore(coleccionOriginal, idOriginal);
                 showToast('Cliente marcado como INCONTACTABLE');
-            } else if (resultado === 'visita_tecnica') {
+                await unlockCustomer(clienteIdOriginal, customerType);
+                refreshAllViews();
+                closeRegisterCallModal();
+                return;
+            }
+            
+            if (resultado === 'visita_tecnica') {
                 if (visitaData && visitaData.fecha) {
-                    const visitaTecnicaData = { clienteIdOriginal: customer.clienteIdOriginal || customer.id, clienteNombre: customer.nombre, clienteDocumento: customer.documento, clienteTelefono: customer.telefono1, direccion: customer.direccion, centroOp: customer.centroOp, fechaVisita: visitaData.fecha, horaVisita: visitaData.hora, tecnicoId: visitaData.tecnicoId || null, tecnicoNombre: visitaData.tecnicoNombre || 'Por asignar', instrucciones: visitaData.instrucciones || 'Visita tecnica', estado: 'pendiente', timestamp: Date.now() };
+                    const visitaTecnicaData = {
+                        clienteIdOriginal: clienteIdOriginal,
+                        clienteNombre: customer.nombre,
+                        clienteDocumento: customer.documento,
+                        clienteTelefono: customer.telefono1 || customer.telefono || '',
+                        direccion: customer.direccion || '',
+                        centroOp: customer.centroOp,
+                        fechaVisita: visitaData.fecha,
+                        horaVisita: visitaData.hora,
+                        tecnicoId: visitaData.tecnicoId || null,
+                        tecnicoNombre: visitaData.tecnicoNombre || 'Por asignar',
+                        instrucciones: visitaData.instrucciones || 'Visita tecnica',
+                        estado: 'pendiente',
+                        timestamp: Date.now()
+                    };
                     await guardarEnFirestore(colecciones.visitasTecnicas, visitaTecnicaData);
                     showToast('Visita tecnica programada');
                 }
-                const contactadoData = { clienteIdOriginal: customer.clienteIdOriginal || customer.id, nombre: customer.nombre, documento: customer.documento, telefono: customer.telefono1, plan: customer.plan, centroOp: customer.centroOp, direccion: customer.direccion, agente: appCurrentUser.fullName, agenteId: appCurrentUser.id, fechaGestion: fechaISO, resultadoTexto: 'Requiere visita tecnica', resumenGestion: observaciones || 'Visita programada', observaciones: observaciones || '', timestamp: Date.now() };
-                await guardarEnFirestore(colecciones.contactados, contactadoData, `${customer.clienteIdOriginal || customer.id}_${Date.now()}`);
-                await eliminarDeFirestore(colecciones[customerType === 'rezagado' ? 'rezagados' : 'perdidos'], customer.id);
+                const contactadoData = {
+                    clienteIdOriginal: clienteIdOriginal,
+                    nombre: customer.nombre,
+                    documento: customer.documento,
+                    telefono: customer.telefono1 || customer.telefono || '',
+                    plan: customer.plan,
+                    centroOp: customer.centroOp,
+                    direccion: customer.direccion || '',
+                    agente: appCurrentUser.fullName,
+                    agenteId: appCurrentUser.id,
+                    fechaGestion: fechaISO,
+                    resultadoTexto: 'Requiere visita tecnica',
+                    resumenGestion: observaciones || 'Visita programada',
+                    observaciones: observaciones || '',
+                    timestamp: Date.now()
+                };
+                const contactadoId = `${clienteIdOriginal}_${Date.now()}`;
+                await guardarEnFirestore(colecciones.contactados, contactadoData, contactadoId);
+                await eliminarDeFirestore(coleccionOriginal, idOriginal);
                 showToast('Cliente movido a Contactados');
-            } else {
-                const contactadoData = { clienteIdOriginal: customer.clienteIdOriginal || customer.id, nombre: customer.nombre, documento: customer.documento, telefono: customer.telefono1, plan: customer.plan, centroOp: customer.centroOp, direccion: customer.direccion, agente: appCurrentUser.fullName, agenteId: appCurrentUser.id, fechaGestion: fechaISO, resultadoTexto: getResultadoTexto(resultado), resumenGestion: observaciones || `Gestion: ${getResultadoTexto(resultado)}`, observaciones: observaciones || '', timestamp: Date.now() };
-                await guardarEnFirestore(colecciones.contactados, contactadoData, `${customer.clienteIdOriginal || customer.id}_${Date.now()}`);
-                await eliminarDeFirestore(colecciones[customerType === 'rezagado' ? 'rezagados' : 'perdidos'], customer.id);
-                showToast(`Cliente movido a Contactados`);
+                await unlockCustomer(clienteIdOriginal, customerType);
+                refreshAllViews();
+                closeRegisterCallModal();
+                return;
             }
-            await unlockCustomer(customer.clienteIdOriginal || customer.id, customerType);
+            
+            // OTROS RESULTADOS (CONTACTADOS)
+            const contactadoData = {
+                clienteIdOriginal: clienteIdOriginal,
+                nombre: customer.nombre,
+                documento: customer.documento,
+                telefono: customer.telefono1 || customer.telefono || '',
+                plan: customer.plan,
+                centroOp: customer.centroOp,
+                direccion: customer.direccion || '',
+                agente: appCurrentUser.fullName,
+                agenteId: appCurrentUser.id,
+                fechaGestion: fechaISO,
+                resultadoTexto: getResultadoTexto(resultado),
+                resumenGestion: observaciones || `Gestion: ${getResultadoTexto(resultado)}`,
+                observaciones: observaciones || '',
+                timestamp: Date.now()
+            };
+            const contactadoId = `${clienteIdOriginal}_${Date.now()}`;
+            await guardarEnFirestore(colecciones.contactados, contactadoData, contactadoId);
+            await eliminarDeFirestore(coleccionOriginal, idOriginal);
+            showToast(`Cliente movido a Contactados`);
+            await unlockCustomer(clienteIdOriginal, customerType);
             refreshAllViews();
             closeRegisterCallModal();
         }
@@ -995,7 +1132,7 @@
             return map[resultado] || resultado;
         }
 
-        // ==================== FUNCIÓN SAVE CALL CON REAGENDAMIENTO ====================
+        // ==================== FUNCIÓN SAVE CALL CORREGIDA ====================
         window.saveCall = async function() {
             const customerId = document.getElementById('callCustomerId').value;
             const customerType = document.getElementById('callCustomerType').value;
@@ -1027,7 +1164,6 @@
             let reagendarData = null;
             
             try {
-                // ===== REAGENDAMIENTO =====
                 if (resultado === 'reagendar') {
                     const fecha = document.getElementById('reagendarFecha').value;
                     const hora = document.getElementById('reagendarHora').value;
@@ -1038,7 +1174,6 @@
                         return; 
                     }
                     
-                    // Validar que la fecha no sea pasada
                     const hoy = getDateObjectVenezuela();
                     const hoyStr = formatearFechaYYYYMMDD(hoy);
                     if (fecha < hoyStr) {
@@ -1091,13 +1226,13 @@
                 
             } catch (error) {
                 console.error('Error en saveCall:', error);
-                showToast('Error al procesar la llamada', 'error');
-                await unlockCustomer(customerId, customerType);
+                showToast('Error al procesar la llamada: ' + error.message, 'error');
+                await unlockCustomer(customer.clienteIdOriginal || customer.id, customerType);
                 closeRegisterCallModal();
             }
         };
 
-        // ==================== FUNCIÓN OPEN REGISTER CALL MODAL CON REAGENDAMIENTO ====================
+        // ==================== FUNCIÓN OPEN REGISTER CALL MODAL ====================
         window.openRegisterCallModal = async function(customerId, customerType) {
             await cleanExpiredLocks();
             const lock = await lockCustomer(customerId, customerType);
@@ -1266,7 +1401,6 @@
             renderReagendamientosTable();
         }
 
-        // ===== COMPLETAR REAGENDAMIENTO =====
         window.completarReagendamiento = function(reagendamientoId) {
             const reag = reagendamientos.find(r => r.id === reagendamientoId);
             if (!reag) { showToast('Registro no encontrado', 'error'); return; }
@@ -1305,7 +1439,6 @@
                 const ahora = getDateObjectVenezuela();
                 const fechaISO = ahora.toISOString();
                 
-                // Si el resultado es reagendar nuevamente
                 if (resultado === 'reagendar') {
                     const nuevaFecha = document.getElementById('nuevaReagendarFecha').value;
                     const nuevaHora = document.getElementById('nuevaReagendarHora').value;
@@ -1316,7 +1449,6 @@
                     const hoyStr = formatearFechaYYYYMMDD(hoy);
                     if (nuevaFecha < hoyStr) { alert('No se puede reagendar en una fecha pasada'); return; }
                     
-                    // Actualizar el reagendamiento con nueva fecha/hora
                     await guardarEnFirestore(colecciones.reagendamientos, {
                         fechaReagendada: nuevaFecha,
                         horaReagendada: nuevaHora,
@@ -1324,7 +1456,6 @@
                         estado: 'pendiente'
                     }, reagId);
                     
-                    // Registrar en historial
                     const histData = {
                         clienteIdOriginal: reag.clienteIdOriginal,
                         nombre: reag.nombre,
@@ -1349,7 +1480,6 @@
                     return;
                 }
                 
-                // Marcar como completada
                 await guardarEnFirestore(colecciones.reagendamientos, {
                     estado: 'completada',
                     fechaCompletada: fechaISO,
@@ -1357,7 +1487,6 @@
                     observaciones: observaciones
                 }, reagId);
                 
-                // Registrar en historial
                 const histData = {
                     clienteIdOriginal: reag.clienteIdOriginal,
                     nombre: reag.nombre,
@@ -1376,10 +1505,13 @@
                 };
                 await guardarEnFirestore(colecciones.callLogs, histData);
                 
-                // Si el resultado es recuperado, mover a recuperados
+                // Mover el cliente según el resultado
+                const clienteIdOriginal = reag.clienteIdOriginal;
+                const idSeguro = generarIdSeguro(clienteIdOriginal);
+                
                 if (resultado === 'recuperado') {
                     const recuperadoData = {
-                        clienteIdOriginal: reag.clienteIdOriginal,
+                        clienteIdOriginal: clienteIdOriginal,
                         nombre: reag.nombre,
                         documento: reag.documento,
                         telefono: reag.telefono,
@@ -1392,12 +1524,11 @@
                         observaciones: observaciones,
                         timestamp: Date.now()
                     };
-                    const idSeguro = generarIdSeguro(reag.clienteIdOriginal);
                     await guardarEnFirestore(colecciones.recuperados, recuperadoData, idSeguro);
                     showToast('Cliente marcado como RECUPERADO');
                 } else if (resultado === 'dado_baja' || resultado === 'perdida_total_inmueble') {
                     const bajaData = {
-                        clienteIdOriginal: reag.clienteIdOriginal,
+                        clienteIdOriginal: clienteIdOriginal,
                         nombre: reag.nombre,
                         documento: reag.documento,
                         telefono: reag.telefono,
@@ -1411,13 +1542,12 @@
                         observaciones: observaciones,
                         timestamp: Date.now()
                     };
-                    const idSeguro = generarIdSeguro(reag.clienteIdOriginal);
                     await guardarEnFirestore(colecciones.perdidosFinal, bajaData, idSeguro);
                     showToast('Cliente marcado como DADO DE BAJA');
                 } else if (resultado === 'no_contacto' || resultado === 'mensaje_tercero' || resultado === 'numero_no_valido') {
                     let motivo = resultado === 'no_contacto' ? 'No se logro contacto' : (resultado === 'mensaje_tercero' ? 'Mensaje con tercero' : 'Numero no valido');
                     const incontactableData = {
-                        clienteIdOriginal: reag.clienteIdOriginal,
+                        clienteIdOriginal: clienteIdOriginal,
                         nombre: reag.nombre,
                         documento: reag.documento,
                         telefono: reag.telefono,
@@ -1431,12 +1561,11 @@
                         observaciones: observaciones,
                         timestamp: Date.now()
                     };
-                    const idSeguro = generarIdSeguro(reag.clienteIdOriginal);
                     await guardarEnFirestore(colecciones.incontactables, incontactableData, idSeguro);
                     showToast('Cliente marcado como INCONTACTABLE');
                 } else {
                     const contactadoData = {
-                        clienteIdOriginal: reag.clienteIdOriginal,
+                        clienteIdOriginal: clienteIdOriginal,
                         nombre: reag.nombre,
                         documento: reag.documento,
                         telefono: reag.telefono,
@@ -1451,7 +1580,8 @@
                         observaciones: observaciones,
                         timestamp: Date.now()
                     };
-                    await guardarEnFirestore(colecciones.contactados, contactadoData, `${reag.clienteIdOriginal}_${Date.now()}`);
+                    const contactadoId = `${clienteIdOriginal}_${Date.now()}`;
+                    await guardarEnFirestore(colecciones.contactados, contactadoData, contactadoId);
                     showToast('Cliente movido a Contactados');
                 }
                 
@@ -1522,7 +1652,6 @@
         function getReportData(fechaInicio, fechaFin) {
             let gestiones = [];
             
-            // SOLO llamadas del período (callLogs)
             callLogs.forEach(log => {
                 const fechaLog = log.fechaGestion ? new Date(log.fechaGestion) : null;
                 if (fechaLog && fechaLog >= fechaInicio && fechaLog <= fechaFin) {
@@ -1540,7 +1669,6 @@
                 }
             });
             
-            // Recuperados del período
             clientesRecuperados.forEach(r => {
                 const fecha = r.fechaGestion ? new Date(r.fechaGestion) : null;
                 if (fecha && fecha >= fechaInicio && fecha <= fechaFin) {
@@ -1558,7 +1686,6 @@
                 }
             });
             
-            // Bajas del período
             clientesPerdidosFinal.forEach(b => {
                 const fecha = b.fechaGestion ? new Date(b.fechaGestion) : null;
                 if (fecha && fecha >= fechaInicio && fecha <= fechaFin) {
@@ -1576,7 +1703,6 @@
                 }
             });
             
-            // Incontactables del período
             clientesIncontactables.forEach(i => {
                 const fecha = i.fechaGestion ? new Date(i.fechaGestion) : null;
                 if (fecha && fecha >= fechaInicio && fecha <= fechaFin) {
@@ -1594,7 +1720,6 @@
                 }
             });
             
-            // Equipos retirados del período
             visitasFinalizadas.forEach(v => {
                 const fecha = v.fechaRetiro || v.fechaCompletado;
                 if (fecha && new Date(fecha) >= fechaInicio && new Date(fecha) <= fechaFin) {
@@ -1695,11 +1820,9 @@
                     periodoTexto = `Desde: ${startDay}/${startMonth}/${startYear} Hasta: ${endDay}/${endMonth}/${endYear}`;
                 }
                 
-                // Obtener datos SOLO del período
                 const reportData = getReportData(fechaInicio, fechaFin);
                 const { gestiones, totalGestiones, totalRecuperados, totalPerdidos, totalIncontactables, totalLlamadas, totalEquiposRetirados, totalReagendamientos } = reportData;
                 
-                // Desglose por fecha
                 function agruparPorFecha(items, fechaCampo = 'fecha') {
                     const grupo = new Map();
                     items.forEach(item => {
@@ -2818,17 +2941,15 @@
 
         setInterval(cleanExpiredLocks, 60000);
         setInterval(() => {
-            // Verificar llamadas reagendadas pendientes cada 5 minutos
             const ahora = getDateObjectVenezuela();
             const hoyStr = formatearFechaYYYYMMDD(ahora);
             const horaActual = String(ahora.getHours()).padStart(2, '0') + ':' + String(ahora.getMinutes()).padStart(2, '0');
             const pendientes = reagendamientos.filter(r => r.estado === 'pendiente');
             const vencidas = pendientes.filter(r => r.fechaReagendada < hoyStr || (r.fechaReagendada === hoyStr && r.horaReagendada <= horaActual));
             if (vencidas.length > 0 && appCurrentUser) {
-                // Solo mostrar notificación si hay usuario logueado
                 showToast(`🔔 ${vencidas.length} llamada(s) reagendada(s) están vencidas`, 'error');
             }
-        }, 300000); // cada 5 minutos
+        }, 300000);
 
         initCharCounters();
 

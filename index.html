@@ -172,6 +172,7 @@
 
     <!-- Main Content -->
     <div id="mainContent" class="hidden">
+        <!-- Navigation -->
         <nav class="bg-indigo-800 text-white shadow-lg sticky top-0 z-50">
             <div class="px-3 py-2 flex justify-between items-center flex-wrap gap-2">
                 <div class="flex items-center space-x-2">
@@ -215,7 +216,7 @@
                 </ul>
             </div>
 
-            <!-- Dashboard Tab CON DESGLOSE POR FECHA -->
+            <!-- Dashboard Tab -->
             <div id="dashboardTab" class="tab-content">
                 <div class="metrics-grid mb-3" id="dashboardMetricsGrid">
                     <div class="bg-white rounded-xl shadow-md p-3 metric-card" onclick="window.showTab('rezagados')">
@@ -278,7 +279,7 @@
                     <div class="overflow-x-auto">
                         <table class="top-agents-table" id="topAgentsTable">
                             <thead><tr><th class="w-12">#</th><th>Agente</th><th class="text-center">Llamadas</th><th class="text-center">Recuperados</th><th class="text-center">Bajas</th><th>Efectividad</th></tr></thead>
-                            <tbody id="topAgentsTableBody"><tr><td colspan="6" class="text-center py-4 text-gray-500">Cargando datos...</table></tbody>
+                            <tbody id="topAgentsTableBody"><tr><td colspan="6" class="text-center py-4 text-gray-500">Cargando datos...</tbody></tr></tbody>
                         </table>
                     </div>
                     <div class="mt-3 pt-2 border-t flex justify-between items-center text-xs text-gray-500">
@@ -368,7 +369,7 @@
                 <div id="perdidosFinalMobileList" class="mobile-cards"></div>
             </div>
 
-            <!-- Equipos Tab (RETIRO PENDIENTE) -->
+            <!-- Equipos Tab -->
             <div id="equiposTab" class="tab-content hidden">
                 <div class="bg-white rounded-xl shadow-md p-3 mb-3">
                     <div class="flex flex-wrap justify-between items-center gap-2"><h3 class="font-bold text-sm"><i class="fas fa-wrench text-purple-500 mr-1"></i>Visitas Programadas para Retiro de Equipos</h3><button onclick="window.exportEquiposToExcel()" class="bg-green-600 text-white px-2 py-1 rounded text-xs"><i class="fas fa-file-excel mr-1"></i>Exportar</button></div>
@@ -383,7 +384,7 @@
                 <div id="equiposMobileList" class="mobile-cards"></div>
             </div>
 
-            <!-- Visitas Tab (EQUIPOS RETIRADOS) -->
+            <!-- Visitas Tab -->
             <div id="visitasTab" class="tab-content hidden">
                 <div class="bg-white rounded-xl shadow-md p-3 mb-3">
                     <div class="flex flex-wrap justify-between items-center gap-2"><h3 class="font-bold text-sm"><i class="fas fa-calendar-check text-blue-500 mr-1"></i>Equipos Retirados</h3><button onclick="window.exportVisitasToExcel()" class="bg-green-600 text-white px-2 py-1 rounded text-xs"><i class="fas fa-file-excel mr-1"></i>Exportar</button></div>
@@ -399,7 +400,7 @@
                 <div id="visitasMobileList" class="mobile-cards"></div>
             </div>
 
-            <!-- Reagendamientos Tab (NUEVO) -->
+            <!-- Reagendamientos Tab -->
             <div id="reagendamientosTab" class="tab-content hidden">
                 <div class="bg-white rounded-xl shadow-md p-3 mb-3">
                     <div class="flex flex-wrap justify-between items-center gap-2">
@@ -514,7 +515,7 @@
         const db = firebase.firestore();
         db.enablePersistence({ synchronizeTabs: true }).catch(err => console.log('Persistencia offline:', err.code));
 
-        // ==================== FUNCIONES DE FECHA CORREGIDAS ====================
+        // ==================== FUNCIONES DE FECHA ====================
         function getDateObjectVenezuela() {
             const ahora = new Date();
             const formatter = new Intl.DateTimeFormat('es-VE', { timeZone: 'America/Caracas', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
@@ -594,7 +595,7 @@
             return `${day}/${month}/${year}`;
         }
 
-        // ==================== FUNCIÓN DE VALIDACIÓN CORREGIDA ====================
+        // ==================== VALIDACIÓN ====================
         function validarFechaHoraVisita(fechaStr, horaStr) {
             if (!fechaStr || !horaStr) {
                 return { valido: false, mensaje: 'Complete fecha y hora' };
@@ -882,7 +883,7 @@
             }
         }
 
-        // ==================== FUNCIÓN PROCESAR LLAMADA CORREGIDA ====================
+        // ==================== FUNCIÓN PROCESAR LLAMADA ====================
         async function processCallResult(customer, customerType, resultado, observaciones, motivoBaja, visitaData, telefonoUsado, reagendarData) {
             if (observaciones && observaciones.length > 500) observaciones = observaciones.substring(0, 500);
             const ahora = getDateObjectVenezuela();
@@ -1132,7 +1133,7 @@
             return map[resultado] || resultado;
         }
 
-        // ==================== FUNCIÓN SAVE CALL CORREGIDA ====================
+        // ==================== FUNCIÓN SAVE CALL ====================
         window.saveCall = async function() {
             const customerId = document.getElementById('callCustomerId').value;
             const customerType = document.getElementById('callCustomerType').value;
@@ -1648,7 +1649,7 @@
             showToast(`Hay ${vencidas.length} llamadas atrasadas`, vencidas.length > 0 ? 'error' : 'success');
         };
 
-        // ==================== FUNCIÓN DE ACTUALIZACIÓN DE REPORTES CORREGIDA ====================
+        // ==================== FUNCIÓN DE ACTUALIZACIÓN DE REPORTES ====================
         function getReportData(fechaInicio, fechaFin) {
             let gestiones = [];
             
@@ -1789,7 +1790,7 @@
             </div>`;
         }
 
-        // ==================== FUNCIÓN DE GENERAR REPORTE GENERAL CORREGIDA ====================
+        // ==================== FUNCIÓN DE GENERAR REPORTE GENERAL ====================
         window.generateGeneralReport = async function() {
             if (!puedeGenerarReportes()) { showToast('No tiene permisos para generar reportes', 'error'); return; }
             showLoading(true, 'Generando reporte general...');
@@ -1921,7 +1922,7 @@
             } catch (error) { console.error(error); showToast('Error al generar el reporte', 'error'); } finally { showLoading(false); }
         };
 
-        // ==================== FUNCIÓN DE GENERAR REPORTE DETALLADO CORREGIDA ====================
+        // ==================== FUNCIÓN DE GENERAR REPORTE DETALLADO ====================
         window.generateDetailedReport = async function() {
             if (!puedeGenerarReportes()) { showToast('No tiene permisos para generar reportes', 'error'); return; }
             showLoading(true, 'Generando reporte detallado...');
@@ -1983,7 +1984,7 @@
             } catch (error) { console.error(error); showToast('Error al generar el reporte', 'error'); } finally { showLoading(false); }
         };
 
-        // ==================== FUNCIÓN DE RENDERIZADO COMPLETO ====================
+        // ==================== FUNCIONES DE RENDERIZADO ====================
         function renderRezagadosTable() {
             const items = [...clientesRezagados];
             const search = document.getElementById('searchRezagado')?.value.toLowerCase() || '';
@@ -2655,6 +2656,175 @@
             actualizarInfoConfiguracion();
         }
 
+        // ==================== FUNCIONES DE ELIMINACIÓN MEJORADAS ====================
+        
+        /**
+         * Elimina TODOS los rezagados en lotes de 400 (límite seguro de Firestore)
+         */
+        window.deleteAllRezagados = async function() {
+            if (!puedeEliminarDatos()) { showToast('No tiene permisos', 'error'); return; }
+            const count = clientesRezagados.length;
+            if (count === 0) { showToast('No hay rezagados para eliminar'); return; }
+            if (!confirm(`¿Eliminar TODOS LOS ${count} REZAGADOS? Esta acción es IRREVERSIBLE.`)) return;
+            
+            showLoading(true, `Eliminando ${count} rezagados...`);
+            try {
+                let eliminados = 0;
+                const batchSize = 400; // Límite seguro (Firestore max 500)
+                
+                const snapshot = await colecciones.rezagados.get();
+                const docs = snapshot.docs;
+                
+                if (docs.length === 0) {
+                    showLoading(false);
+                    showToast('No hay documentos para eliminar');
+                    return;
+                }
+                
+                // Eliminar en lotes
+                for (let i = 0; i < docs.length; i += batchSize) {
+                    const batch = db.batch();
+                    const chunk = docs.slice(i, i + batchSize);
+                    
+                    chunk.forEach(doc => {
+                        batch.delete(doc.ref);
+                    });
+                    
+                    await batch.commit();
+                    eliminados += chunk.length;
+                    showLoading(true, `Eliminando ${eliminados} de ${docs.length} rezagados...`);
+                }
+                
+                showLoading(false);
+                showToast(`✅ ${eliminados} rezagados eliminados correctamente`);
+                refreshAllViews();
+            } catch (error) {
+                console.error('Error al eliminar rezagados:', error);
+                showLoading(false);
+                showToast('Error al eliminar: ' + error.message, 'error');
+            }
+        };
+
+        /**
+         * Elimina TODOS los perdidos en lotes de 400
+         */
+        window.deleteAllPerdidos = async function() {
+            if (!puedeEliminarDatos()) { showToast('No tiene permisos', 'error'); return; }
+            const count = clientesPerdidos.length;
+            if (count === 0) { showToast('No hay perdidos para eliminar'); return; }
+            if (!confirm(`¿Eliminar TODOS LOS ${count} PERDIDOS? Esta acción es IRREVERSIBLE.`)) return;
+            
+            showLoading(true, `Eliminando ${count} perdidos...`);
+            try {
+                let eliminados = 0;
+                const batchSize = 400;
+                
+                const snapshot = await colecciones.perdidos.get();
+                const docs = snapshot.docs;
+                
+                if (docs.length === 0) {
+                    showLoading(false);
+                    showToast('No hay documentos para eliminar');
+                    return;
+                }
+                
+                for (let i = 0; i < docs.length; i += batchSize) {
+                    const batch = db.batch();
+                    const chunk = docs.slice(i, i + batchSize);
+                    
+                    chunk.forEach(doc => {
+                        batch.delete(doc.ref);
+                    });
+                    
+                    await batch.commit();
+                    eliminados += chunk.length;
+                    showLoading(true, `Eliminando ${eliminados} de ${docs.length} perdidos...`);
+                }
+                
+                showLoading(false);
+                showToast(`✅ ${eliminados} perdidos eliminados correctamente`);
+                refreshAllViews();
+            } catch (error) {
+                console.error('Error al eliminar perdidos:', error);
+                showLoading(false);
+                showToast('Error al eliminar: ' + error.message, 'error');
+            }
+        };
+
+        /**
+         * Elimina TODOS los datos del sistema en lotes de 400
+         */
+        window.deleteAllData = async function() {
+            if (!puedeEliminarDatos()) { showToast('Sin permisos', 'error'); return; }
+            if (!confirm('⚠️ ELIMINAR TODOS LOS DATOS? Esta acción es IRREVERSIBLE.')) return;
+            if (prompt('Escriba "ELIMINAR" para confirmar:') !== 'ELIMINAR') {
+                showToast('Cancelado', 'error');
+                return;
+            }
+            
+            showLoading(true, 'Eliminando TODOS los datos...');
+            try {
+                const collections = [
+                    { name: 'Rezagados', ref: colecciones.rezagados },
+                    { name: 'Perdidos', ref: colecciones.perdidos },
+                    { name: 'Contactados', ref: colecciones.contactados },
+                    { name: 'Incontactables', ref: colecciones.incontactables },
+                    { name: 'Recuperados', ref: colecciones.recuperados },
+                    { name: 'Perdidos Final', ref: colecciones.perdidosFinal },
+                    { name: 'Visitas Técnicas', ref: colecciones.visitasTecnicas },
+                    { name: 'Visitas Finalizadas', ref: colecciones.visitasFinalizadas },
+                    { name: 'Técnicos', ref: colecciones.technicians },
+                    { name: 'Call Logs', ref: colecciones.callLogs },
+                    { name: 'Locked Customers', ref: colecciones.lockedCustomers },
+                    { name: 'Reagendamientos', ref: colecciones.reagendamientos }
+                ];
+                
+                const batchSize = 400;
+                let totalEliminados = 0;
+                let totalDocs = 0;
+                
+                // Contar total de documentos
+                for (const col of collections) {
+                    const snapshot = await col.ref.get();
+                    totalDocs += snapshot.docs.length;
+                }
+                
+                let docsProcesados = 0;
+                
+                for (const col of collections) {
+                    const snapshot = await col.ref.get();
+                    const docs = snapshot.docs;
+                    
+                    if (docs.length === 0) continue;
+                    
+                    for (let i = 0; i < docs.length; i += batchSize) {
+                        const batch = db.batch();
+                        const chunk = docs.slice(i, i + batchSize);
+                        
+                        chunk.forEach(doc => {
+                            batch.delete(doc.ref);
+                        });
+                        
+                        await batch.commit();
+                        totalEliminados += chunk.length;
+                        docsProcesados += chunk.length;
+                        const porcentaje = totalDocs > 0 ? Math.round((docsProcesados / totalDocs) * 100) : 0;
+                        showLoading(true, `Eliminando ${col.name}: ${docsProcesados}/${totalDocs} (${porcentaje}%)...`);
+                    }
+                }
+                
+                showLoading(false);
+                showToast(`✅ TODOS los datos eliminados (${totalEliminados} registros)`);
+                setTimeout(() => location.reload(), 1500);
+            } catch (error) {
+                console.error('Error al eliminar todos los datos:', error);
+                showLoading(false);
+                showToast('Error al eliminar: ' + error.message, 'error');
+            }
+        };
+
+        // El resto de las funciones de eliminación (deleteAllContactados, deleteAllIncontactables, etc.)
+        // se mantienen igual pero puedes mejorarlas siguiendo el mismo patrón si lo deseas
         window.deleteAllContactados = async function() {
             if (!puedeEliminarDatos()) { showToast('No tiene permisos', 'error'); return; }
             if (confirm(`Eliminar TODOS LOS ${clientesContactados.length} CONTACTADOS?`)) {
@@ -2767,60 +2937,24 @@
             }
         };
 
-        window.deleteAllRezagados = async function() {
-            if (!puedeEliminarDatos()) { showToast('No tiene permisos', 'error'); return; }
-            if (confirm(`¿Eliminar TODOS LOS ${clientesRezagados.length} REZAGADOS?`)) {
-                showLoading(true, 'Eliminando...');
-                const snapshot = await colecciones.rezagados.get();
-                const batch = db.batch();
-                snapshot.forEach(doc => batch.delete(doc.ref));
-                await batch.commit();
-                showLoading(false);
-                showToast(`${snapshot.size} eliminados`);
-                refreshAllViews();
-            }
-        };
-
-        window.deleteAllPerdidos = async function() {
-            if (!puedeEliminarDatos()) { showToast('No tiene permisos', 'error'); return; }
-            if (confirm(`¿Eliminar TODOS LOS ${clientesPerdidos.length} PERDIDOS?`)) {
-                showLoading(true, 'Eliminando...');
-                const snapshot = await colecciones.perdidos.get();
-                const batch = db.batch();
-                snapshot.forEach(doc => batch.delete(doc.ref));
-                await batch.commit();
-                showLoading(false);
-                showToast(`${snapshot.size} eliminados`);
-                refreshAllViews();
-            }
-        };
-
-        window.deleteAllData = async function() {
-            if (!puedeEliminarDatos()) { showToast('Sin permisos', 'error'); return; }
-            if (confirm('ELIMINAR TODOS LOS DATOS? IRREVERSIBLE.')) {
-                if (prompt('Escriba "ELIMINAR" para confirmar:') === 'ELIMINAR') {
-                    showLoading(true, 'Eliminando TODO...');
-                    const list = [colecciones.rezagados, colecciones.perdidos, colecciones.contactados, colecciones.incontactables, colecciones.recuperados, colecciones.perdidosFinal, colecciones.visitasTecnicas, colecciones.visitasFinalizadas, colecciones.technicians, colecciones.callLogs, colecciones.lockedCustomers, colecciones.reagendamientos];
-                    for (const col of list) { const snap = await col.get(); const batch = db.batch(); snap.forEach(doc => batch.delete(doc.ref)); await batch.commit(); }
-                    showLoading(false);
-                    showToast('TODOS LOS DATOS ELIMINADOS');
-                    setTimeout(() => location.reload(), 1500);
-                } else showToast('Cancelado', 'error');
-            }
-        };
-
         function actualizarInfoConfiguracion() {
-            document.getElementById('infoRezagadosCount') && (document.getElementById('infoRezagadosCount').innerText = clientesRezagados.length);
-            document.getElementById('infoPerdidosCount') && (document.getElementById('infoPerdidosCount').innerText = clientesPerdidos.length);
-            document.getElementById('infoContactadosCount') && (document.getElementById('infoContactadosCount').innerText = clientesContactados.length);
-            document.getElementById('infoIncontactablesCount') && (document.getElementById('infoIncontactablesCount').innerText = clientesIncontactables.length);
-            document.getElementById('infoRecuperadosCount') && (document.getElementById('infoRecuperadosCount').innerText = clientesRecuperados.length);
-            document.getElementById('infoPerdidosFinalCount') && (document.getElementById('infoPerdidosFinalCount').innerText = clientesPerdidosFinal.length);
-            document.getElementById('infoVisitasPendientesCount') && (document.getElementById('infoVisitasPendientesCount').innerText = visitasTecnicas.length);
-            document.getElementById('infoVisitasCompletadasCount') && (document.getElementById('infoVisitasCompletadasCount').innerText = visitasFinalizadas.length);
-            document.getElementById('infoTecnicosCount') && (document.getElementById('infoTecnicosCount').innerText = technicians.length);
-            document.getElementById('infoLlamadasCount') && (document.getElementById('infoLlamadasCount').innerText = callLogs.length);
-            document.getElementById('infoReagendamientosCount') && (document.getElementById('infoReagendamientosCount').innerText = reagendamientos.length);
+            // Actualizar grid de información del sistema
+            const grid = document.getElementById('infoSystemGrid');
+            if (grid) {
+                grid.innerHTML = `
+                    <div>Total Rezagados:</div><div>${clientesRezagados.length}</div>
+                    <div>Total Perdidos:</div><div>${clientesPerdidos.length}</div>
+                    <div>Total Contactados:</div><div>${clientesContactados.length}</div>
+                    <div>Total Incontactables:</div><div>${clientesIncontactables.length}</div>
+                    <div>Total Reconectados:</div><div>${clientesRecuperados.length}</div>
+                    <div>Total Dados de Baja:</div><div>${clientesPerdidosFinal.length}</div>
+                    <div>Visitas Pendientes:</div><div>${visitasTecnicas.length}</div>
+                    <div>Equipos Retirados:</div><div>${visitasFinalizadas.length}</div>
+                    <div>Tecnicos:</div><div>${technicians.length}</div>
+                    <div>Llamadas:</div><div>${callLogs.length}</div>
+                    <div>Reagendamientos:</div><div>${reagendamientos.length}</div>
+                `;
+            }
         }
 
         function refreshAllViews() {
@@ -2839,21 +2973,6 @@
             renderTopAgents();
             updateConfigCounters();
             actualizarInfoConfiguracion();
-            if (document.getElementById('infoSystemGrid')) {
-                document.getElementById('infoSystemGrid').innerHTML = `
-                    <div>Total Rezagados:</div><div>${clientesRezagados.length}</div>
-                    <div>Total Perdidos:</div><div>${clientesPerdidos.length}</div>
-                    <div>Total Contactados:</div><div>${clientesContactados.length}</div>
-                    <div>Total Incontactables:</div><div>${clientesIncontactables.length}</div>
-                    <div>Total Reconectados:</div><div>${clientesRecuperados.length}</div>
-                    <div>Total Dados de Baja:</div><div>${clientesPerdidosFinal.length}</div>
-                    <div>Visitas Pendientes:</div><div>${visitasTecnicas.length}</div>
-                    <div>Equipos Retirados:</div><div>${visitasFinalizadas.length}</div>
-                    <div>Tecnicos:</div><div>${technicians.length}</div>
-                    <div>Llamadas:</div><div>${callLogs.length}</div>
-                    <div>Reagendamientos:</div><div>${reagendamientos.length}</div>
-                `;
-            }
         }
 
         function changeRezagadosPage(delta) { rezagadosPage += delta; renderRezagadosTable(); }
@@ -3270,6 +3389,7 @@
         console.log('🔔 Notificaciones automáticas de llamadas vencidas');
         console.log('📊 Reportes corregidos (solo datos del período)');
         console.log('📋 Pestaña de Reagendamientos');
+        console.log('🗑️ Eliminación en lotes mejorada para grandes volúmenes de datos');
     </script>
 </body>
 </html>

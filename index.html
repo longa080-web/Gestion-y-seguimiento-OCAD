@@ -151,11 +151,10 @@
                     <option value="marina">Marina M (Supervisor)</option>
                     <option value="karla">Karla E (Supervisor)</option>
                     <option value="edgar">Edgar R (Supervisor)</option>
-                    <option value="yuraza">Yuraza R</option>
-                    <option value="samira">Samira M</option>
-                    <option value="ivette">Ivette A</option>
-                    <option value="genesis">Genesis U</option>
-                    <option value="alexa">Alexa B</option>
+                    <option value="acxel">Acxel Marquez</option>
+                    <option value="kaherine">Kaherine Franca</option>
+                    <option value="yamileth">Yamileth Azuaje</option>
+                    <option value="karla_urbina">Karla Urbina</option>
                     <option value="agente1">Agente 1</option>
                     <option value="agente2">Agente 2</option>
                     <option value="admin">Administrador</option>
@@ -673,11 +672,10 @@
             { id: "marina", fullName: "Marina M", role: "supervisor", password: "Inter6202", canManageEquipment: true, canGenerateReports: true, canDeleteData: true, canViewHistory: true, canCompleteVisits: true, canEditVisits: true },
             { id: "karla", fullName: "Karla E", role: "supervisor", password: "Inter1234", canManageEquipment: true, canGenerateReports: true, canDeleteData: true, canViewHistory: true, canCompleteVisits: true, canEditVisits: true },
             { id: "edgar", fullName: "Edgar R", role: "supervisor", password: "Inter1234", canManageEquipment: true, canGenerateReports: true, canDeleteData: true, canViewHistory: true, canCompleteVisits: true, canEditVisits: true },
-            { id: "yuraza", fullName: "Yuraza R", role: "agente", password: "Inter1234", canManageEquipment: false, canGenerateReports: false, canDeleteData: false, canViewHistory: false, canCompleteVisits: false, canEditVisits: false },
-            { id: "samira", fullName: "Samira M", role: "agente", password: "Inter1234", canManageEquipment: false, canGenerateReports: false, canDeleteData: false, canViewHistory: false, canCompleteVisits: false, canEditVisits: false },
-            { id: "ivette", fullName: "Ivette A", role: "agente", password: "Inter1234", canManageEquipment: false, canGenerateReports: false, canDeleteData: false, canViewHistory: false, canCompleteVisits: false, canEditVisits: false },
-            { id: "genesis", fullName: "Genesis U", role: "agente", password: "Inter1234", canManageEquipment: false, canGenerateReports: false, canDeleteData: false, canViewHistory: false, canCompleteVisits: false, canEditVisits: false },
-            { id: "alexa", fullName: "Alexa B", role: "agente", password: "Inter1234", canManageEquipment: false, canGenerateReports: false, canDeleteData: false, canViewHistory: false, canCompleteVisits: false, canEditVisits: false },
+            { id: "acxel", fullName: "Acxel Marquez", role: "agente", password: "Inter1234", canManageEquipment: false, canGenerateReports: false, canDeleteData: false, canViewHistory: false, canCompleteVisits: false, canEditVisits: false },
+            { id: "kaherine", fullName: "Kaherine Franca", role: "agente", password: "Inter1234", canManageEquipment: false, canGenerateReports: false, canDeleteData: false, canViewHistory: false, canCompleteVisits: false, canEditVisits: false },
+            { id: "yamileth", fullName: "Yamileth Azuaje", role: "agente", password: "Inter1234", canManageEquipment: false, canGenerateReports: false, canDeleteData: false, canViewHistory: false, canCompleteVisits: false, canEditVisits: false },
+            { id: "karla_urbina", fullName: "Karla Urbina", role: "agente", password: "Inter1234", canManageEquipment: false, canGenerateReports: false, canDeleteData: false, canViewHistory: false, canCompleteVisits: false, canEditVisits: false },
             { id: "agente1", fullName: "Agente 1", role: "agente", password: "Inter1234", canManageEquipment: false, canGenerateReports: false, canDeleteData: false, canViewHistory: false, canCompleteVisits: false, canEditVisits: false },
             { id: "agente2", fullName: "Agente 2", role: "agente", password: "Inter1234", canManageEquipment: false, canGenerateReports: false, canDeleteData: false, canViewHistory: false, canCompleteVisits: false, canEditVisits: false },
             { id: "admin", fullName: "Administrador", role: "admin", password: "Admin1234", canManageEquipment: true, canGenerateReports: true, canDeleteData: true, canViewHistory: true, canCompleteVisits: true, canEditVisits: true }
@@ -762,7 +760,7 @@
         function puedeVerHistorial() { return appCurrentUser && (appCurrentUser.canViewHistory === true || appCurrentUser.role === 'admin'); }
         function puedeGenerarReportes() { return appCurrentUser && (appCurrentUser.canGenerateReports === true || appCurrentUser.role === 'admin'); }
         function puedeCompletarVisitas() { return appCurrentUser !== null; }
-        function puedeEditarVisitas() { return appCurrentUser && (appCurrentUser.canEditVisitas === true); }
+        function puedeEditarVisitas() { return appCurrentUser && (appCurrentUser.canEditVisits === true); }
 
         // ==================== FUNCIONES DE LOCK ====================
         async function lockCustomer(customerId, customerType) {

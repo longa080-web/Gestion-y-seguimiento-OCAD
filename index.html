@@ -155,6 +155,7 @@
                     <option value="kaherine">Kaherine Franca</option>
                     <option value="yamileth">Yamileth Azuaje</option>
                     <option value="karla_urbina">Karla Urbina</option>
+                    <option value="ivette_araque">Ivette Araque</option>
                     <option value="agente1">Agente 1</option>
                     <option value="agente2">Agente 2</option>
                     <option value="admin">Administrador</option>
@@ -676,6 +677,7 @@
             { id: "kaherine", fullName: "Kaherine Franca", role: "agente", password: "Inter1234", canManageEquipment: false, canGenerateReports: false, canDeleteData: false, canViewHistory: false, canCompleteVisits: false, canEditVisits: false },
             { id: "yamileth", fullName: "Yamileth Azuaje", role: "agente", password: "Inter1234", canManageEquipment: false, canGenerateReports: false, canDeleteData: false, canViewHistory: false, canCompleteVisits: false, canEditVisits: false },
             { id: "karla_urbina", fullName: "Karla Urbina", role: "agente", password: "Inter1234", canManageEquipment: false, canGenerateReports: false, canDeleteData: false, canViewHistory: false, canCompleteVisits: false, canEditVisits: false },
+            { id: "ivette_araque", fullName: "Ivette Araque", role: "agente", password: "Inter1234", canManageEquipment: false, canGenerateReports: false, canDeleteData: false, canViewHistory: false, canCompleteVisits: false, canEditVisits: false },
             { id: "agente1", fullName: "Agente 1", role: "agente", password: "Inter1234", canManageEquipment: false, canGenerateReports: false, canDeleteData: false, canViewHistory: false, canCompleteVisits: false, canEditVisits: false },
             { id: "agente2", fullName: "Agente 2", role: "agente", password: "Inter1234", canManageEquipment: false, canGenerateReports: false, canDeleteData: false, canViewHistory: false, canCompleteVisits: false, canEditVisits: false },
             { id: "admin", fullName: "Administrador", role: "admin", password: "Admin1234", canManageEquipment: true, canGenerateReports: true, canDeleteData: true, canViewHistory: true, canCompleteVisits: true, canEditVisits: true }
@@ -2655,10 +2657,6 @@
         }
 
         // ==================== FUNCIONES DE ELIMINACIÓN MEJORADAS ====================
-        
-        /**
-         * Elimina TODOS los rezagados en lotes de 400 (límite seguro de Firestore)
-         */
         window.deleteAllRezagados = async function() {
             if (!puedeEliminarDatos()) { showToast('No tiene permisos', 'error'); return; }
             const count = clientesRezagados.length;
@@ -2668,31 +2666,18 @@
             showLoading(true, `Eliminando ${count} rezagados...`);
             try {
                 let eliminados = 0;
-                const batchSize = 400; // Límite seguro (Firestore max 500)
-                
+                const batchSize = 400;
                 const snapshot = await colecciones.rezagados.get();
                 const docs = snapshot.docs;
-                
-                if (docs.length === 0) {
-                    showLoading(false);
-                    showToast('No hay documentos para eliminar');
-                    return;
-                }
-                
-                // Eliminar en lotes
+                if (docs.length === 0) { showLoading(false); showToast('No hay documentos para eliminar'); return; }
                 for (let i = 0; i < docs.length; i += batchSize) {
                     const batch = db.batch();
                     const chunk = docs.slice(i, i + batchSize);
-                    
-                    chunk.forEach(doc => {
-                        batch.delete(doc.ref);
-                    });
-                    
+                    chunk.forEach(doc => { batch.delete(doc.ref); });
                     await batch.commit();
                     eliminados += chunk.length;
                     showLoading(true, `Eliminando ${eliminados} de ${docs.length} rezagados...`);
                 }
-                
                 showLoading(false);
                 showToast(`✅ ${eliminados} rezagados eliminados correctamente`);
                 refreshAllViews();
@@ -2703,9 +2688,6 @@
             }
         };
 
-        /**
-         * Elimina TODOS los perdidos en lotes de 400
-         */
         window.deleteAllPerdidos = async function() {
             if (!puedeEliminarDatos()) { showToast('No tiene permisos', 'error'); return; }
             const count = clientesPerdidos.length;
@@ -2716,29 +2698,17 @@
             try {
                 let eliminados = 0;
                 const batchSize = 400;
-                
                 const snapshot = await colecciones.perdidos.get();
                 const docs = snapshot.docs;
-                
-                if (docs.length === 0) {
-                    showLoading(false);
-                    showToast('No hay documentos para eliminar');
-                    return;
-                }
-                
+                if (docs.length === 0) { showLoading(false); showToast('No hay documentos para eliminar'); return; }
                 for (let i = 0; i < docs.length; i += batchSize) {
                     const batch = db.batch();
                     const chunk = docs.slice(i, i + batchSize);
-                    
-                    chunk.forEach(doc => {
-                        batch.delete(doc.ref);
-                    });
-                    
+                    chunk.forEach(doc => { batch.delete(doc.ref); });
                     await batch.commit();
                     eliminados += chunk.length;
                     showLoading(true, `Eliminando ${eliminados} de ${docs.length} perdidos...`);
                 }
-                
                 showLoading(false);
                 showToast(`✅ ${eliminados} perdidos eliminados correctamente`);
                 refreshAllViews();
@@ -2749,9 +2719,6 @@
             }
         };
 
-        /**
-         * Elimina TODOS los datos del sistema en lotes de 400
-         */
         window.deleteAllData = async function() {
             if (!puedeEliminarDatos()) { showToast('Sin permisos', 'error'); return; }
             if (!confirm('⚠️ ELIMINAR TODOS LOS DATOS? Esta acción es IRREVERSIBLE.')) return;
@@ -2780,29 +2747,19 @@
                 const batchSize = 400;
                 let totalEliminados = 0;
                 let totalDocs = 0;
-                
-                // Contar total de documentos
                 for (const col of collections) {
                     const snapshot = await col.ref.get();
                     totalDocs += snapshot.docs.length;
                 }
-                
                 let docsProcesados = 0;
-                
                 for (const col of collections) {
                     const snapshot = await col.ref.get();
                     const docs = snapshot.docs;
-                    
                     if (docs.length === 0) continue;
-                    
                     for (let i = 0; i < docs.length; i += batchSize) {
                         const batch = db.batch();
                         const chunk = docs.slice(i, i + batchSize);
-                        
-                        chunk.forEach(doc => {
-                            batch.delete(doc.ref);
-                        });
-                        
+                        chunk.forEach(doc => { batch.delete(doc.ref); });
                         await batch.commit();
                         totalEliminados += chunk.length;
                         docsProcesados += chunk.length;
@@ -2810,7 +2767,6 @@
                         showLoading(true, `Eliminando ${col.name}: ${docsProcesados}/${totalDocs} (${porcentaje}%)...`);
                     }
                 }
-                
                 showLoading(false);
                 showToast(`✅ TODOS los datos eliminados (${totalEliminados} registros)`);
                 setTimeout(() => location.reload(), 1500);
@@ -2821,8 +2777,6 @@
             }
         };
 
-        // El resto de las funciones de eliminación (deleteAllContactados, deleteAllIncontactables, etc.)
-        // se mantienen igual pero puedes mejorarlas siguiendo el mismo patrón si lo deseas
         window.deleteAllContactados = async function() {
             if (!puedeEliminarDatos()) { showToast('No tiene permisos', 'error'); return; }
             if (confirm(`Eliminar TODOS LOS ${clientesContactados.length} CONTACTADOS?`)) {
@@ -2936,7 +2890,6 @@
         };
 
         function actualizarInfoConfiguracion() {
-            // Actualizar grid de información del sistema
             const grid = document.getElementById('infoSystemGrid');
             if (grid) {
                 grid.innerHTML = `
